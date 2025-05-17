@@ -23,3 +23,11 @@ void CBaseEntity::setHealth( int health ) {
 void CBaseEntity::setEntityPosition( GVector2D pos ) {
 	this->entityPosition = pos;
 }
+
+CBaseEntityMovementDirection CBaseEntity::getEntityMovementDirection( ) {
+	return this->entityMovementDirection;
+}
+
+void CBaseEntity::setEntityMovementDirection( CBaseEntityMovementDirection move ) {
+	this->entityMovementDirection = move;
+}

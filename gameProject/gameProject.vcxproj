@@ -122,7 +122,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)dependencies\x64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,37 +130,54 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>raylib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameWindow\gameWindow.cpp" />
+    <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Game\gameInitializer\gameInitializer.cpp" />
+    <ClCompile Include="Game\gameResources\gameResourceManager\gameResourceManager.cpp" />
     <ClCompile Include="Game\gameThreads\eventHandlers\eventHandlers.cpp" />
     <ClCompile Include="Game\gameThreads\gameThreads.cpp" />
     <ClCompile Include="Game\gameThreads\CBaseThread\CBaseThread.cpp" />
-    <ClCompile Include="Game\gameThreads\Render\Render.cpp" />
     <ClCompile Include="Game\gameControls\keybindHandler\keybindHandler.cpp" />
+    <ClCompile Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntitySprite.cpp" />
     <ClCompile Include="Globals\Globals.cpp" />
+    <ClCompile Include="Game\gameResources\gameResourceManager\rSpritesManager\rSpritesManager.cpp" />
+    <ClCompile Include="Game\gameResources\rBaseResource\rBaseResource.cpp" />
+    <ClCompile Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.cpp" />
+    <ClCompile Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
-    <ClCompile Include="SDK\Entities\PlayerEntity\CPlayerEntity.cpp" />
-    <ClCompile Include="SDK\Entities\BaseEntity\CBaseEntity.cpp" />
+    <ClCompile Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.cpp" />
+    <ClCompile Include="Game\SDK\Entities\CBaseEntity\CBaseEntity.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game\gameThreads\updatePosition\updatePosition.cpp" />
-    <ClCompile Include="SDK\math\Vector2D\GVector2D.cpp" />
+    <ClCompile Include="Game\SDK\math\Vector2D\GVector2D.cpp" />
     <ClCompile Include="Game\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\gameWindow\gameWindow.h" />
+    <ClInclude Include="Game\Game.h" />
+    <ClInclude Include="Game\gameInitializer\gameInitializer.h" />
+    <ClInclude Include="Game\gameResources\gameResourceManager\gameResourceManager.h" />
     <ClInclude Include="Game\gameThreads\eventHandlers\eventHandlers.h" />
     <ClInclude Include="Game\gameThreads\gameThreads.h" />
     <ClInclude Include="Game\gameThreads\CBaseThread\CBaseThread.h" />
-    <ClInclude Include="Game\gameThreads\Render\Render.h" />
     <ClInclude Include="Game\gameControls\keybindHandler\keybindHandler.h" />
+    <ClInclude Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntitySprite.h" />
     <ClInclude Include="Globals\Globals.h" />
+    <ClInclude Include="Game\gameResources\gameResourceManager\rSpritesManager\rSpritesManager.h" />
+    <ClInclude Include="Game\gameResources\rBaseResource\rBaseResource.h" />
+    <ClInclude Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.h" />
+    <ClInclude Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />
-    <ClInclude Include="SDK\Entities\PlayerEntity\CPlayerEntity.h" />
-    <ClInclude Include="SDK\Entities\BaseEntity\CBaseEntity.h" />
+    <ClInclude Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.h" />
+    <ClInclude Include="Game\SDK\Entities\CBaseEntity\CBaseEntity.h" />
     <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h" />
-    <ClInclude Include="SDK\math\Vector2D\GVector2D.h" />
+    <ClInclude Include="Game\SDK\math\Vector2D\GVector2D.h" />
     <ClInclude Include="Utils\singleton.h" />
     <ClInclude Include="Game\World\World.h" />
   </ItemGroup>

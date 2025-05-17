@@ -1,9 +1,13 @@
 #include "keybindHandler.h"
 
+#include "../../../Utils/Log/Log.h"
+
 #include <Windows.h>
 
 bool keybindHandler::isPressed( keybind_identifier identifier ) {
+  
     if ( this->keybinds.find( identifier ) != this->keybinds.end( ) ) {
+        Log::Print( "Checking %d" , ( int ) identifier );
         keybind key = this->keybinds[ identifier ];
         switch ( key.mode ) {
         case keybind_mode::HOLD:
@@ -21,7 +25,7 @@ bool keybindHandler::initializeKeybinds( ) {
         { MOVE_BACKWARD, keybind( ( int ) 's', keybind_mode::HOLD ) },
         { MOVE_LEFT,     keybind( ( int ) 'a', keybind_mode::HOLD ) },
         { MOVE_RIGHT,    keybind( ( int ) 'd', keybind_mode::HOLD ) },
-        { UPDATE_MENU,    keybind( VK_DELETE, keybind_mode::HOLD ) }
+        { UPDATE_MENU,    keybind( VK_DELETE, keybind_mode::TOGGLE ) }
     };
     return true;
 }

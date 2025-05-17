@@ -21,13 +21,13 @@
     <ClCompile Include="Game\gameThreads\updatePosition\updatePosition.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Entities\BaseEntity\CBaseEntity.cpp">
+    <ClCompile Include="Game\SDK\Entities\CBaseEntity\CBaseEntity.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Entities\PlayerEntity\CPlayerEntity.cpp">
+    <ClCompile Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\math\Vector2D\GVector2D.cpp">
+    <ClCompile Include="Game\SDK\math\Vector2D\GVector2D.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\World\World.cpp">
@@ -48,13 +48,37 @@
     <ClCompile Include="Utils\Log\Log.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameThreads\Render\Render.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Game\gameControls\keybindHandler\keybindHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Globals\Globals.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntitySprite.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameResources\gameResourceManager\rSpritesManager\rSpritesManager.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameResources\gameResourceManager\gameResourceManager.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameResources\rBaseResource\rBaseResource.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameInitializer\gameInitializer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Game.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameWindow\gameWindow.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,13 +86,13 @@
     <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Entities\BaseEntity\CBaseEntity.h">
+    <ClInclude Include="Game\SDK\Entities\CBaseEntity\CBaseEntity.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Entities\PlayerEntity\CPlayerEntity.h">
+    <ClInclude Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\math\Vector2D\GVector2D.h">
+    <ClInclude Include="Game\SDK\math\Vector2D\GVector2D.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\World\World.h">
@@ -89,9 +113,6 @@
     <ClInclude Include="Utils\Log\Log.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameThreads\Render\Render.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\singleton.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
@@ -99,6 +120,33 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Globals\Globals.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntitySprite.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameResources\gameResourceManager\rSpritesManager\rSpritesManager.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameResources\gameResourceManager\gameResourceManager.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameResources\rBaseResource\rBaseResource.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameInitializer\gameInitializer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Game.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameWindow\gameWindow.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

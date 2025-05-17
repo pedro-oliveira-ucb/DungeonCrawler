@@ -5,7 +5,15 @@
 enum CBaseEntityType {
 	ITEM,
 	PLAYER,
-	MOB
+	MOB,
+	ATTACK
+};
+
+enum CBaseEntityMovementDirection {
+	MOVEMENT_FORWARD,
+	MOVEMENT_BACKWARD,
+	MOVEMENT_LEFT,
+	MOVEMENT_RIGHT
 };
 
 class CBaseEntity
@@ -16,6 +24,7 @@ class CBaseEntity
 	int health;
 
 	CBaseEntityType entityType;
+	CBaseEntityMovementDirection entityMovementDirection = MOVEMENT_FORWARD;
 
 public:
 
@@ -25,8 +34,10 @@ public:
 	std::string GetEntityName( );
 	GVector2D getEntityPosition( );
 	CBaseEntityType getEntityType( );
+	CBaseEntityMovementDirection getEntityMovementDirection();
 	int getHealth( );
 
+	void setEntityMovementDirection( CBaseEntityMovementDirection move );
 	void setHealth( int health );
 	void setEntityPosition( GVector2D pos );
 };

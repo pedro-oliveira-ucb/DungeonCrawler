@@ -19,7 +19,7 @@ enum keybind_identifier {
 class keybind {
 public:
 	int key;
-	int mode;
+	int mode = keybind_mode::HOLD;
 
 	keybind( ) : key( 0 ) , mode( keybind_mode::HOLD ) {} // Construtor padrão
 	keybind( int k , int m ) : key( k ) , mode( m ) {}

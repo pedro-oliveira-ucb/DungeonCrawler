@@ -15,15 +15,7 @@ std::vector<std::pair<CBaseThread *, std::string> > _gameThreads {
 	//{  &gameRender, "gameRender" }
 };
 
-bool InitGameWindow( );
-
 bool gameThreads::deploy( ) {
-
-	InitGameWindow( );
-
-	/*if ( !gameRender.InitGameWindow( ) ) {
-		Log::Print( "[gameThreads] Failed to initialize window!");
-	}*/
 
 	for ( int i = 0; i < _gameThreads.size( ); i++ ) {
 		std::pair<CBaseThread * , std::string> thread = _gameThreads.at( i );
@@ -31,4 +23,6 @@ bool gameThreads::deploy( ) {
 		thread.first->start( );
 		Log::Print( "[gameThreads] %s initialized!" , thread.second );
 	}
+
+	return true;
 }
