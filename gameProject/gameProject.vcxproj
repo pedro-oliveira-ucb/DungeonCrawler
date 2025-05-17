@@ -133,7 +133,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameThreads\eventHandlers\eventHandlers.cpp" />
+    <ClCompile Include="Game\gameThreads\gameThreads.cpp" />
+    <ClCompile Include="Game\gameThreads\CBaseThread\CBaseThread.cpp" />
+    <ClCompile Include="Game\gameThreads\Render\Render.cpp" />
+    <ClCompile Include="Game\gameControls\keybindHandler\keybindHandler.cpp" />
+    <ClCompile Include="Globals\Globals.cpp" />
+    <ClCompile Include="Utils\Log\Log.cpp" />
+    <ClCompile Include="Process\Thread.cpp" />
+    <ClCompile Include="SDK\Entities\PlayerEntity\CPlayerEntity.cpp" />
+    <ClCompile Include="SDK\Entities\BaseEntity\CBaseEntity.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Game\gameThreads\updatePosition\updatePosition.cpp" />
+    <ClCompile Include="SDK\math\Vector2D\GVector2D.cpp" />
+    <ClCompile Include="Game\World\World.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game\gameThreads\eventHandlers\eventHandlers.h" />
+    <ClInclude Include="Game\gameThreads\gameThreads.h" />
+    <ClInclude Include="Game\gameThreads\CBaseThread\CBaseThread.h" />
+    <ClInclude Include="Game\gameThreads\Render\Render.h" />
+    <ClInclude Include="Game\gameControls\keybindHandler\keybindHandler.h" />
+    <ClInclude Include="Globals\Globals.h" />
+    <ClInclude Include="Utils\Log\Log.h" />
+    <ClInclude Include="Process\Thread.hpp" />
+    <ClInclude Include="SDK\Entities\PlayerEntity\CPlayerEntity.h" />
+    <ClInclude Include="SDK\Entities\BaseEntity\CBaseEntity.h" />
+    <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h" />
+    <ClInclude Include="SDK\math\Vector2D\GVector2D.h" />
+    <ClInclude Include="Utils\singleton.h" />
+    <ClInclude Include="Game\World\World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
