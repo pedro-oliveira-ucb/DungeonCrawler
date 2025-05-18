@@ -29,8 +29,9 @@ int main( void ) {
 	Log::Print( "[Render] Initialized window!" );
 
 	//	raylib::SetConfigFlags( raylib::FLAG_FULLSCREEN_MODE ); // Define a flag de fullscreen
-	InitWindow( 700 , 700 , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
+	InitWindow( globals.screenWidth , globals.screenHeight , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
 
+	
 	Log::Print( "[main] starting game!" );
 	game.start( );
 	Log::Print( "[main] game started!" );
@@ -45,10 +46,12 @@ int main( void ) {
 				break;
 			}
 
-		
+			globals.mousePosX = GetMousePosition( ).x;
+			globals.mousePosY = GetMousePosition( ).y;
+
 			BeginDrawing( );
 			//remove old draws?
-			ClearBackground( RAYWHITE );
+			ClearBackground( BLACK );
 
 			gameRender::Get().render( );
 			

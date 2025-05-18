@@ -1,5 +1,7 @@
 #include "CBaseEntity.h"
 
+
+
 std::string CBaseEntity::GetEntityName( ) {
 	return this->Name;
 }
@@ -44,19 +46,68 @@ void CBaseEntity::setEntityState( CBaseEntityState state ) {
 	this->entityState = state;
 }
 
-void CBaseEntity::MoveEntity( CBaseEntityMovementDirection movement ) {
+void CBaseEntity::addMoveRequest( CBaseEntityMovementDirection movement ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	switch ( movement ) {
 	case CBaseEntityMovementDirection::MOVEMENT_FORWARD:
-		this->entityPosition.y -= movementSpeed;
+		this->movementsRequest.y -= movementSpeed;
 		break;
 	case CBaseEntityMovementDirection::MOVEMENT_BACKWARD:
-		this->entityPosition.y += movementSpeed;
+		this->movementsRequest.y += movementSpeed;
 		break;
 	case CBaseEntityMovementDirection::MOVEMENT_LEFT:
-		this->entityPosition.x -= movementSpeed;
+		this->movementsRequest.x -= movementSpeed;
 		break;
 	case CBaseEntityMovementDirection::MOVEMENT_RIGHT:
-		this->entityPosition.x += movementSpeed;
+		this->movementsRequest.x += movementSpeed;
 		break;
 	}
+
+}
+
+float CBaseEntity::getMovementAngle( ) {
+	return this->movementAngle;
+}
+
+void CBaseEntity::move( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	if ( this->movementsRequest.x != 0 || this->movementsRequest.y != 0 ) {
+
+
+		// Calcula o ângulo em radianos
+
+		float angleRadians = std::atan2( this->movementsRequest.y , this->movementsRequest.x );
+
+		// Converte para graus, se quiser
+		float angleDegrees = angleRadians * ( 180.0f / static_cast< float >( M_PI ) );
+
+		// Salva o ângulo se você tiver uma variável pra isso
+		this->movementAngle = angleDegrees; // Exemplo: float lastMovementAngle;
+
+		// Atualiza a posição
+		this->entityPosition.x += this->movementsRequest.x;
+		this->entityPosition.y += this->movementsRequest.y;
+
+		// Zera o movimento pendente
+		this->movementsRequest = GVector2D( 0 , 0 );
+	}
+}
+
+void CBaseEntity::setLookingAngle( float degress )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+
+	this->lookingAngle.setDegrees( degress );
+}
+
+GAngle CBaseEntity::getLookingAngle( )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+
+	return this->lookingAngle;
+}
+
+CBaseEntityHitbox CBaseEntity::getHitbox( )
+{
+	return this->entityHitbox;
 }

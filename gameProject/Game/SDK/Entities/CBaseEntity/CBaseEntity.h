@@ -2,6 +2,9 @@
 #include <string>
 #include "../../math/Vector2D/GVector2D.h"
 #include "../../Animation/CBaseEntityAnimation/CBaseEntityAnimation.h"
+#include "../../math/gAngle/GAngle.h"
+
+#include <mutex>
 
 enum CBaseEntityType {
 	ITEM,
@@ -41,8 +44,25 @@ struct CBaseEntityConstructor {
 	CBaseEntityAnimationConstructor entityAnimations;
 };
 
+
+class CBaseEntityHitbox {
+	GVector2D hitboxSize;
+public:
+	CBaseEntityHitbox( ) = default;
+	CBaseEntityHitbox( GVector2D size ) {
+		this->hitboxSize = size;
+	}
+
+	GVector2D getHitboxSize( ) {
+		return this->hitboxSize;
+	}
+};
+
+
+
 class CBaseEntity
 {
+	std::mutex cBaseMutex;
 	std::string Name;
 
 	GVector2D entityPosition;
@@ -53,7 +73,10 @@ class CBaseEntity
 	CBaseEntityMovementDirection entityMovementDirection = MOVEMENT_FORWARD;
 	CBaseEntityState entityState;
 	std::unique_ptr<CBaseEntityAnimation> entityAnimations;
-
+	GVector2D movementsRequest;
+	GAngle lookingAngle;
+	float movementAngle;
+	CBaseEntityHitbox entityHitbox;
 public:
 
 	CBaseEntity( CBaseEntityConstructor builder ) {
@@ -64,9 +87,13 @@ public:
 		this->entityType = builder.entityType;
 		this->entityMovementDirection = builder.entityMovementDirection;
 		this->entityAnimations = std::make_unique<CBaseEntityAnimation>(builder.entityAnimations);
+		this->entityHitbox = CBaseEntityHitbox(entityAnimations->getSpriteSize( ));
 	}
 
-	void MoveEntity( CBaseEntityMovementDirection movement );
+	void addMoveRequest( CBaseEntityMovementDirection movement );
+	void move( );
+
+	float getMovementAngle( );
 
 	std::string GetEntityName( );
 	GVector2D getEntityPosition( );
@@ -74,8 +101,12 @@ public:
 	CBaseEntityMovementDirection getEntityMovementDirection();
 	CBaseEntityAnimation * getEntityAnimations( );
 	CBaseEntityState getEntityState( );
+	GAngle getLookingAngle( );
 	int getHealth( );
+	CBaseEntityHitbox getHitbox( );
 
+
+	void setLookingAngle( float degrees );
 	void setEntityState( CBaseEntityState state );
 	void setEntityMovementDirection( CBaseEntityMovementDirection move );
 	void setHealth( int health );

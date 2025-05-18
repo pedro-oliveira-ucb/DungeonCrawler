@@ -11,6 +11,9 @@ public:
 	bool windowInitialized = false;
 	bool resourcesLoaded = false;
 
+	float mousePosX;
+	float mousePosY;
+
 	void * resourceManagerPointer = nullptr;
 };
 

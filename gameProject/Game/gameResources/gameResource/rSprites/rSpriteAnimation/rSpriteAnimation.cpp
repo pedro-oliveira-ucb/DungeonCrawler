@@ -73,7 +73,7 @@ void rSpriteAnimation::updateAnimation( bool loop, bool reverse ) {
             this->currentAnimationStep++;
     }
     else {
-        if ( ( this->currentAnimationStep + 1 ) > 0 ) {
+        if ( ( this->currentAnimationStep ) > 0 ) {
             this->currentAnimationStep--;
         }
         else

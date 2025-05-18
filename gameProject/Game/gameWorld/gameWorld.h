@@ -5,6 +5,6 @@ class gameWorld
 {
 public:
 	CPlayerEntity * localplayer = nullptr;
-
+	std::vector<CBaseEntity *> entities;
 };
 extern gameWorld _gameWorld;

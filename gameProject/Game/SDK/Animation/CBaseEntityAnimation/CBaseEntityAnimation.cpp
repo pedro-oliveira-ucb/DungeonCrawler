@@ -89,3 +89,34 @@ std::string CBaseEntityAnimation::getAnimationTypePath( CBaseEntityAnimationType
 		return "UNKNOWN_ANIMATION_PATH";
 	}
 }
+
+CBaseEntityAnimationType CBaseEntityAnimation::getReverseAnimation( CBaseEntityAnimationType anim ) {
+	switch ( anim ) {
+	case IDLE_FORWARD:
+		return IDLE_BACKWARD;
+	case IDLE_BACKWARD:
+		return IDLE_FORWARD;
+	case IDLE_LEFT:
+		return IDLE_RIGHT;
+	case IDLE_RIGHT:
+		return IDLE_LEFT;
+	case WALKING_FORWARD:
+		return WALKING_BACKWARD;
+	case WALKING_BACKWARD:
+		return WALKING_FORWARD;
+	case WALKING_LEFT:
+		return WALKING_RIGHT;
+	case WALKING_RIGHT:
+		return WALKING_LEFT;
+	case ATTACKING_FORWARD:
+		return ATTACKING_BACKWARD;
+	case ATTACKING_BACKWARD:
+		return ATTACKING_FORWARD;
+	case ATTACKING_LEFT:
+		return ATTACKING_RIGHT;
+	case ATTACKING_RIGHT:
+		return ATTACKING_LEFT;
+	default:
+		return anim; // Return the same animation if no reverse is found
+	}
+}

@@ -13,6 +13,8 @@ enum keybind_identifier {
 	MOVE_BACKWARD,
 	MOVE_LEFT,
 	MOVE_RIGHT,
+	ATTACK_SIMPLE,
+	ATTACK_HEAVY,
 	UPDATE_MENU
 };
 

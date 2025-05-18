@@ -59,7 +59,7 @@ std::optional < CBaseEntityAnimationConstructor > createLocalPlayerAnimationEnti
 	builder.animations = animations;
 	builder.animationFPS = 24;
 	builder.currentAnimationType = IDLE_FORWARD;
-	builder.spriteSize = GVector2D( 72 , 72 );
+	builder.spriteSize = GVector2D( 23 , 29 );
 
 	return builder;
 }
