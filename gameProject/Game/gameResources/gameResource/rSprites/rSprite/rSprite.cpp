@@ -1,23 +1,34 @@
 #include "rSprite.h"
+#include <raylib/raylib.h>
 #include "../../../Utils/Log/Log.h"
 
-rSprite::rSprite( std::string model ) : modelPath( model ) {
-    initializeTexture( );
+rSprite::rSprite( std::string model )
+    : modelPath( model ) , texture( nullptr ) {
+    // Lazy loading opcional: 
+     
+    initializeTexture();
 }
 
 rSprite::~rSprite( ) {
     if ( texture ) {
-        UnloadTexture( *texture );
-        // unique_ptr será automaticamente deletado
+        UnloadTexture( *( Texture2D * ) texture );
+        delete ( Texture2D * ) texture;
+        texture = nullptr;
     }
 }
+
 void rSprite::initializeTexture( ) {
-    // NOTE: Textures MUST be loaded after Window initialization( OpenGL context is required )
-    texture = std::make_unique<Texture2D>( );
-    *texture = LoadTexture( modelPath.c_str( ) );       // Image converted to texture, GPU memory (RAM -> VRAM)
-    Log::Print( "Loaded %s" , modelPath.c_str() );
+    if ( !texture ) {
+        Texture2D * tex = new Texture2D( );
+        *tex = LoadTexture( modelPath.c_str( ) );
+        texture = static_cast< void * >( tex );
+        Log::Print( "Loaded %s, address: 0x%p" , modelPath.c_str( ), texture );
+    }
 }
 
-Texture2D * rSprite::getTexture( ) {
-    return texture.get();
+void * rSprite::getTexture( ) {
+    if ( !texture ) {
+        initializeTexture( );
+    }
+    return texture;
 }

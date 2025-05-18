@@ -5,5 +5,6 @@ class gameInitializer : public CSingleton<gameInitializer>
 {
 public:
 	bool initializeResources( );
+	bool initializeThreads( );
 };
 

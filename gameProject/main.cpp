@@ -2,7 +2,7 @@
 #include <thread>
 
 #include "Game/game.h"
-#include "Game/gameResources/gameResourceManager/gameResourceManager.h"
+#include "Game/gameRender/gameRender.h"
 #include "Globals/Globals.h"
 #include "Utils/Log/Log.h"
 
@@ -45,17 +45,14 @@ int main( void ) {
 				break;
 			}
 
-			auto spriteAnimations = static_cast< gameResourceManager * >( globals.resourceManagerPointer )->getSpritesManager( ).getSpriteAnimations( );
-			if ( spriteAnimations->find( "Explosion_1" ) != spriteAnimations->end( ) ) {
-				DrawTexture( *spriteAnimations->at( "Explosion_1" ).getCurrentTexture( ), 50, 50, WHITE );
-				spriteAnimations->at( "Explosion_1" ).updateAnimation( );
-				printf( "found animation!\n" );
-			}
 		
 			BeginDrawing( );
-			ClearBackground( LIME );
+			//remove old draws?
+			ClearBackground( RAYWHITE );
+
+			gameRender::Get().render( );
 			
-			DrawText( "Janela em fullscreen!" , 100 , 100 , 20 , BLACK );
+			//DrawText( "Janela em fullscreen!" , 100 , 100 , 20 , BLACK );
 			EndDrawing( );
 
 		}

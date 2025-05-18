@@ -4,28 +4,38 @@
 
 #include <Windows.h>
 
-bool keybindHandler::isPressed( keybind_identifier identifier ) {
-  
-    if ( this->keybinds.find( identifier ) != this->keybinds.end( ) ) {
-        Log::Print( "Checking %d" , ( int ) identifier );
-        keybind key = this->keybinds[ identifier ];
-        switch ( key.mode ) {
-        case keybind_mode::HOLD:
-            return ( GetAsyncKeyState( key.key ) & 0x8000 );
-        case keybind_mode::TOGGLE:
-            return ( GetAsyncKeyState( key.key ) & 0x1 );
-        }
+std::unordered_map<keybind_identifier , bool> toggleStates;
+std::unordered_map<keybind_identifier , bool> lastKeyDown;
+
+bool keybindHandler::isPressed( keybind_identifier id ) {
+    auto it = keybinds.find( id );
+    if ( it == keybinds.end( ) ) return false;
+
+    keybind & kb = it->second;
+    SHORT state = GetAsyncKeyState( kb.key );
+    bool isDown = ( state & 0x8000 ) != 0;
+
+    if ( kb.mode == keybind_mode::HOLD ) {
+        return isDown;
     }
-    return false;
+    else { // TOGGLE
+        bool wasDown = lastKeyDown[ id ];
+        if ( isDown && !wasDown ) {
+            // borda de descida: invertendo o estado
+            toggleStates[ id ] = !toggleStates[ id ];
+        }
+        lastKeyDown[ id ] = isDown;
+        return toggleStates[ id ];
+    }
 }
 
 bool keybindHandler::initializeKeybinds( ) {
-    this->keybinds = {
-        { MOVE_FORWARD,  keybind( (int)'w', keybind_mode::HOLD ) },
-        { MOVE_BACKWARD, keybind( ( int ) 's', keybind_mode::HOLD ) },
-        { MOVE_LEFT,     keybind( ( int ) 'a', keybind_mode::HOLD ) },
-        { MOVE_RIGHT,    keybind( ( int ) 'd', keybind_mode::HOLD ) },
-        { UPDATE_MENU,    keybind( VK_DELETE, keybind_mode::TOGGLE ) }
-    };
-    return true;
+	this->keybinds = {
+		{ MOVE_FORWARD,  keybind( 'W', keybind_mode::HOLD ) },
+		{ MOVE_BACKWARD, keybind( 'S', keybind_mode::HOLD ) },
+		{ MOVE_LEFT,     keybind( 'A', keybind_mode::HOLD ) },
+		{ MOVE_RIGHT,    keybind( 'D', keybind_mode::HOLD ) },
+		{ UPDATE_MENU,    keybind( VK_DELETE, keybind_mode::TOGGLE ) }
+	};
+	return true;
 }

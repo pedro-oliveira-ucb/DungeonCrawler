@@ -17,3 +17,4 @@ public:
 
 };
 
+extern gameResourceManager _gameResourceManager;

@@ -5,13 +5,16 @@
 
 #include "eventHandlers/eventHandlers.h"
 #include "updatePosition/updatePosition.h"
+#include "updateEntities/updateEntities.h"
 #include "../../Utils/Log/Log.h"
 
 
 updatePositionEvent _updatePositionEvent;
+updateEntities _updateEntities;
 
 std::vector<std::pair<CBaseThread *, std::string> > _gameThreads {
-	{  &_updatePositionEvent, "updatePosition" }
+	{  &_updatePositionEvent, "updatePosition" },
+	{ &_updateEntities, "updateEntities" }
 	//{  &gameRender, "gameRender" }
 };
 

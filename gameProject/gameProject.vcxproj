@@ -134,6 +134,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameWorld\gameWorld.cpp" />
+    <ClCompile Include="Game\gameRender\gameRender.cpp" />
+    <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.cpp" />
     <ClCompile Include="Game\gameWindow\gameWindow.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\gameInitializer\gameInitializer.cpp" />
@@ -142,12 +145,16 @@
     <ClCompile Include="Game\gameThreads\gameThreads.cpp" />
     <ClCompile Include="Game\gameThreads\CBaseThread\CBaseThread.cpp" />
     <ClCompile Include="Game\gameControls\keybindHandler\keybindHandler.cpp" />
-    <ClCompile Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntitySprite.cpp" />
+    <ClCompile Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntityAnimation.cpp" />
     <ClCompile Include="Globals\Globals.cpp" />
     <ClCompile Include="Game\gameResources\gameResourceManager\rSpritesManager\rSpritesManager.cpp" />
     <ClCompile Include="Game\gameResources\rBaseResource\rBaseResource.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.cpp" />
+    <ClCompile Include="Game\gameRender\RenderEntities\RenderEntities.cpp" />
+    <ClCompile Include="Game\gameInitializer\EntitiesInitializer\LocalPlayerInitializer\LocalPlayerInitializer.cpp" />
+    <ClCompile Include="Game\gameControls\mouseMovement\mouseMovement.cpp" />
+    <ClCompile Include="Game\gameThreads\updateEntities\updateEntities.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
     <ClCompile Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.cpp" />
@@ -158,6 +165,9 @@
     <ClCompile Include="Game\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\gameWorld\gameWorld.h" />
+    <ClInclude Include="Game\gameRender\gameRender.h" />
+    <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.h" />
     <ClInclude Include="Game\gameWindow\gameWindow.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\gameInitializer\gameInitializer.h" />
@@ -166,12 +176,16 @@
     <ClInclude Include="Game\gameThreads\gameThreads.h" />
     <ClInclude Include="Game\gameThreads\CBaseThread\CBaseThread.h" />
     <ClInclude Include="Game\gameControls\keybindHandler\keybindHandler.h" />
-    <ClInclude Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntitySprite.h" />
+    <ClInclude Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntityAnimation.h" />
     <ClInclude Include="Globals\Globals.h" />
     <ClInclude Include="Game\gameResources\gameResourceManager\rSpritesManager\rSpritesManager.h" />
     <ClInclude Include="Game\gameResources\rBaseResource\rBaseResource.h" />
     <ClInclude Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.h" />
     <ClInclude Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.h" />
+    <ClInclude Include="Game\gameRender\RenderEntities\RenderEntities.h" />
+    <ClInclude Include="Game\gameInitializer\EntitiesInitializer\LocalPlayerInitializer\LocalPlayerInitializer.h" />
+    <ClInclude Include="Game\gameControls\mouseMovement\mouseMovement.h" />
+    <ClInclude Include="Game\gameThreads\updateEntities\updateEntities.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />
     <ClInclude Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.h" />

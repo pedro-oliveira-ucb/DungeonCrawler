@@ -1,13 +1,11 @@
 #pragma once
 #include <string>
-#include <raylib/raylib.h>
-#include <memory>
-
 
 class rSprite
 {
     std::string modelPath;
-    std::unique_ptr<Texture2D> texture;
+    void * texture; // tipo opaco
+
     void initializeTexture( );
 
 public:
@@ -16,5 +14,6 @@ public:
 
     rSprite( std::string model );
     ~rSprite( );
-    Texture2D * getTexture( );
+
+    void * getTexture( ); // retorna tipo opaco
 };

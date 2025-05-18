@@ -5,7 +5,11 @@
 #include <regex>
 #include <algorithm>
 
+#include <mutex>
+
 namespace fs = std::filesystem;
+
+std::mutex rSpriteAnimationMutex;
 
 void rSpriteAnimation::initializeAnimation( ) {
     Log::Print( "[rSpriteAnimation] Initializing %s" , this->getModelName( ) );
@@ -42,6 +46,8 @@ void rSpriteAnimation::initializeAnimation( ) {
     // Cria os rSprites com os arquivos encontrados
     for ( const auto & [index , fullPath] : orderedFiles ) {
         Log::Print( "[rSpriteAnimation] Loading sprite: %s" , fullPath.c_str( ) );
+   
+
         sprites.push_back( std::make_unique<rSprite>( fullPath ) );
     }
 
@@ -56,15 +62,34 @@ std::string rSpriteAnimation::getModelPath( ) {
 	return this->modelFolderPath;
 }
 
-void rSpriteAnimation::updateAnimation( bool loop ) {
-    if ( ( this->currentAnimationStep + 1 ) >= sprites.size( )) {
-        this->currentAnimationStep = 0;
+void rSpriteAnimation::updateAnimation( bool loop, bool reverse ) {
+	std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
+
+    if ( !reverse ) {
+        if ( ( this->currentAnimationStep + 1 ) >= sprites.size( ) ) {
+            this->currentAnimationStep = 0;
+        }
+        else
+            this->currentAnimationStep++;
     }
-    else
-        this->currentAnimationStep++;
+    else {
+        if ( ( this->currentAnimationStep + 1 ) > 0 ) {
+            this->currentAnimationStep--;
+        }
+        else
+            this->currentAnimationStep = sprites.size( ) - 1;
+    }
 }
 
-Texture2D * rSpriteAnimation::getCurrentTexture( ) {
-    if ( sprites.empty( ) ) return nullptr;
+void * rSpriteAnimation::getCurrentTexture( ) {
+    std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
+
+    if ( this == nullptr ) {
+        return nullptr;
+    }
+
+    if ( this->sprites.empty( ) ) 
+        return nullptr;
+
     return sprites[ currentAnimationStep ]->getTexture( );
 }

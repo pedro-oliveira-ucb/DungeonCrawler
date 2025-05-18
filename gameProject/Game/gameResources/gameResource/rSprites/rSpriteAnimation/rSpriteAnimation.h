@@ -23,9 +23,9 @@ public:
 	rSpriteAnimation( std::string model, std::string path) : modelName( model ), modelFolderPath(path)
 	{ initializeAnimation( ); }
 
-	Texture2D * getCurrentTexture( );
+	void * getCurrentTexture( );
 	std::string getModelName( );
 	std::string getModelPath( );
-	void updateAnimation(bool loop = true );
+	void updateAnimation(bool loop = true, bool reverse= false);
 };
 

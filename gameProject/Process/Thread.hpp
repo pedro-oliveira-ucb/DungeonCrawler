@@ -1,10 +1,15 @@
 //By AlSch092 @ Github
 #pragma once
-#include <windows.h>
+#include <thread>
+#include <atomic>
+#include <wtypes.h>
+
 /*
 	Thread class represents a process thread, we aim to track threads in our process such that we can determine possible rogue threads
 	Any helper functions related to threads are also defined in this class
 */
+
+
 class Thread final
 {
 public:

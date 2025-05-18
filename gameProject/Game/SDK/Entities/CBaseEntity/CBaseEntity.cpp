@@ -12,8 +12,16 @@ CBaseEntityType CBaseEntity::getEntityType( ) {
 	return this->entityType;
 }
 
+CBaseEntityState CBaseEntity::getEntityState( ) {
+	return this->entityState;
+}
+
 int CBaseEntity::getHealth( ) {
 	return this->health;
+}
+
+CBaseEntityAnimation * CBaseEntity::getEntityAnimations( ) {
+	return this->entityAnimations.get();
 }
 
 void CBaseEntity::setHealth( int health ) {
@@ -30,4 +38,25 @@ CBaseEntityMovementDirection CBaseEntity::getEntityMovementDirection( ) {
 
 void CBaseEntity::setEntityMovementDirection( CBaseEntityMovementDirection move ) {
 	this->entityMovementDirection = move;
+}
+
+void CBaseEntity::setEntityState( CBaseEntityState state ) {
+	this->entityState = state;
+}
+
+void CBaseEntity::MoveEntity( CBaseEntityMovementDirection movement ) {
+	switch ( movement ) {
+	case CBaseEntityMovementDirection::MOVEMENT_FORWARD:
+		this->entityPosition.y -= movementSpeed;
+		break;
+	case CBaseEntityMovementDirection::MOVEMENT_BACKWARD:
+		this->entityPosition.y += movementSpeed;
+		break;
+	case CBaseEntityMovementDirection::MOVEMENT_LEFT:
+		this->entityPosition.x -= movementSpeed;
+		break;
+	case CBaseEntityMovementDirection::MOVEMENT_RIGHT:
+		this->entityPosition.x += movementSpeed;
+		break;
+	}
 }
