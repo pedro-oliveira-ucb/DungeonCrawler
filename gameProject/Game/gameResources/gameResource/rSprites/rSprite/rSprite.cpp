@@ -22,6 +22,8 @@ void rSprite::initializeTexture( ) {
         Texture2D * tex = new Texture2D( );
         *tex = LoadTexture( modelPath.c_str( ) );
         texture = static_cast< void * >( tex );
+		this->spriteSize.x = tex->width;
+		this->spriteSize.y = tex->height;
         Log::Print( "Loaded %s, address: 0x%p" , modelPath.c_str( ), texture );
     }
 }

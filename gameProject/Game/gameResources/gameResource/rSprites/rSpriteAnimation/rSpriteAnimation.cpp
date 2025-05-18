@@ -9,6 +9,7 @@
 
 namespace fs = std::filesystem;
 
+
 std::mutex rSpriteAnimationMutex;
 
 void rSpriteAnimation::initializeAnimation( ) {
@@ -60,6 +61,11 @@ std::string rSpriteAnimation::getModelName( ) {
 
 std::string rSpriteAnimation::getModelPath( ) {
 	return this->modelFolderPath;
+}
+
+GVector2D rSpriteAnimation::getCurrentSpriteSize( ) {
+    std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
+    return sprites[ currentAnimationStep ]->getSpriteSize();
 }
 
 void rSpriteAnimation::updateAnimation( bool loop, bool reverse ) {

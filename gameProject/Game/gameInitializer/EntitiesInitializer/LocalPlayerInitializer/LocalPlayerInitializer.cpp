@@ -42,7 +42,12 @@ std::optional < CBaseEntityAnimationConstructor > createLocalPlayerAnimationEnti
 		CBaseEntityAnimationType::WALKING_FORWARD ,
 		CBaseEntityAnimationType::WALKING_BACKWARD ,
 		CBaseEntityAnimationType::WALKING_LEFT ,
-		CBaseEntityAnimationType::WALKING_RIGHT
+		CBaseEntityAnimationType::WALKING_RIGHT,
+		CBaseEntityAnimationType::ATTACKING_FORWARD ,
+		CBaseEntityAnimationType::ATTACKING_BACKWARD ,
+		CBaseEntityAnimationType::ATTACKING_LEFT ,
+		CBaseEntityAnimationType::ATTACKING_RIGHT
+		// Add more animation types as needed
 	};
 
 	for ( int i = 0; i < data.size( ); i++ ) {

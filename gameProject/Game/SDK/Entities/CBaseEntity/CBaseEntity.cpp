@@ -69,6 +69,11 @@ float CBaseEntity::getMovementAngle( ) {
 	return this->movementAngle;
 }
 
+void CBaseEntity::clearMovementRequest( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	this->movementsRequest = GVector2D( 0 , 0 );
+}
+
 void CBaseEntity::move( ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	if ( this->movementsRequest.x != 0 || this->movementsRequest.y != 0 ) {

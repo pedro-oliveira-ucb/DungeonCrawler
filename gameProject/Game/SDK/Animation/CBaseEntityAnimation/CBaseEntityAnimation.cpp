@@ -1,9 +1,11 @@
 #include "CBaseEntityAnimation.h"
 #include <mutex>
 
+
 std::mutex animationMutex;
 
 GVector2D CBaseEntityAnimation::getSpriteSize( ) {
+	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
 	return this->spriteSize;
 }
 
@@ -20,6 +22,7 @@ void CBaseEntityAnimation::SetCurrentAnimation( CBaseEntityAnimationType animati
 	if ( animations.find( animationType ) != animations.end( ) ) {
 		this->currentAnimationType = animationType;
 		this->currentAnimation= animations.at(animationType);
+		this->spriteSize = this->currentAnimation->getCurrentSpriteSize( );
 	}
 }
 

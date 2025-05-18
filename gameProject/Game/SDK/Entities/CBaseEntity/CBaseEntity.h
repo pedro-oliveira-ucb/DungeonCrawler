@@ -77,6 +77,7 @@ class CBaseEntity
 	GAngle lookingAngle;
 	float movementAngle;
 	CBaseEntityHitbox entityHitbox;
+
 public:
 
 	CBaseEntity( CBaseEntityConstructor builder ) {
@@ -91,6 +92,7 @@ public:
 	}
 
 	void addMoveRequest( CBaseEntityMovementDirection movement );
+	void clearMovementRequest( );
 	void move( );
 
 	float getMovementAngle( );

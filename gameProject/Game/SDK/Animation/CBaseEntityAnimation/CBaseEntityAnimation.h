@@ -7,6 +7,13 @@
 #include "../../math/Vector2D/GVector2D.h"
 
 
+enum DIRECTION {
+	LEFT ,
+	RIGHT ,
+	FORWARD ,
+	BACKWARD
+};
+
 enum CBaseEntityAnimationType {
 	IDLE_FORWARD,
 	IDLE_BACKWARD,
@@ -21,8 +28,6 @@ enum CBaseEntityAnimationType {
 	ATTACKING_LEFT,
 	ATTACKING_RIGHT,
 };
-
-
 
 struct CBaseEntityAnimationConstructor {
 	std::unordered_map<CBaseEntityAnimationType , rSpriteAnimation *> animations;

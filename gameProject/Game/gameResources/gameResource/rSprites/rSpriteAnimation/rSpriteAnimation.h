@@ -24,6 +24,7 @@ public:
 	{ initializeAnimation( ); }
 
 	void * getCurrentTexture( );
+	GVector2D getCurrentSpriteSize( );
 	std::string getModelName( );
 	std::string getModelPath( );
 	void updateAnimation(bool loop = true, bool reverse= false);
