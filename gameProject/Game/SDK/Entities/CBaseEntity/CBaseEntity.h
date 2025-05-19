@@ -57,8 +57,12 @@ public:
 		return this->hitboxSize;
 	}
 };
-
-
+enum DIRECTION {
+	LEFT ,
+	RIGHT ,
+	FORWARD ,
+	BACKWARD
+};
 
 class CBaseEntity
 {
@@ -71,6 +75,7 @@ class CBaseEntity
 
 	CBaseEntityType entityType;
 	CBaseEntityMovementDirection entityMovementDirection = MOVEMENT_FORWARD;
+	DIRECTION entityLookingDirection;
 	CBaseEntityState entityState;
 	std::unique_ptr<CBaseEntityAnimation> entityAnimations;
 	GVector2D movementsRequest;
@@ -89,6 +94,11 @@ public:
 		this->entityMovementDirection = builder.entityMovementDirection;
 		this->entityAnimations = std::make_unique<CBaseEntityAnimation>(builder.entityAnimations);
 		this->entityHitbox = CBaseEntityHitbox(entityAnimations->getSpriteSize( ));
+		this->entityState = CBaseEntityState::STOPPED;
+		this->movementsRequest = GVector2D( 0 , 0 );
+		this->lookingAngle = GAngle( 0 );
+		this->movementAngle = 0;
+		this->entityLookingDirection = DIRECTION::FORWARD;
 	}
 
 	void addMoveRequest( CBaseEntityMovementDirection movement );
@@ -103,11 +113,12 @@ public:
 	CBaseEntityMovementDirection getEntityMovementDirection();
 	CBaseEntityAnimation * getEntityAnimations( );
 	CBaseEntityState getEntityState( );
+	DIRECTION getEntityLookingDirection( );
 	GAngle getLookingAngle( );
 	int getHealth( );
 	CBaseEntityHitbox getHitbox( );
 
-
+	void setEntityLookingDirection( DIRECTION direction );
 	void setLookingAngle( float degrees );
 	void setEntityState( CBaseEntityState state );
 	void setEntityMovementDirection( CBaseEntityMovementDirection move );

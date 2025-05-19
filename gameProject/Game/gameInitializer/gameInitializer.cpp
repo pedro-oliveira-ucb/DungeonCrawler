@@ -29,7 +29,6 @@ bool gameInitializer::initializeResources( ) {
 
 	Log::Print( "[gameInitializer] assets initialized!" );
 
-
 	if ( !_entitiesInitializer.initialize(  ) ) {
 		Log::Print( "[gameInitializer] EntitiesInitializer failed to initialize!" );
 		return false;

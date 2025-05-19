@@ -77,8 +77,6 @@ void CBaseEntity::clearMovementRequest( ) {
 void CBaseEntity::move( ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	if ( this->movementsRequest.x != 0 || this->movementsRequest.y != 0 ) {
-
-
 		// Calcula o ângulo em radianos
 
 		float angleRadians = std::atan2( this->movementsRequest.y , this->movementsRequest.x );
@@ -115,4 +113,17 @@ GAngle CBaseEntity::getLookingAngle( )
 CBaseEntityHitbox CBaseEntity::getHitbox( )
 {
 	return this->entityHitbox;
+}
+DIRECTION CBaseEntity::getEntityLookingDirection( )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+
+	return this->entityLookingDirection;
+}
+
+void CBaseEntity::setEntityLookingDirection( DIRECTION direction )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+
+	this->entityLookingDirection = direction;
 }

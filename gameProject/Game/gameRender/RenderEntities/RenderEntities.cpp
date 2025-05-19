@@ -1,15 +1,14 @@
 ﻿#include "RenderEntities.h"
 
+#include <raylib/raylib.h>
+#include <cmath>
+
 #include "../../../Utils/Log/Log.h"
 
 #include "../../World/World.h"
 #include "../../../Globals/Globals.h"
 #include "../../gameWorld/gameWorld.h"
 #include "../../SDK/Entities/CPlayerEntity/CPlayerEntity.h"
-
-#include <raylib/raylib.h>
-
-#include <cmath>
 
 #define M_PI 3.14159265358979323846f
 
@@ -18,7 +17,6 @@ float angleDiff( const GVector2D & a , const GVector2D & b ) {
     float det = a.x * b.y - a.y * b.x; // Determinant (equivalente ao cross product em 2D)
     return atan2( det , dot ); // Retorna ângulo em radianos, entre -π e π
 }
-
 
 float angleDiff360( const GVector2D & a , const GVector2D & b ) {
     float angle = atan2( a.x * b.y - a.y * b.x , a.x * b.x + a.y * b.y );
@@ -29,7 +27,6 @@ float angleDiff360( const GVector2D & a , const GVector2D & b ) {
 float AngleDiff( float a , float b );
 
 void renderEntity( CBaseEntity * entity, bool DrawInfo = false ) {
-    // Verifica se o jogador local existe
     if ( entity == nullptr ) {
         return;
     }
@@ -53,21 +50,17 @@ void renderEntity( CBaseEntity * entity, bool DrawInfo = false ) {
 
     float baseAngle = 0.0f;
 
-    switch ( entity->getEntityAnimations( )->getCurrentAnimationType( ) ) {
-    case IDLE_FORWARD:
-    case WALKING_FORWARD:
+    switch ( entity->getEntityLookingDirection() ) {
+    case DIRECTION::FORWARD:
         baseAngle = 270.0f;
         break;
-    case IDLE_BACKWARD:
-    case WALKING_BACKWARD:
+    case DIRECTION::BACKWARD:
         baseAngle = 90.0f;
         break;
-    case IDLE_LEFT:
-    case WALKING_LEFT:
+    case DIRECTION::LEFT:
         baseAngle = 180.0f;
         break;
-    case IDLE_RIGHT:
-    case WALKING_RIGHT:
+    case DIRECTION::RIGHT:
         baseAngle = 0.0f;
         break;
     default:
@@ -78,24 +71,18 @@ void renderEntity( CBaseEntity * entity, bool DrawInfo = false ) {
     float lookingAngleDeg = entity->getLookingAngle( ).getDegrees( );
     float rotationAngle = AngleDiff( lookingAngleDeg , baseAngle ); // Isso garante um valor de -180° a 180°
 
-  
-    // Normaliza o ângulo para o intervalo [-180, 180]
-    //if ( rotationAngle > 180.0f ) rotationAngle -= 360.0f;
-    //if ( rotationAngle < -180.0f ) rotationAngle += 360.0f;
-
     Vector2 position = { pos.x, pos.y };
     Vector2 origin = { size.x / 2.0f, size.y / 2.0f };
 
     DrawTexturePro(
         *texture ,
         { 0, 0, ( float ) texture->width, ( float ) texture->height } ,
-        { position.x, position.y, size.x, size.y } ,
+        { position.x, position.y, ( float ) texture->width, ( float ) texture->height } ,
         origin ,
         rotationAngle ,
         WHITE
     );
 
-    // Corrigir a hitbox também para centralizar
     DrawRectangleLines(
         pos.x - size.x / 2.0f ,
         pos.y - size.y / 2.0f ,
@@ -105,7 +92,6 @@ void renderEntity( CBaseEntity * entity, bool DrawInfo = false ) {
     );
 
     if ( DrawInfo ) {
-
         DrawRectangleLines(
             pos.x - size.x / 2 ,
             pos.y - size.y / 2 ,
@@ -139,7 +125,6 @@ void renderEntity( CBaseEntity * entity, bool DrawInfo = false ) {
         );
     }
 }
-
 
 void RenderEntities::render( ) {
 	renderEntity( _gameWorld.localplayer, true );

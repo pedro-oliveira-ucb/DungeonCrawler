@@ -1,40 +1,20 @@
-#include <optional>
-
 #include "LocalPlayerInitializer.h"
 
-#include "../../../World/World.h"
-#include "../../../gameWorld/gameWorld.h"
-#include "../../../gameResources/gameResourceManager/gameResourceManager.h"
 
-#include "../../../Utils/Log/Log.h"
+#include <optional>
 
 
-std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>> generateLocalPlayerAnimationPair( CBaseEntityAnimationType type , std::string Name ) {
-	if ( _gameResourceManager.getSpritesManager( ).getSpriteAnimations( )->find( Name ) !=
-		_gameResourceManager.getSpritesManager( ).getSpriteAnimations( )->end( ) )
-	{
-		Log::Print( "[LocalPlayerInitializer] Found %s animation" , Name.c_str() );
-		rSpriteAnimation * anim = &_gameResourceManager.getSpritesManager( ).getSpriteAnimations( )->at( Name );
 
-		return std::make_pair(
-			type ,
-			anim
-		);
-	}
-
-	Log::Print( "[LocalPlayerInitializer] Can't Found %s animation" , Name.c_str() );
-
-	return std::nullopt;
-}
+std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>> 
+generateAnimationPair( CBaseEntityAnimationType type , std::string Name );
 
 
-std::optional < CBaseEntityAnimationConstructor > createLocalPlayerAnimationEntity( std::string animationName ) {
-	CBaseEntityAnimationConstructor builder;
+std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstructor( std::string animationName ,
+	std::vector<CBaseEntityAnimationType> requiredAnimations );
 
+CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 
-	std::unordered_map<CBaseEntityAnimationType , rSpriteAnimation * > animations;
-
-	std::vector<CBaseEntityAnimationType> data = {
+	std::vector<CBaseEntityAnimationType> requiredAnimations = {
 		CBaseEntityAnimationType::IDLE_FORWARD ,
 		CBaseEntityAnimationType::IDLE_BACKWARD ,
 		CBaseEntityAnimationType::IDLE_LEFT ,
@@ -47,31 +27,9 @@ std::optional < CBaseEntityAnimationConstructor > createLocalPlayerAnimationEnti
 		CBaseEntityAnimationType::ATTACKING_BACKWARD ,
 		CBaseEntityAnimationType::ATTACKING_LEFT ,
 		CBaseEntityAnimationType::ATTACKING_RIGHT
-		// Add more animation types as needed
 	};
 
-	for ( int i = 0; i < data.size( ); i++ ) {
-		CBaseEntityAnimationType anim = data.at( i );
-
-		auto animation =
-			generateLocalPlayerAnimationPair( anim , animationName + "_" + CBaseEntityAnimation::getAnimationTypePath( anim ) );
-		if ( !animation )
-			return std::nullopt;
-
-		animations.emplace( animation.value( ) );
-	}
-
-	builder.animations = animations;
-	builder.animationFPS = 24;
-	builder.currentAnimationType = IDLE_FORWARD;
-	builder.spriteSize = GVector2D( 23 , 29 );
-
-	return builder;
-}
-
-CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
-
-	std::optional<CBaseEntityAnimationConstructor> animation = createLocalPlayerAnimationEntity( "localPlayer" );
+	std::optional<CBaseEntityAnimationConstructor> animation = createEntityAnimationConstructor( "localPlayer", requiredAnimations );
 	if ( !animation ) {
 		return nullptr;
 	}

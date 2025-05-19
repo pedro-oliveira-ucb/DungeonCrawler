@@ -7,12 +7,6 @@
 #include "../../math/Vector2D/GVector2D.h"
 
 
-enum DIRECTION {
-	LEFT ,
-	RIGHT ,
-	FORWARD ,
-	BACKWARD
-};
 
 enum CBaseEntityAnimationType {
 	IDLE_FORWARD,
@@ -32,7 +26,6 @@ enum CBaseEntityAnimationType {
 struct CBaseEntityAnimationConstructor {
 	std::unordered_map<CBaseEntityAnimationType , rSpriteAnimation *> animations;
 
-	GVector2D spriteSize;
 	int animationFPS = 10;
 	CBaseEntityAnimationType currentAnimationType;
 };
@@ -55,7 +48,6 @@ public:
 
 	CBaseEntityAnimation( CBaseEntityAnimationConstructor builder ) {
 		this->animations = builder.animations;
-		this->spriteSize = builder.spriteSize;
 		this->animationFPS = builder.animationFPS;
 		this->currentAnimationType = builder.currentAnimationType;
 		SetCurrentAnimation( builder.currentAnimationType );

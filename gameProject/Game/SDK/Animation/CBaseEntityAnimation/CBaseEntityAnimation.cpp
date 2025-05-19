@@ -89,7 +89,7 @@ std::string CBaseEntityAnimation::getAnimationTypePath( CBaseEntityAnimationType
 	case ATTACKING_RIGHT:
 		return "attacking_right";
 	default:
-		return "UNKNOWN_ANIMATION_PATH";
+		return "";
 	}
 }
 

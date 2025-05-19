@@ -134,6 +134,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.cpp" />
+    <ClCompile Include="Game\SDK\Entities\Attacks\CBaseAttack\CBaseAttack.cpp" />
     <ClCompile Include="Game\gameWorld\gameWorld.cpp" />
     <ClCompile Include="Game\gameRender\gameRender.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.cpp" />
@@ -166,6 +168,8 @@
     <ClCompile Include="Game\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.h" />
+    <ClInclude Include="Game\SDK\Entities\Attacks\CBaseAttack\CBaseAttack.h" />
     <ClInclude Include="Game\gameWorld\gameWorld.h" />
     <ClInclude Include="Game\gameRender\gameRender.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.h" />

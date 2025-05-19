@@ -74,7 +74,7 @@ CBaseEntityAnimationType getAnimationTypeBasedOnStateAndDirection( CBaseEntitySt
 		case DIRECTION::RIGHT:
 			return ATTACKING_RIGHT;
 		default:
-			return IDLE_FORWARD; // Padrão
+			return ATTACKING_FORWARD; // Padrão
 		}
 
 	default:
@@ -169,7 +169,7 @@ void updatePositionEvent::threadFunction( ) {
 
 		float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , GVector2D( globals.mousePosX , globals.mousePosY ) ) );
 		localPlayer->setLookingAngle( newLookingAngle );
-
+		localPlayer->setEntityLookingDirection( localDirection );
 		localPlayer->setEntityState( updateState );
 
 		localPlayer->getEntityAnimations( )->SetCurrentAnimation( updateAnimation );
