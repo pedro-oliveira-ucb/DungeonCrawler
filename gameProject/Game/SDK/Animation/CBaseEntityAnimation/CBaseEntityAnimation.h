@@ -24,7 +24,7 @@ enum CBaseEntityAnimationType {
 };
 
 struct CBaseEntityAnimationConstructor {
-	std::unordered_map<CBaseEntityAnimationType , rSpriteAnimation *> animations;
+	std::unordered_map<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation>> animations;
 
 	int animationFPS = 10;
 	CBaseEntityAnimationType currentAnimationType;
@@ -32,30 +32,37 @@ struct CBaseEntityAnimationConstructor {
 
 class CBaseEntityAnimation {
 
-	std::unordered_map<CBaseEntityAnimationType, rSpriteAnimation *> animations;
+	std::unordered_map<CBaseEntityAnimationType, std::shared_ptr<rSpriteAnimation> > animations;
 	rSpriteAnimation * currentAnimation;
 
 	GVector2D spriteSize;
 	int animationFPS = 10;
+	int currentAnimationStep = 0;
 	CBaseEntityAnimationType currentAnimationType;
+	void * texture;
+
+	int animationCycle = 0;
+
 public:
 	
+	int getAnimationCycle( ) { return this->animationCycle; }
+
 	CBaseEntityAnimation( ){}
 
 	static std::string getAnimationTypeName( CBaseEntityAnimationType anim );
 	static std::string getAnimationTypePath( CBaseEntityAnimationType anim );
 	static CBaseEntityAnimationType getReverseAnimation( CBaseEntityAnimationType anim );
 
-	CBaseEntityAnimation( CBaseEntityAnimationConstructor builder ) {
-		this->animations = builder.animations;
-		this->animationFPS = builder.animationFPS;
-		this->currentAnimationType = builder.currentAnimationType;
-		SetCurrentAnimation( builder.currentAnimationType );
-	}
-	rSpriteAnimation * GetCurrentAnimation( );
+	CBaseEntityAnimation( CBaseEntityAnimationConstructor builder );
 
-	void SetCurrentAnimation( CBaseEntityAnimationType animationType);
-	GVector2D getSpriteSize( );
+	void updateAnimation( bool loop = true, bool reverse = false );
+	
+	void * getCurrentTexture( );
+	GVector2D getCurrentTextureSize( );
+
+	void setCurrentAnimationType( CBaseEntityAnimationType animationType, bool ignoreCheck = false );
+
 	int getAnimationFPS( );
+
 	CBaseEntityAnimationType getCurrentAnimationType( );
 };

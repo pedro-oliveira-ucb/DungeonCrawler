@@ -134,6 +134,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameObjects\entitiesHandler\entitiesHandler.cpp" />
+    <ClCompile Include="Game\gameObjects\attackHandler\attackHandler.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.cpp" />
     <ClCompile Include="Game\SDK\Entities\Attacks\CBaseAttack\CBaseAttack.cpp" />
     <ClCompile Include="Game\gameWorld\gameWorld.cpp" />
@@ -158,6 +160,8 @@
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\LocalPlayerInitializer\LocalPlayerInitializer.cpp" />
     <ClCompile Include="Game\gameControls\mouseMovement\mouseMovement.cpp" />
     <ClCompile Include="Game\gameThreads\updateEntities\updateEntities.cpp" />
+    <ClCompile Include="Game\gameThreads\updateAttacks\updateAttacks.cpp" />
+    <ClCompile Include="Game\SDK\math\math.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
     <ClCompile Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.cpp" />
@@ -168,6 +172,8 @@
     <ClCompile Include="Game\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\gameObjects\entitiesHandler\entitiesHandler.h" />
+    <ClInclude Include="Game\gameObjects\attackHandler\attackHandler.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.h" />
     <ClInclude Include="Game\SDK\Entities\Attacks\CBaseAttack\CBaseAttack.h" />
     <ClInclude Include="Game\gameWorld\gameWorld.h" />
@@ -192,6 +198,8 @@
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\LocalPlayerInitializer\LocalPlayerInitializer.h" />
     <ClInclude Include="Game\gameControls\mouseMovement\mouseMovement.h" />
     <ClInclude Include="Game\gameThreads\updateEntities\updateEntities.h" />
+    <ClInclude Include="Game\gameThreads\updateAttacks\updateAttacks.h" />
+    <ClInclude Include="Game\SDK\math\math.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />
     <ClInclude Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.h" />

@@ -5,5 +5,5 @@
 class AttacksInitializer : public CSingleton<AttacksInitializer>
 {
 public:
-	CBaseAttack * generate( std::string animationName );
+	CBaseAttack * generate( std::string animationName, CBaseAttackConstructor attackBuilder );
 };

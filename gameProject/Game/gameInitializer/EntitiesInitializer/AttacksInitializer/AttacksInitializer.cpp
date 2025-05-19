@@ -1,6 +1,8 @@
 #include "AttacksInitializer.h"
 #include <optional>
 
+
+
 std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>>
 generateAnimationPair( CBaseEntityAnimationType type , std::string Name );
 
@@ -9,16 +11,13 @@ std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstruct
 	std::vector<CBaseEntityAnimationType> requiredAnimations );
 
 
-CBaseAttack * AttacksInitializer::generate( std::string animationName )
+CBaseAttack * AttacksInitializer::generate( std::string animationName, CBaseAttackConstructor attackBuilder )
 {
 	std::vector<CBaseEntityAnimationType> requiredAnimations = {
-			CBaseEntityAnimationType::ATTACKING_BACKWARD ,
 			CBaseEntityAnimationType::ATTACKING_FORWARD ,
-			CBaseEntityAnimationType::ATTACKING_LEFT ,
-			CBaseEntityAnimationType::ATTACKING_RIGHT ,
 	};
 
-	std::optional<CBaseEntityAnimationConstructor> animation = createEntityAnimationConstructor( "localPlayer" , requiredAnimations );
+	std::optional<CBaseEntityAnimationConstructor> animation = createEntityAnimationConstructor( animationName , requiredAnimations );
 	if ( !animation ) {
 		return nullptr;
 	}
@@ -32,5 +31,5 @@ CBaseAttack * AttacksInitializer::generate( std::string animationName )
 	builder.movementSpeed = 10;
 	builder.Name = animationName;
 
-	return new CBaseAttack( builder, 10, 10, 5, 10, 5 );
+	return new CBaseAttack( builder, attackBuilder );
 }

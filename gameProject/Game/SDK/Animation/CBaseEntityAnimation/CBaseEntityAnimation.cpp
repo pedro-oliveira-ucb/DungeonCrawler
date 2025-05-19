@@ -1,10 +1,17 @@
 #include "CBaseEntityAnimation.h"
 #include <mutex>
 
-
 std::mutex animationMutex;
 
-GVector2D CBaseEntityAnimation::getSpriteSize( ) {
+CBaseEntityAnimation::CBaseEntityAnimation( CBaseEntityAnimationConstructor builder ) {
+	this->animations = builder.animations;
+	this->animationFPS = builder.animationFPS;
+	this->currentAnimationType = builder.currentAnimationType;
+	this->currentAnimationStep = 0;
+	setCurrentAnimationType( builder.currentAnimationType, true );
+}
+
+GVector2D CBaseEntityAnimation::getCurrentTextureSize( ) {
 	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
 	return this->spriteSize;
 }
@@ -17,20 +24,57 @@ CBaseEntityAnimationType CBaseEntityAnimation::getCurrentAnimationType( ) {
 	return this->currentAnimationType;
 }
 
-void CBaseEntityAnimation::SetCurrentAnimation( CBaseEntityAnimationType animationType ) {
+void CBaseEntityAnimation::updateAnimation( bool loop , bool reverse ) {
 	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
+
+	if ( this->currentAnimationStep < this->currentAnimation->size( ) - 1 ) {
+		this->currentAnimationStep++;
+	}
+	else {
+		this->animationCycle++;
+
+		if ( loop ) {
+			this->currentAnimationStep = 0;	
+		}
+	}
+
+	this->spriteSize = this->currentAnimation->getFrame( this->currentAnimationStep )->getSpriteSize( );
+}
+
+void * CBaseEntityAnimation::getCurrentTexture( ) {
+	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
+
+	if ( this->currentAnimation == nullptr ) {
+		return nullptr;
+	}
+
+	if ( this->currentAnimation->getFrame( this->currentAnimationStep ) == nullptr ) {
+		return nullptr;
+	}
+
+	return this->currentAnimation->getFrame( this->currentAnimationStep )->getTexture( );
+}
+
+void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType animationType, bool ignoreCheck ) {
+	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
+
+	if ( animationType == this->currentAnimationType && !ignoreCheck) {
+		return;
+	}
+
 	if ( animations.find( animationType ) != animations.end( ) ) {
 		this->currentAnimationType = animationType;
-		this->currentAnimation= animations.at(animationType);
-		this->spriteSize = this->currentAnimation->getCurrentSpriteSize( );
+		this->currentAnimationStep = 0;
+
+		std::shared_ptr<rSpriteAnimation> animation = this->animations.at( this->currentAnimationType );
+
+		if ( animation.get( ) == nullptr ) {
+			return;
+		}
+
+		this->currentAnimation = this->animations.at( this->currentAnimationType ).get( );
 	}
 }
-
-rSpriteAnimation * CBaseEntityAnimation::GetCurrentAnimation( ) {
-	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
-	return this->currentAnimation;
-}
-
 std::string CBaseEntityAnimation::getAnimationTypeName( CBaseEntityAnimationType anim ) {
 	switch ( anim ) {
 	case IDLE_FORWARD:

@@ -1,40 +1,38 @@
 #include "EntitiesInitializer.h"
-
 #include <optional>
 
+#include "LocalPlayerInitializer/LocalPlayerInitializer.h"
+#include "AttacksInitializer/AttacksInitializer.h"
 
 #include "../../World/World.h"
 #include "../../gameWorld/gameWorld.h"
 #include "../../gameResources/gameResourceManager/gameResourceManager.h"
-
-#include "LocalPlayerInitializer/LocalPlayerInitializer.h"
-
 #include "../../../Utils/Log/Log.h"
 
+std::optional<std::pair<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation>>> generateAnimationPair( CBaseEntityAnimationType type , std::string Name ) {
 
-std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>> generateAnimationPair( CBaseEntityAnimationType type , std::string Name ) {
-	if ( _gameResourceManager.getSpritesManager( ).getSpriteAnimations( )->find( Name ) !=
-		_gameResourceManager.getSpritesManager( ).getSpriteAnimations( )->end( ) )
+	std::shared_ptr< rSpriteAnimation> clip = _gameResourceManager.getSpritesManager( ).getClip( Name );
+
+	if ( clip.get( ) != nullptr )
 	{
-		Log::Print( "[LocalPlayerInitializer] Found %s animation" , Name.c_str( ) );
-		rSpriteAnimation * anim = &_gameResourceManager.getSpritesManager( ).getSpriteAnimations( )->at( Name );
+		Log::Print( "[EntitiesInitializer] Found %s animation" , Name.c_str( ) );
 
 		return std::make_pair(
 			type ,
-			anim
+			clip
 		);
 	}
 
-	Log::Print( "[LocalPlayerInitializer] Can't Found %s animation" , Name.c_str( ) );
+	Log::Print( "[EntitiesInitializer] Can't Found %s animation" , Name.c_str( ) );
 
 	return std::nullopt;
 }
 
-std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstructor( std::string animationName, 
+std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstructor( std::string animationName ,
 	std::vector<CBaseEntityAnimationType> requiredAnimations ) {
 	CBaseEntityAnimationConstructor builder;
 
-	std::unordered_map<CBaseEntityAnimationType , rSpriteAnimation * > animations;
+	std::unordered_map<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation> > animations;
 
 	for ( int i = 0; i < requiredAnimations.size( ); i++ ) {
 		CBaseEntityAnimationType anim = requiredAnimations.at( i );
@@ -44,11 +42,13 @@ std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstruct
 		if ( !animationTypePath.empty( ) ) {
 			fullAnimationName += "_" + animationTypePath;
 		}
-		
+
 		auto animation =
 			generateAnimationPair( anim , fullAnimationName );
-		if ( !animation )
+		if ( !animation ) {
+			Log::Print( "[EntitiesInitializer] Failed to initialize %s" , animationName.c_str( ) );
 			return std::nullopt;
+		}
 
 		animations.emplace( animation.value( ) );
 	}
@@ -68,7 +68,48 @@ bool EntitiesInitializer::initialize( ) {
 		return false;
 	}
 	_gameWorld.localplayer = localPlayer;
-	printf( "LocalPlayer name: %s\n" , _gameWorld.localplayer->GetEntityName().c_str());
+	Log::Print( "[EntitiesInitializer] localPlayer generated" );
+
+	CBaseAttackConstructor attackBuilder;
+
+	{
+		attackBuilder.damage = 10;
+		attackBuilder.delay = .5f;
+		attackBuilder.cooldown = 1.0f;
+		attackBuilder.duration = 0.5f;
+		attackBuilder.range = 70.f;
+		attackBuilder.speed = 5;
+
+		CBaseAttack * localPlayerSimpleAttack = AttacksInitializer::Get( ).generate( "localPlayerSimpleAttack" , attackBuilder );
+		localPlayerSimpleAttack->getEntityAnimations( )->setCurrentAnimationType( CBaseEntityAnimationType::ATTACKING_FORWARD );
+
+		_gameWorld.availableAttacks.push_back( localPlayerSimpleAttack );
+		if ( localPlayerSimpleAttack != nullptr )
+			_gameWorld.availableAttacks.push_back( localPlayerSimpleAttack );
+		else
+			Log::Print( "[EntitiesInitializer] Failed to generate localPlayerSimpleAttack" );
+
+		localPlayer->AddAttack( localPlayerSimpleAttack );
+	}
+
+	{
+		attackBuilder.damage = 30;
+		attackBuilder.delay = .5f;
+		attackBuilder.cooldown = 1.0f;
+		attackBuilder.duration = 0.5f;
+		attackBuilder.range = 30.f;
+		attackBuilder.speed = 10;
+
+		CBaseAttack * localPlayerSimpleAttack = AttacksInitializer::Get( ).generate( "localPlayerHeavyAttack" , attackBuilder );
+		localPlayerSimpleAttack->getEntityAnimations( )->setCurrentAnimationType( CBaseEntityAnimationType::ATTACKING_FORWARD );
+
+		if ( localPlayerSimpleAttack != nullptr )
+			_gameWorld.availableAttacks.push_back( localPlayerSimpleAttack );
+		else
+			Log::Print( "[EntitiesInitializer] Failed to generate localPlayerHeavyAttack" );
+
+		localPlayer->AddAttack( localPlayerSimpleAttack );
+	}
 
 	return true;
 }

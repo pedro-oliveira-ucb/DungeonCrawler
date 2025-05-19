@@ -5,6 +5,8 @@
 
 #include "../../../Utils/Log/Log.h"
 
+#include "../../gameObjects/attackHandler/attackHandler.h"
+
 #include "../../World/World.h"
 #include "../../../Globals/Globals.h"
 #include "../../gameWorld/gameWorld.h"
@@ -24,74 +26,57 @@ float angleDiff360( const GVector2D & a , const GVector2D & b ) {
     return angle; // radianos
 }
 
+
+
 float AngleDiff( float a , float b );
 
-void renderEntity( CBaseEntity * entity, bool DrawInfo = false ) {
+void renderEntity( CBaseEntity * entity, bool DrawInfo = false, float sizeFactor = 1.0f ) {
     if ( entity == nullptr ) {
         return;
     }
 
     CBaseEntityAnimation * entityAnimation = entity->getEntityAnimations( );
 
-    if ( entityAnimation == nullptr )
-        return;
-
-    if ( entityAnimation->GetCurrentAnimation( ) == nullptr ) {
+    if ( entityAnimation == nullptr ) {
         return;
     }
 
-    rSpriteAnimation * animation = entityAnimation->GetCurrentAnimation( );
-    Texture2D * texture = static_cast< Texture2D * >( animation->getCurrentTexture( ) );
-    GVector2D size = entityAnimation->getSpriteSize( );
+    if ( entityAnimation->getCurrentTexture( ) == nullptr ) {
+        return;
+    }
+
+    Texture2D * texture = static_cast< Texture2D * >( entityAnimation->getCurrentTexture( ) );
+    GVector2D size = entityAnimation->getCurrentTextureSize( ) * sizeFactor;
     GVector2D pos = entity->getEntityPosition( );
 
     GAngle entityLookingAngle = entity->getLookingAngle( );
     GAngle entityMovingAngle = entity->getMovementAngle( );
 
-    float baseAngle = 0.0f;
-
-    switch ( entity->getEntityLookingDirection() ) {
-    case DIRECTION::FORWARD:
-        baseAngle = 270.0f;
-        break;
-    case DIRECTION::BACKWARD:
-        baseAngle = 90.0f;
-        break;
-    case DIRECTION::LEFT:
-        baseAngle = 180.0f;
-        break;
-    case DIRECTION::RIGHT:
-        baseAngle = 0.0f;
-        break;
-    default:
-        baseAngle = 0.0f;
-        break;
-    }
-
+    float baseAngle = entity->getEntityLookingDirectionBaseAngle();
     float lookingAngleDeg = entity->getLookingAngle( ).getDegrees( );
-    float rotationAngle = AngleDiff( lookingAngleDeg , baseAngle ); // Isso garante um valor de -180° a 180°
+    float rotationAngle = AngleDiff( lookingAngleDeg , baseAngle );
 
     Vector2 position = { pos.x, pos.y };
     Vector2 origin = { size.x / 2.0f, size.y / 2.0f };
 
     DrawTexturePro(
         *texture ,
-        { 0, 0, ( float ) texture->width, ( float ) texture->height } ,
-        { position.x, position.y, ( float ) texture->width, ( float ) texture->height } ,
+        { 0, 0, ( float ) texture->width, ( float ) texture->height } , // source = tamanho real da textura
+        { position.x, position.y, size.x, size.y } ,               // dest = tamanho desejado (escalado)
         origin ,
         rotationAngle ,
         WHITE
     );
 
-    DrawRectangleLines(
-        pos.x - size.x / 2.0f ,
-        pos.y - size.y / 2.0f ,
-        size.x ,
-        size.y ,
-        BLUE
-    );
-
     if ( DrawInfo ) {
+        DrawRectangleLines(
+            pos.x - size.x / 2.0f ,
+            pos.y - size.y / 2.0f ,
+            size.x ,
+            size.y ,
+            BLUE
+        );
+
         DrawRectangleLines(
             pos.x - size.x / 2 ,
             pos.y - size.y / 2 ,
@@ -126,13 +111,33 @@ void renderEntity( CBaseEntity * entity, bool DrawInfo = false ) {
     }
 }
 
+void renderAttacks( ) {
+    int attacksSize = attackHandler::Get().runningAttacksSize();
+    for ( int i = 0; i < attacksSize; i++ ) {
+		std::shared_ptr<CBaseAttack> attack = attackHandler::Get( ).getRunningAttack( i );
+
+        if(attack.get() == nullptr )
+			continue;
+		CBaseAttack * attackPtr = attack.get( );
+
+        if ( attackPtr == nullptr )
+            continue;
+
+		if ( attackPtr->getEntityAnimations( ) == nullptr )
+			continue;
+
+        renderEntity( attackPtr, true, 0.1 );
+    }
+}
+
 void RenderEntities::render( ) {
 	renderEntity( _gameWorld.localplayer, true );
-	for ( int i = 0; i < _gameWorld.entities.size( ); i++ ) {
+	renderAttacks( );
+	/*for ( int i = 0; i < _gameWorld.entities.size( ); i++ ) {
 		CBaseEntity * entity = _gameWorld.entities.at( i );
 		if ( entity == nullptr ) {
 			continue;
 		}
 		renderEntity( entity );
-	}
+	}*/
 }

@@ -77,29 +77,23 @@ class CBaseEntity
 	CBaseEntityMovementDirection entityMovementDirection = MOVEMENT_FORWARD;
 	DIRECTION entityLookingDirection;
 	CBaseEntityState entityState;
-	std::unique_ptr<CBaseEntityAnimation> entityAnimations;
-	GVector2D movementsRequest;
+	CBaseEntityAnimation entityAnimations;
+	std::vector<CBaseEntityMovementDirection> movementsRequest;
 	GAngle lookingAngle;
 	float movementAngle;
 	CBaseEntityHitbox entityHitbox;
 
 public:
+	virtual void updateEntity( );
 
-	CBaseEntity( CBaseEntityConstructor builder ) {
-		this->Name = builder.Name;
-		this->entityPosition = builder.entityPosition;
-		this->health = builder.health;
-		this->movementSpeed = builder.movementSpeed;
-		this->entityType = builder.entityType;
-		this->entityMovementDirection = builder.entityMovementDirection;
-		this->entityAnimations = std::make_unique<CBaseEntityAnimation>(builder.entityAnimations);
-		this->entityHitbox = CBaseEntityHitbox(entityAnimations->getSpriteSize( ));
-		this->entityState = CBaseEntityState::STOPPED;
-		this->movementsRequest = GVector2D( 0 , 0 );
-		this->lookingAngle = GAngle( 0 );
-		this->movementAngle = 0;
-		this->entityLookingDirection = DIRECTION::FORWARD;
-	}
+	static CBaseEntityAnimationType getAnimationTypeBasedOnStateAndDirection( CBaseEntityState entityState , DIRECTION entityDirection );
+
+	CBaseEntity( const CBaseEntity & other );
+	CBaseEntity( CBaseEntityConstructor builder );
+
+	float getEntityLookingDirectionBaseAngle( );
+
+	bool hasMovementRequest( );
 
 	void addMoveRequest( CBaseEntityMovementDirection movement );
 	void clearMovementRequest( );

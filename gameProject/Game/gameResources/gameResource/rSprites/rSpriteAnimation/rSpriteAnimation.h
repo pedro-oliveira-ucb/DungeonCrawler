@@ -12,21 +12,11 @@ enum SPRITE_TYPE {
 
 class rSpriteAnimation
 {
-	std::vector<std::unique_ptr<rSprite>> sprites;
-	std::string modelName;
-	std::string modelFolderPath;
-	int currentAnimationStep = 0;
-	SPRITE_TYPE _spriteType;
-
-	void initializeAnimation( );
+	std::vector<std::shared_ptr<rSprite>> sprites;
 public:
-	rSpriteAnimation( std::string model, std::string path) : modelName( model ), modelFolderPath(path)
-	{ initializeAnimation( ); }
+	rSpriteAnimation( std::vector<std::shared_ptr<rSprite>> frames , int fps  );
 
-	void * getCurrentTexture( );
-	GVector2D getCurrentSpriteSize( );
-	std::string getModelName( );
-	std::string getModelPath( );
-	void updateAnimation(bool loop = true, bool reverse= false);
+	std::shared_ptr<rSprite> getFrame( int idx );
+	int size( );
 };
 

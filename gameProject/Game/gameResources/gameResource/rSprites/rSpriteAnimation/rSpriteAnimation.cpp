@@ -12,90 +12,35 @@ namespace fs = std::filesystem;
 
 std::mutex rSpriteAnimationMutex;
 
-void rSpriteAnimation::initializeAnimation( ) {
-    Log::Print( "[rSpriteAnimation] Initializing %s" , this->getModelName( ) );
-
-    // this->modelFolderPath = this->modelName; // Define o path base, pode ser ajustado se necessário
-
-    if ( !fs::exists( modelFolderPath ) || !fs::is_directory( modelFolderPath ) ) {
-        Log::Print( "[rSpriteAnimation] Folder not found: %s" , modelFolderPath.c_str( ) );
-        return;
-    }
-
-    std::vector<std::pair<int , std::string>> orderedFiles;
-
-    // Regex para pegar arquivos com nome tipo 0.png, 1.png, ...
-    std::regex pattern( R"((\d+)\.png)" );
-
-    for ( const auto & entry : fs::directory_iterator( modelFolderPath ) ) {
-        if ( !entry.is_regular_file( ) ) continue;
-
-        const std::string filename = entry.path( ).filename( ).string( );
-        std::smatch match;
-        if ( std::regex_match( filename , match , pattern ) ) {
-            int index = std::stoi( match[ 1 ].str( ) );
-            orderedFiles.emplace_back( index , entry.path( ).string( ) );
-        }
-    }
-
-    // Ordena pelo índice (ordem crescente: 0.png, 1.png, 2.png, ...)
-    std::sort( orderedFiles.begin( ) , orderedFiles.end( ) ,
-        [ ] ( const auto & a , const auto & b ) {
-            return a.first < b.first;
-        } );
-
-    // Cria os rSprites com os arquivos encontrados
-    for ( const auto & [index , fullPath] : orderedFiles ) {
-        Log::Print( "[rSpriteAnimation] Loading sprite: %s" , fullPath.c_str( ) );
-   
-
-        sprites.push_back( std::make_unique<rSprite>( fullPath ) );
-    }
-
-    Log::Print( "[rSpriteAnimation] Loaded %d sprites" , static_cast< int >( this->sprites.size( ) ) );
+rSpriteAnimation::rSpriteAnimation( std::vector<std::shared_ptr<rSprite>> sprites , int fps ) {
+	this->sprites = sprites;
 }
 
-std::string rSpriteAnimation::getModelName( ) {
-	return this->modelName;
-}
-
-std::string rSpriteAnimation::getModelPath( ) {
-	return this->modelFolderPath;
-}
-
-GVector2D rSpriteAnimation::getCurrentSpriteSize( ) {
-    std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
-    return sprites[ currentAnimationStep ]->getSpriteSize();
-}
-
-void rSpriteAnimation::updateAnimation( bool loop, bool reverse ) {
+int rSpriteAnimation::size( ) {
 	std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
 
-    if ( !reverse ) {
-        if ( ( this->currentAnimationStep + 1 ) >= sprites.size( ) ) {
-            this->currentAnimationStep = 0;
-        }
-        else
-            this->currentAnimationStep++;
-    }
-    else {
-        if ( ( this->currentAnimationStep ) > 0 ) {
-            this->currentAnimationStep--;
-        }
-        else
-            this->currentAnimationStep = sprites.size( ) - 1;
-    }
+	if ( this == nullptr ) {
+		return 0;
+	}
+
+	if ( this->sprites.empty( ) )
+		return 0;
+
+	return static_cast< int >( this->sprites.size( ) );
 }
 
-void * rSpriteAnimation::getCurrentTexture( ) {
-    std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
+std::shared_ptr<rSprite> rSpriteAnimation::getFrame( int idx )  {
+	std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
 
-    if ( this == nullptr ) {
-        return nullptr;
-    }
+	if ( this == nullptr ) {
+		return nullptr;
+	}
 
-    if ( this->sprites.empty( ) ) 
-        return nullptr;
+	if ( this->sprites.empty( ) )
+		return nullptr;
 
-    return sprites[ currentAnimationStep ]->getTexture( );
+	if ( idx < 0 || idx >= static_cast< int >( this->sprites.size( ) ) )
+		return nullptr;
+
+	return sprites[ idx ];
 }

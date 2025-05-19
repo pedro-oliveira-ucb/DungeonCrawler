@@ -12,9 +12,52 @@ public:
     GVector2D( float x , float y ) : x( x ) , y( y ) {}
     GVector2D( int x , int y ) : x( static_cast< float >( x ) ) , y( static_cast< float >( y ) ) {}
 
-    // Operador de subtração
+    // Operadores aritméticos
+    GVector2D operator+( const GVector2D & other ) const {
+        return { x + other.x, y + other.y };
+    }
+
     GVector2D operator-( const GVector2D & other ) const {
-        return GVector2D( x - other.x , y - other.y );
+        return { x - other.x, y - other.y };
+    }
+
+    GVector2D operator*( const GVector2D & other ) const {
+        return { x * other.x, y * other.y };
+    }
+
+    GVector2D operator/( const GVector2D & other ) const {
+        return { x / other.x, y / other.y };
+    }
+
+    // Operadores com escalar
+    GVector2D operator+( float scalar ) const {
+        return { x + scalar, y + scalar };
+    }
+    GVector2D operator* ( float scalar ) const {
+        return { x * scalar, y * scalar };
+    }
+
+    GVector2D operator-( float scalar ) const {
+        return { x - scalar, y - scalar };
+    }
+
+    // Operadores compostos
+    GVector2D & operator+=( const GVector2D & other ) {
+        x += other.x;
+        y += other.y;
+        return *this;
+    }
+
+    GVector2D & operator+=( float scalar ) {
+        x += scalar;
+        y += scalar;
+        return *this;
+    }
+
+    GVector2D & operator-=( float scalar ) {
+        x -= scalar;
+        y -= scalar;
+        return *this;
     }
 
     // Calcula o comprimento (magnitude) do vetor
@@ -28,4 +71,5 @@ public:
         if ( len == 0 ) return GVector2D( 0 , 0 );
         return GVector2D( x / len , y / len );
     }
+
 };

@@ -28,6 +28,8 @@ int main( void ) {
 
 	Log::Print( "[Render] Initialized window!" );
 
+	SetConfigFlags( FLAG_VSYNC_HINT );
+
 	//	raylib::SetConfigFlags( raylib::FLAG_FULLSCREEN_MODE ); // Define a flag de fullscreen
 	InitWindow( globals.screenWidth , globals.screenHeight , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
 
@@ -46,8 +48,21 @@ int main( void ) {
 				break;
 			}
 
-			globals.mousePosX = GetMousePosition( ).x;
-			globals.mousePosY = GetMousePosition( ).y;
+
+			Vector2 mousePos = GetMousePosition( );
+
+			globals.mousePosX = mousePos.x;
+			globals.mousePosY = mousePos.y;
+
+			// Check if mouse is inside the window bounds
+			if ( CheckCollisionPointRec( mousePos , ( Rectangle )( 0 , 0 , globals.screenWidth , globals.screenHeight ) ) )
+			{
+				HideCursor( );
+			}
+			else
+			{
+				ShowCursor( );
+			}
 
 			BeginDrawing( );
 			//remove old draws?

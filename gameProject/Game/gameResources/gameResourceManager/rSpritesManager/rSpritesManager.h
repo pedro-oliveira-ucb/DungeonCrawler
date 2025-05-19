@@ -9,11 +9,12 @@
 
 class rSpritesManager : public rBaseResource
 {
-	std::unordered_map<std::string, rSpriteAnimation> spriteAnimations;
-
+	std::unordered_map<std::string, std::shared_ptr<rSpriteAnimation>> spriteAnimations;
 public:
 	rSpritesManager( std::string path ) :rBaseResource( path ) { }
 	bool initialize( );
-	std::unordered_map<std::string , rSpriteAnimation> * getSpriteAnimations( );
+
+	std::shared_ptr<rSpriteAnimation> loadClip( const std::string & name , SPRITE_TYPE type );
+	std::shared_ptr<rSpriteAnimation> getClip( const std::string & name ) const;
 };
 
