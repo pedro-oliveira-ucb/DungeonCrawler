@@ -4,6 +4,8 @@
 #include "LocalPlayerInitializer/LocalPlayerInitializer.h"
 #include "AttacksInitializer/AttacksInitializer.h"
 
+#include "../../gameObjects/entitiesHandler/entitiesHandler.h"
+
 #include "../../World/World.h"
 #include "../../gameWorld/gameWorld.h"
 #include "../../gameResources/gameResourceManager/gameResourceManager.h"
@@ -62,6 +64,11 @@ std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstruct
 
 bool EntitiesInitializer::initialize( ) {
 
+	if ( !AttacksInitializer::Get( ).initializeAttacks( ) ) {
+		Log::Print( "[EntitiesInitializer] Failed to initialize attacks" );
+		return false;
+	}
+
 	CPlayerEntity * localPlayer = LocalPlayerInitializer::Get( ).generate( "localPlayer" );
 	if ( !localPlayer ) {
 		Log::Print( "[EntitiesInitializer] Failed to generate localplayer" );
@@ -70,46 +77,7 @@ bool EntitiesInitializer::initialize( ) {
 	_gameWorld.localplayer = localPlayer;
 	Log::Print( "[EntitiesInitializer] localPlayer generated" );
 
-	CBaseAttackConstructor attackBuilder;
-
-	{
-		attackBuilder.damage = 10;
-		attackBuilder.delay = .5f;
-		attackBuilder.cooldown = 1.0f;
-		attackBuilder.duration = 0.5f;
-		attackBuilder.range = 70.f;
-		attackBuilder.speed = 5;
-
-		CBaseAttack * localPlayerSimpleAttack = AttacksInitializer::Get( ).generate( "localPlayerSimpleAttack" , attackBuilder );
-		localPlayerSimpleAttack->getEntityAnimations( )->setCurrentAnimationType( CBaseEntityAnimationType::ATTACKING_FORWARD );
-
-		_gameWorld.availableAttacks.push_back( localPlayerSimpleAttack );
-		if ( localPlayerSimpleAttack != nullptr )
-			_gameWorld.availableAttacks.push_back( localPlayerSimpleAttack );
-		else
-			Log::Print( "[EntitiesInitializer] Failed to generate localPlayerSimpleAttack" );
-
-		localPlayer->AddAttack( localPlayerSimpleAttack );
-	}
-
-	{
-		attackBuilder.damage = 30;
-		attackBuilder.delay = .5f;
-		attackBuilder.cooldown = 1.0f;
-		attackBuilder.duration = 0.5f;
-		attackBuilder.range = 30.f;
-		attackBuilder.speed = 10;
-
-		CBaseAttack * localPlayerSimpleAttack = AttacksInitializer::Get( ).generate( "localPlayerHeavyAttack" , attackBuilder );
-		localPlayerSimpleAttack->getEntityAnimations( )->setCurrentAnimationType( CBaseEntityAnimationType::ATTACKING_FORWARD );
-
-		if ( localPlayerSimpleAttack != nullptr )
-			_gameWorld.availableAttacks.push_back( localPlayerSimpleAttack );
-		else
-			Log::Print( "[EntitiesInitializer] Failed to generate localPlayerHeavyAttack" );
-
-		localPlayer->AddAttack( localPlayerSimpleAttack );
-	}
+	entitiesHandler::Get().setLocalPlayer( localPlayer );
 
 	return true;
 }

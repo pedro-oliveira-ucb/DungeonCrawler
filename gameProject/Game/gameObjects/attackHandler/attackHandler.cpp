@@ -52,7 +52,11 @@ std::shared_ptr<CBaseAttack> attackHandler::getRunningAttack( int index )
 	return nullptr;
 }
 
-std::shared_ptr<CBaseAttack>  attackHandler::throwNewAttack( CBaseEntity * sender , CBaseAttack * attack )
+std::vector<std::shared_ptr<CBaseAttack>> &attackHandler::getAvailableLocalPlayerAttack( ) {
+	return this->availableLocalPlayerAttacks;
+}
+
+std::shared_ptr<CBaseAttack> attackHandler::throwNewAttack( CBaseEntity * sender , CBaseAttack * attack )
 {
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );
 	std::shared_ptr<CBaseAttack> newAttack = attack->Clone( );
@@ -60,4 +64,9 @@ std::shared_ptr<CBaseAttack>  attackHandler::throwNewAttack( CBaseEntity * sende
 	runningAttacks.push_back( std::make_pair( sender , newAttack ) );
 
 	return newAttack;
+}
+
+void attackHandler::addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> attack ) {
+	std::lock_guard<std::mutex> lock( attackHandlerMutex );
+	this->availableLocalPlayerAttacks.emplace_back( attack );
 }

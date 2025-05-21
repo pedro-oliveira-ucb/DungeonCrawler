@@ -8,7 +8,7 @@ CBaseEntityAnimation::CBaseEntityAnimation( CBaseEntityAnimationConstructor buil
 	this->animationFPS = builder.animationFPS;
 	this->currentAnimationType = builder.currentAnimationType;
 	this->currentAnimationStep = 0;
-	setCurrentAnimationType( builder.currentAnimationType, true );
+	setCurrentAnimationType( builder.currentAnimationType , true );
 }
 
 GVector2D CBaseEntityAnimation::getCurrentTextureSize( ) {
@@ -34,11 +34,13 @@ void CBaseEntityAnimation::updateAnimation( bool loop , bool reverse ) {
 		this->animationCycle++;
 
 		if ( loop ) {
-			this->currentAnimationStep = 0;	
+			this->currentAnimationStep = 0;
 		}
 	}
 
-	this->spriteSize = this->currentAnimation->getFrame( this->currentAnimationStep )->getSpriteSize( );
+	if ( this->currentAnimation != nullptr ) {
+		this->spriteSize = this->currentAnimation->getFrame( this->currentAnimationStep )->getSpriteSize( );
+	}
 }
 
 void * CBaseEntityAnimation::getCurrentTexture( ) {
@@ -55,16 +57,24 @@ void * CBaseEntityAnimation::getCurrentTexture( ) {
 	return this->currentAnimation->getFrame( this->currentAnimationStep )->getTexture( );
 }
 
-void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType animationType, bool ignoreCheck ) {
+
+bool CBaseEntityAnimation::isDifferentAnimationType( CBaseEntityAnimationType animA , CBaseEntityAnimationType animB ) {
+	// check if it is different type walking, idle or attacking
+	return ( animA / 4 ) != ( animB / 4 );
+}
+
+void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType animationType , bool ignoreCheck ) {
 	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
 
-	if ( animationType == this->currentAnimationType && !ignoreCheck) {
+	if ( animationType == this->currentAnimationType && !ignoreCheck ) {
 		return;
 	}
 
 	if ( animations.find( animationType ) != animations.end( ) ) {
 		this->currentAnimationType = animationType;
-		this->currentAnimationStep = 0;
+		if ( this->isDifferentAnimationType( this->currentAnimationType , animationType ) ) {
+			this->currentAnimationStep = 0;
+		}
 
 		std::shared_ptr<rSpriteAnimation> animation = this->animations.at( this->currentAnimationType );
 

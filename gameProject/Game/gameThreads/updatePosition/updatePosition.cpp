@@ -36,6 +36,9 @@ void updatePositionEvent::threadFunction( ) {
 	};
 
 	while ( true ) {
+
+	
+
 		if ( !localPlayer ) {
 			Log::Print( "[updatePositionEvent] Local player is null" );
 			continue;
@@ -44,8 +47,7 @@ void updatePositionEvent::threadFunction( ) {
 		GVector2D localPos = localPlayer->getEntityPosition( );
 		float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , GVector2D( globals.mousePosX , globals.mousePosY ) ) );
 
-
-		if ( !localPlayer->isAttacking( ) ) {
+		// if ( !localPlayer->isAttacking( ) ) {
 			if ( keybindHandler::Get( ).isPressed( keybind_identifier::ATTACK_SIMPLE ) ) {
 				localPlayer->UseAttack( 0 );
 			}
@@ -63,7 +65,7 @@ void updatePositionEvent::threadFunction( ) {
 					localPlayer->addMoveRequest( move.movementDirection );
 				}
 			}
-		}
+		//}
 
 		localPlayer->updateEntity( );
 

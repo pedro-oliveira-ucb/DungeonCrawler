@@ -52,6 +52,7 @@ public:
 	static std::string getAnimationTypeName( CBaseEntityAnimationType anim );
 	static std::string getAnimationTypePath( CBaseEntityAnimationType anim );
 	static CBaseEntityAnimationType getReverseAnimation( CBaseEntityAnimationType anim );
+	static bool isDifferentAnimationType( CBaseEntityAnimationType animA , CBaseEntityAnimationType animB );
 
 	CBaseEntityAnimation( CBaseEntityAnimationConstructor builder );
 

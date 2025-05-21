@@ -18,7 +18,7 @@ public:
 	int runningAttacksSize( );
 	std::shared_ptr<CBaseAttack> getRunningAttack( int index );
 
-	std::shared_ptr<CBaseAttack> getAvailableLocalPlayerAttack( int index );
+	std::vector<std::shared_ptr<CBaseAttack>> &getAvailableLocalPlayerAttack( );
 	std::shared_ptr<CBaseAttack> getAvailableEnemyAttack( int index );
 
 	void addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> attack );

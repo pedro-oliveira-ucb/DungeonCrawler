@@ -33,6 +33,9 @@ int main( void ) {
 	//	raylib::SetConfigFlags( raylib::FLAG_FULLSCREEN_MODE ); // Define a flag de fullscreen
 	InitWindow( globals.screenWidth , globals.screenHeight , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
 
+
+	DisableCursor( );
+
 	
 	Log::Print( "[main] starting game!" );
 	game.start( );
@@ -48,25 +51,15 @@ int main( void ) {
 				break;
 			}
 
-
 			Vector2 mousePos = GetMousePosition( );
 
 			globals.mousePosX = mousePos.x;
 			globals.mousePosY = mousePos.y;
 
-			// Check if mouse is inside the window bounds
-			if ( CheckCollisionPointRec( mousePos , ( Rectangle )( 0 , 0 , globals.screenWidth , globals.screenHeight ) ) )
-			{
-				HideCursor( );
-			}
-			else
-			{
-				ShowCursor( );
-			}
 
 			BeginDrawing( );
 			//remove old draws?
-			ClearBackground( BLACK );
+			ClearBackground( WHITE );
 
 			gameRender::Get().render( );
 			

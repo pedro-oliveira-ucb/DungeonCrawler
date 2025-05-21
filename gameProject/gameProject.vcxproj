@@ -134,6 +134,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.cpp" />
+    <ClCompile Include="Game\SDK\Entities\Attacks\CMeleeAttack\CMeleeAttack.cpp" />
+    <ClCompile Include="Game\gameResources\gameResource\rSound\rSound.cpp" />
+    <ClCompile Include="Game\SDK\Events\GameEvents.cpp" />
     <ClCompile Include="Game\gameObjects\entitiesHandler\entitiesHandler.cpp" />
     <ClCompile Include="Game\gameObjects\attackHandler\attackHandler.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.cpp" />
@@ -162,6 +166,7 @@
     <ClCompile Include="Game\gameThreads\updateEntities\updateEntities.cpp" />
     <ClCompile Include="Game\gameThreads\updateAttacks\updateAttacks.cpp" />
     <ClCompile Include="Game\SDK\math\math.cpp" />
+    <ClCompile Include="Game\gameResources\gameResourceManager\rSoundsManager\rSoundsManager.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
     <ClCompile Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.cpp" />
@@ -172,6 +177,10 @@
     <ClCompile Include="Game\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.h" />
+    <ClInclude Include="Game\SDK\Entities\Attacks\CMeleeAttack\CMeleeAttack.h" />
+    <ClInclude Include="Game\gameResources\gameResource\rSound\rSound.h" />
+    <ClInclude Include="Game\SDK\Events\GameEvents.h" />
     <ClInclude Include="Game\gameObjects\entitiesHandler\entitiesHandler.h" />
     <ClInclude Include="Game\gameObjects\attackHandler\attackHandler.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.h" />
@@ -200,6 +209,7 @@
     <ClInclude Include="Game\gameThreads\updateEntities\updateEntities.h" />
     <ClInclude Include="Game\gameThreads\updateAttacks\updateAttacks.h" />
     <ClInclude Include="Game\SDK\math\math.h" />
+    <ClInclude Include="Game\gameResources\gameResourceManager\rSoundsManager\rSoundsManager.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />
     <ClInclude Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.h" />

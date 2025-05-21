@@ -37,7 +37,7 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 	CBaseEntityConstructor builder;
 
 	builder.entityAnimations = animation.value( );
-	builder.entityPosition = GVector2D( 0 , 0 );
+	builder.entityPosition = GVector2D( 500 , 500 );
 	builder.entityType = CBaseEntityType::PLAYER;
 	builder.health = 100;
 	builder.movementSpeed = 10;

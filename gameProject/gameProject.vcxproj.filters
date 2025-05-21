@@ -123,6 +123,21 @@
     <ClCompile Include="Game\SDK\math\math.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Game\SDK\Events\GameEvents.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameResources\gameResourceManager\rSoundsManager\rSoundsManager.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameResources\gameResource\rSound\rSound.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\SDK\Entities\Attacks\CMeleeAttack\CMeleeAttack.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h">
@@ -231,6 +246,21 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\SDK\math\math.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Events\GameEvents.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameResources\gameResourceManager\rSoundsManager\rSoundsManager.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameResources\gameResource\rSound\rSound.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Entities\Attacks\CMeleeAttack\CMeleeAttack.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

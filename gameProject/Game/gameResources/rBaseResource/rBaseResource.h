@@ -13,5 +13,8 @@ class rBaseResource
 public:
 	rBaseResource( std::string path );
 	std::string getPath( );
+
+	virtual bool initialize( ) = 0;
+
 };
 

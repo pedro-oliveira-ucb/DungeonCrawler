@@ -7,79 +7,105 @@ CBaseAttack::CBaseAttack( CBaseEntityConstructor builder , CBaseAttackConstructo
 {
 	this->damage = attackBuilder.damage;
 	this->range = attackBuilder.range;
-	this->duration = attackBuilder.duration;
 	this->cooldown = attackBuilder.cooldown;
 	this->delay = attackBuilder.delay;
-	this->isActive = false;
+	this->active = false;
 	this->type = attackBuilder.type;
 	this->speed = attackBuilder.speed;
+	this->area = attackBuilder.area;
+	this->Name = attackBuilder.Name;
 }
 
 CBaseAttack::CBaseAttack( const CBaseAttack & other )
 	: CBaseEntity( other ) // Chama o construtor de cópia da classe base
 {
+	this->Name = other.Name;
 	this->damage = other.damage;
 	this->range = other.range;
-	this->duration = other.duration;
 	this->cooldown = other.cooldown;
 	this->delay = other.delay;
-	this->isActive = other.isActive;
+	this->active = other.active;
 	this->type = other.type;
 	this->initialPos = other.initialPos;
 	this->speed = other.speed;
+	this->area = other.area;
 
 	Log::Print( "[%s] Copy constructor called" , this->GetEntityName( ).c_str( ) );
 }
 
 void CBaseAttack::updateAttackPosition( ) {
-	if ( isActive ) {
-		float angleRad = this->getLookingAngle( ).getRadians( );
 
-		GVector2D newDirection(
-			cosf( angleRad ) * this->speed,
-			sinf( angleRad ) * this->speed
-		);
-
-		GVector2D nextPosition = this->getEntityPosition( ) + newDirection;
-
-		float positionDelta = GVector2D( this->initialPos - nextPosition ).length( );
-
-		bool animationFinished = this->getEntityAnimations( )->getAnimationCycle( );
-
-		if ( positionDelta > this->range || animationFinished ) {
-			Log::Print( "[%s] Attack out of range" , this->GetEntityName( ).c_str( ) );
-			if ( animationFinished ) {
-				this->isActive = false;
-				this->setEntityPosition( GVector2D( 0 , 0 ) );
-			}
-			return;
-		}
-
-		this->setEntityPosition( nextPosition );
-		Log::Print( "[%s] Attack addPos: %f,%f, delta: %f, range: %f" ,
-			this->GetEntityName( ).c_str( ) , newDirection.x , newDirection.y , positionDelta , this->range );
-	}
 }
 
-bool CBaseAttack::IsActive( ) const {
-	return isActive;
+std::shared_ptr<CBaseAttack> CBaseAttack::Clone() {
+		std::shared_ptr<CBaseAttack> clone = std::make_shared<CBaseAttack>( *this ); // Usa cópia
+		return clone;
 }
 
-float CBaseAttack::GetDamage( ) const {
-	return damage;
+void CBaseAttack::otherActiveLogic( CBaseEntity * sender ) {
+
 }
 
-float CBaseAttack::GetRange( ) const {
-	return range;
+void CBaseAttack::otherDeactiveLogic( ) {
+
 }
 
 void CBaseAttack::Active( CBaseEntity * sender ) {
-	this->isActive = true;
-	this->setEntityPosition( sender->getEntityPosition( ) );
+	this->active = true;
 	this->setLookingAngle( sender->getLookingAngle( ).getDegrees() );
 	this->setEntityLookingDirection( sender->getEntityLookingDirection( ) );
 	this->setEntityMovementDirection( sender->getEntityMovementDirection( ) );
+	this->setEntityPosition( sender->getEntityPosition() );
 
+	otherActiveLogic( sender );
+}
 
-	this->initialPos = this->getEntityPosition();
+void CBaseAttack::Deactive( ) {
+	this->active = false;
+	this->setEntityPosition( GVector2D( 0 , 0 ) );
+	otherDeactiveLogic( );
+}
+
+bool CBaseAttack::IsActive( ) const {
+	return this->active;
+}
+
+float CBaseAttack::getDamage( ) const {
+	return this->damage;
+}
+
+float CBaseAttack::getRange( ) const {
+	return this->range;
+}
+
+float CBaseAttack::getDelay( ) const {
+	return this->delay;
+}
+
+float CBaseAttack::getCooldown( ) const {
+	return this->cooldown;
+}
+
+float CBaseAttack::getSpeed( ) const {
+	return this->speed;
+}
+
+GVector2D CBaseAttack::getArea( ) const {
+	return this->area;
+}
+
+CBaseAttackType CBaseAttack::getAttackType( ) {
+	return this->type;
+}
+
+std::string CBaseAttack::getName( ) const {
+	return this->Name;
+}
+
+GVector2D CBaseAttack::getInitialPosition( ) const {
+	return this->initialPos;
+}
+
+void CBaseAttack::setInitialPosition( GVector2D position ) {
+	this->initialPos = position;
 }
