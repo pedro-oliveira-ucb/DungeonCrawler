@@ -85,8 +85,11 @@ class CBaseEntity
 	float movementAngle;
 	CBaseEntityHitbox entityHitbox;
 	float maxHealth = 100;
+	bool beingHit = false;
+	bool finishedDeathAnimation = false;
 
 public:
+
 	virtual void updateEntity( );
 
 	static CBaseEntityAnimationType getAnimationTypeBasedOnStateAndDirection( CBaseEntityState entityState , DIRECTION entityDirection );
@@ -104,6 +107,9 @@ public:
 
 	bool isAlive( );
 
+	bool deathAnimationFinished( );
+	void setDeathAnimationFinished( bool finished );
+
 	float getMovementAngle( );
 
 	std::string GetEntityName( );
@@ -114,6 +120,7 @@ public:
 	CBaseEntityState getEntityState( );
 	DIRECTION getEntityLookingDirection( );
 	GAngle getLookingAngle( );
+	float getMovementSpeed( ) { return this->movementSpeed; }
 	int getHealth( );
 	CBaseEntityHitbox getHitbox( );
 
@@ -124,4 +131,7 @@ public:
 	void setHealth( int health );
 	void setEntityPosition( GVector2D pos );
 	float getMaxHealth( );
+	void Hit( int damage );
+	bool isBeingHit( );
+	void stopBeingHit( );
 };

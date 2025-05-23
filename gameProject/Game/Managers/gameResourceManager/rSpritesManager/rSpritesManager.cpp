@@ -105,7 +105,11 @@ std::shared_ptr<rSpriteAnimation> rSpritesManager::loadClip( const std::string &
 	std::replace( relativePath.begin( ) , relativePath.end( ) , '\\' , '_' );
 
 
-	this->spriteAnimations.emplace( relativePath.c_str() , std::make_shared<rSpriteAnimation>( rSpriteAnimation( sprites , 24 ) ) );
+	rSpriteAnimation * animation = new rSpriteAnimation( sprites , 24);
+	std::shared_ptr< rSpriteAnimation> sharedAnimationPtr( animation );
+
+
+	this->spriteAnimations.emplace( relativePath.c_str() , sharedAnimationPtr );
 
 	Log::Print( "[rSpritesManager] Loaded %d sprites" , static_cast< int >( sprites.size( ) ) );
 }

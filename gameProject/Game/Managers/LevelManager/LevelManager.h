@@ -8,6 +8,7 @@ struct LevelData {
     std::string mapName;
     int enemyCount;
     int RespawnCount;
+    int RespawnTimer = 10;
     // Outras propriedades como spawn points, boss, etc.
 };
 
@@ -20,14 +21,15 @@ private:
 
     bool started = false;
     int respawnCount = 0;
+    int respawnTimer = 0;
 
     // Mutex para proteger as variáveis acima
-    mutable std::mutex managerMutex;
+    std::mutex managerMutex;
 
     // Métodos de acesso podem agora usar lock para thread safety
-    const LevelData & getCurrentLevel( ) const;
+     LevelData getCurrentLevel( ) ;
     void moveToNextLevel( );
-    bool isLastLevel( ) const;
+    bool isLastLevel( );
     bool hasEnemyAlive( );
 
     void updateEnemies( );
@@ -38,7 +40,7 @@ public:
     LevelManager();
     void loadLevels();
     void updateLevel( );
-	std::vector<std::shared_ptr< CEnemyEntity>> getEnemies( ) const;
+	std::vector<std::shared_ptr< CEnemyEntity>> getEnemies( );
 };
 
 extern LevelManager levelManager;

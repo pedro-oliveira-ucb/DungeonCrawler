@@ -1,7 +1,17 @@
 #include "CBaseEntityAnimation.h"
 #include <mutex>
 
-std::mutex animationMutex;
+
+
+
+CBaseEntityAnimation::CBaseEntityAnimation( const  CBaseEntityAnimation & other ) {
+	this->animations = other.animations;
+	this->currentAnimationType = other.currentAnimationType;
+	this->animationFPS = other.animationFPS;
+	this->currentAnimationStep = 0;
+	setCurrentAnimationType( other.currentAnimationType , true );
+}
+
 
 CBaseEntityAnimation::CBaseEntityAnimation( CBaseEntityAnimationConstructor builder ) {
 	this->animations = builder.animations;
@@ -38,9 +48,11 @@ void CBaseEntityAnimation::updateAnimation( bool loop , bool reverse ) {
 		}
 	}
 
-	if ( this->currentAnimation != nullptr ) {
-		this->spriteSize = this->currentAnimation->getFrame( this->currentAnimationStep )->getSpriteSize( );
+	if ( this->currentAnimation == nullptr || this->currentAnimation->getFrame( this->currentAnimationStep ).get( ) == nullptr ) {
+		return;
 	}
+
+	this->spriteSize = this->currentAnimation->getFrame( this->currentAnimationStep )->getSpriteSize( );
 }
 
 void * CBaseEntityAnimation::getCurrentTexture( ) {

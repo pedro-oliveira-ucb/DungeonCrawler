@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <mutex>
 #include <unordered_map>
 
 #include "../../../gameResources/gameResource/rSprites/rSpriteAnimation/rSpriteAnimation.h"
@@ -39,7 +40,7 @@ struct CBaseEntityAnimationConstructor {
 };
 
 class CBaseEntityAnimation {
-
+	std::mutex animationMutex;
 	std::unordered_map<CBaseEntityAnimationType, std::shared_ptr<rSpriteAnimation> > animations;
 	rSpriteAnimation * currentAnimation;
 
@@ -54,9 +55,24 @@ class CBaseEntityAnimation {
 
 public:
 	
-	int getAnimationCycle( ) { return this->animationCycle; }
+	CBaseEntityAnimation & operator=( const CBaseEntityAnimation & other ) {
+		if ( this == &other )
+			return *this;
 
-	CBaseEntityAnimation( ){}
+		std::lock_guard<std::mutex> lock( this->animationMutex );
+
+		this->animations = other.animations;
+		this->spriteSize = other.spriteSize;
+		this->animationFPS = other.animationFPS;
+		this->currentAnimationStep = other.currentAnimationStep;
+		this->currentAnimationType = other.currentAnimationType;
+		this->texture = other.texture;
+		this->animationCycle = other.animationCycle;
+
+		return *this;
+	}
+
+	CBaseEntityAnimation( const CBaseEntityAnimation & other );
 	CBaseEntityAnimation( CBaseEntityAnimationConstructor builder );
 
 	static std::string getAnimationTypeName( CBaseEntityAnimationType anim );
@@ -64,15 +80,13 @@ public:
 	static CBaseEntityAnimationType getReverseAnimation( CBaseEntityAnimationType anim );
 	static bool isDifferentAnimationType( CBaseEntityAnimationType animA , CBaseEntityAnimationType animB );
 
-
 	void updateAnimation( bool loop = true, bool reverse = false );
-	
 	void * getCurrentTexture( );
-	GVector2D getCurrentTextureSize( );
+	void setCurrentAnimationType( CBaseEntityAnimationType animationType , bool ignoreCheck = false );
 
-	void setCurrentAnimationType( CBaseEntityAnimationType animationType, bool ignoreCheck = false );
-
+	int getAnimationCycle( ) { return this->animationCycle; }
 	int getAnimationFPS( );
 
+	GVector2D getCurrentTextureSize( );
 	CBaseEntityAnimationType getCurrentAnimationType( );
 };

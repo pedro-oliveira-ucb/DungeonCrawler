@@ -5,19 +5,14 @@
 #include <regex>
 #include <algorithm>
 
-#include <mutex>
-
 namespace fs = std::filesystem;
-
-
-std::mutex rSpriteAnimationMutex;
 
 rSpriteAnimation::rSpriteAnimation( std::vector<std::shared_ptr<rSprite>> sprites , int fps ) {
 	this->sprites = sprites;
 }
 
 int rSpriteAnimation::size( ) {
-	std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
+	std::lock_guard<std::mutex> lock( this->rSpriteAnimationMutex );
 
 	if ( this == nullptr ) {
 		return 0;
@@ -30,7 +25,7 @@ int rSpriteAnimation::size( ) {
 }
 
 std::shared_ptr<rSprite> rSpriteAnimation::getFrame( int idx )  {
-	std::lock_guard<std::mutex> lock( rSpriteAnimationMutex );
+	std::lock_guard<std::mutex> lock( this->rSpriteAnimationMutex );
 
 	if ( this == nullptr ) {
 		return nullptr;

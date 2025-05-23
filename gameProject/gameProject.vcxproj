@@ -135,6 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EnemiesInitializer\EnemiesInitializer.cpp" />
+    <ClCompile Include="Game\Managers\collisionManager\collisionManager.cpp" />
     <ClCompile Include="Game\gameObjects\gameSoundEventsHandler\gameSoundsEventHandler.cpp" />
     <ClCompile Include="Game\Managers\LevelManager\LevelManager.cpp" />
     <ClCompile Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.cpp" />
@@ -179,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EnemiesInitializer\EnemiesInitializer.h" />
+    <ClInclude Include="Game\Managers\collisionManager\collisionManager.h" />
     <ClInclude Include="Game\gameObjects\gameSoundEventsHandler\gameSoundsEventHandler.h" />
     <ClInclude Include="Game\Managers\LevelManager\LevelManager.h" />
     <ClInclude Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.h" />

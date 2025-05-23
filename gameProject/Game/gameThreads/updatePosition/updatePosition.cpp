@@ -1,16 +1,14 @@
 #include "updatePosition.h"
 
+#include <cmath>
+
 #include "../../gameControls/keybindHandler/keybindHandler.h"
 #include "../../gameControls/mouseMovement/mouseMovement.h"
 
-#include "../../../Globals/Globals.h"
-#include "../../../Utils/Log/Log.h"
-
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
 
-#include "../../Managers/LevelManager/LevelManager.h"
-
-#include <cmath>
+#include "../../../Globals/Globals.h"
+#include "../../../Utils/Log/Log.h"
 
 struct movementUpdater {
     keybind_identifier key;
@@ -37,8 +35,6 @@ void updatePositionEvent::threadFunction() {
         { MOVE_RIGHT,     MOVEMENT_RIGHT },
         { MOVE_LEFT,      MOVEMENT_LEFT }
     };
-
-
 
     while (true) {
         if (!localPlayer) {
@@ -75,8 +71,6 @@ void updatePositionEvent::threadFunction() {
 
         // Atualiza player
         localPlayer->updateEntity();
-
-        levelManager.updateLevel( );
 
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }

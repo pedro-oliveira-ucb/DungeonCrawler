@@ -51,7 +51,7 @@ CEnemyEntity * EnemiesInitializer::generateEnemy( const std::string & animationN
 	builder.entityPosition = GVector2D( 0 , 0 );
 	builder.entityType = CBaseEntityType::MOB;
 	builder.health = 100;
-	builder.movementSpeed = 1;
+	builder.movementSpeed = 5;
 	builder.Name = animationName;
 
 	// Cria a instância do inimigo
@@ -64,32 +64,32 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 	std::string eventName = enemyName + "_hurt";
 	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 		eventName ,
-		[ & ] ( ) {
-			gameSoundsQueue.addEventToQueue( enemyName + "_hurt" );
+		[ ] ( ) {
+			gameSoundsQueue.addEventToQueue( "BasicEnemy_hurt" );
 		}
 	) );
 
 	eventName = enemyName + "_dead";
 	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 		eventName ,
-		[ & ] ( ) {
-			gameSoundsQueue.addEventToQueue( enemyName + "_dead" );
+		[ ] ( ) {
+			gameSoundsQueue.addEventToQueue( "BasicEnemy_dead" );
 		}
 	) );
 
 	eventName = enemyName + "_meleeAttack";
 	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 		eventName ,
-		[ & ] ( ) {
-			gameSoundsQueue.addEventToQueue( enemyName + "_meleeAttack" );
+		[ ] ( ) {
+			gameSoundsQueue.addEventToQueue( "BasicEnemy_meleeAttack" );
 		}
 	) );
 
 	eventName = enemyName + "_rangedAttack";
 	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 		eventName ,
-		[ & ] ( ) {
-			gameSoundsQueue.addEventToQueue( enemyName + "_meleeAttack" );
+		[ ] ( ) {
+			gameSoundsQueue.addEventToQueue( "BasicEnemy_meleeAttack" );
 		}
 	) );
 

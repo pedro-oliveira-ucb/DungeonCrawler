@@ -87,6 +87,15 @@ bool LocalPlayerInitializer::initializeEvents( ) {
 		}
 	) );
 
+	eventName = "localPlayer_walking";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ ] ( ) {
+
+			gameSoundsQueue.addEventToQueue( "localPlayer_walking" );
+		}
+	) );
+
 	return true;
 }
 

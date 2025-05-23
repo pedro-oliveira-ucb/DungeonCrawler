@@ -69,7 +69,7 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 	}
 	 
 	{
-		attackBuilder.damage = 30;
+		attackBuilder.damage = 50;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 1.0f;
 		attackBuilder.range = 1000.f;

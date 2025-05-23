@@ -17,9 +17,9 @@ class CPlayerEntity : public CBaseEntity {
     CBaseAttackType currentLoadingAttack;
     int AnimationCycleOnAttackInit = -1;
     int lastTimeAttacking = -1;
-    bool beingHit = false;
 
     int AnimationCycleOnHurtInit = -1;
+    int AnimationCycleOnStep = -1;
 
 	CBaseAttack * currentAttack = nullptr; // Ataque atual do jogador
 
@@ -33,8 +33,6 @@ public:
     bool isAttacking( );
 
     void updateEntity( ) override;
-
-    void Hit( int damage );
 
     void Respawn(  );
 };

@@ -81,11 +81,8 @@ int main( void ) {
 	InitWindow( globals.screenWidth , globals.screenHeight , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
 	InitAudioDevice( );      // Initialize audio device
 
-	extractStyleSheet( "style.png" );
-
 	DisableCursor( );
 
-	
 	Log::Print( "[main] starting game!" );
 	game.start( );
 	Log::Print( "[main] game started!" );
@@ -107,10 +104,9 @@ int main( void ) {
 			globals.mousePosX = mousePos.x;
 			globals.mousePosY = mousePos.y;
 
-
 			BeginDrawing( );
 			//remove old draws?
-			ClearBackground( BLACK );
+			ClearBackground( GRAY );
 
 			gameRender::Get().render( );
 			

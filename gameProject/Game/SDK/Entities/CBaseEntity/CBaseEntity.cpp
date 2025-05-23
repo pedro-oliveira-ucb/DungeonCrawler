@@ -1,25 +1,34 @@
 #include "CBaseEntity.h"
 
+#include "../../../Managers/collisionManager/collisionManager.h"
+#include "../../Events/EventManager.h"
 #include "../../../Utils/Log/Log.h"
+#include <unordered_map>
+#include <set>
+#include <cmath>
 
-CBaseEntity::CBaseEntity( const CBaseEntity & other ) {
+
+CBaseEntity::CBaseEntity( const CBaseEntity & other ) :
+	entityAnimations( other.entityAnimations ) 
+{
 	this->Name = other.Name;
 	this->entityPosition = other.entityPosition;
 	this->health = other.health;
 	this->entityType = other.entityType;
 	this->entityMovementDirection = other.entityMovementDirection;
 	this->entityState = other.entityState;
-	this->entityAnimations = other.entityAnimations;
 	this->movementsRequest = other.movementsRequest;
 	this->lookingAngle = other.lookingAngle;
 	this->movementAngle = other.movementAngle;
 	this->movementSpeed = other.movementSpeed;
 	this->entityHitbox = other.entityHitbox;
 
-	Log::Print( "[%s] Copy constructor called" , this->GetEntityName( ).c_str() );
+	Log::Print( "[%s] Copy constructor called" , this->GetEntityName( ).c_str( ) );
 }
 
-CBaseEntity::CBaseEntity( CBaseEntityConstructor builder ) {
+CBaseEntity::CBaseEntity( CBaseEntityConstructor builder ) :
+	entityAnimations( builder.entityAnimations )
+{
 	this->health = builder.health;
 	this->Name = builder.Name;
 	this->entityPosition = builder.entityPosition;
@@ -29,27 +38,31 @@ CBaseEntity::CBaseEntity( CBaseEntityConstructor builder ) {
 	this->movementSpeed = builder.movementSpeed;
 }
 
-
-
 std::string CBaseEntity::GetEntityName( ) {
 	return this->Name;
 }
 
 GVector2D CBaseEntity::getEntityPosition( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	return this->entityPosition;
 }
 
-CBaseEntityType CBaseEntity::getEntityType( ) {
-	return this->entityType;
+int CBaseEntity::getHealth( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	return this->health;
 }
 
 CBaseEntityState CBaseEntity::getEntityState( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	return this->entityState;
 }
 
-int CBaseEntity::getHealth( ) {
-	return this->health;
+CBaseEntityType CBaseEntity::getEntityType( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	return this->entityType;
 }
+
+
 
 float CBaseEntity::getEntityLookingDirectionBaseAngle( ) {
 	switch ( getEntityLookingDirection( ) ) {
@@ -75,11 +88,34 @@ CBaseEntityAnimation * CBaseEntity::getEntityAnimations( ) {
 }
 
 void CBaseEntity::setHealth( int health ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	this->health = health;
 }
 
 void CBaseEntity::setEntityPosition( GVector2D pos ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	this->entityPosition = pos;
+}
+
+void CBaseEntity::Hit( int damage ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	this->health -= damage;
+	this->beingHit = true;
+
+	if ( this->isAlive( ) )
+		EventManager::Get( ).Trigger( this->Name + "_hurt" );
+	else
+		EventManager::Get( ).Trigger( this->Name + "_dead" );
+}
+
+bool CBaseEntity::isBeingHit( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	return this->beingHit;
+}
+
+void CBaseEntity::stopBeingHit( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	this->beingHit = false;
 }
 
 CBaseEntityMovementDirection CBaseEntity::getEntityMovementDirection( ) {
@@ -110,7 +146,7 @@ void CBaseEntity::clearMovementRequest( ) {
 
 void CBaseEntity::move( ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
-	GVector2D finalMovement = GVector2D(0.f, 0.f);
+	GVector2D finalMovement = GVector2D( 0.f , 0.f );
 
 	for ( auto move : this->movementsRequest ) {
 		switch ( move ) {
@@ -132,19 +168,16 @@ void CBaseEntity::move( ) {
 	this->movementsRequest.clear( );
 
 	if ( finalMovement.x != 0 || finalMovement.y != 0 ) {
-		// Calcula o ângulo em radianos
+		GVector2D newPos = this->entityPosition + finalMovement;
 
-		float angleRadians = std::atan2(finalMovement.y , finalMovement.x );
-
-		// Converte para graus, se quiser
-		float angleDegrees = angleRadians * ( 180.0f / static_cast< float >( M_PI ) );
-
-		// Salva o ângulo se você tiver uma variável pra isso
-		this->movementAngle = angleDegrees; // Exemplo: float lastMovementAngle;
-
-		// Atualiza a posição
-		this->entityPosition.x += finalMovement.x;
-		this->entityPosition.y += finalMovement.y;
+		// Usa o CollisionManager para checar se pode mover
+		if ( CollisionManager::Get( ).CanMoveTo( this , newPos ) ) {
+			float angleRadians = std::atan2( finalMovement.y , finalMovement.x );
+			float angleDegrees = angleRadians * ( 180.0f / static_cast< float >( M_PI ) );
+			this->movementAngle = angleDegrees;
+			this->entityPosition = newPos;
+		}
+		// Se colidir, não move
 	}
 }
 
@@ -154,8 +187,6 @@ bool CBaseEntity::hasMovementRequest( ) {
 }
 
 void CBaseEntity::updateEntity( ) {
-
-
 
 }
 
@@ -185,6 +216,17 @@ bool CBaseEntity::isAlive( ) {
 	return this->health > 0;
 }
 
+bool CBaseEntity::deathAnimationFinished( )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	return this->finishedDeathAnimation;
+}
+
+void CBaseEntity::setDeathAnimationFinished( bool finished )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	this->finishedDeathAnimation = finished;
+}
 
 void CBaseEntity::setLookingAngle( float degress )
 {

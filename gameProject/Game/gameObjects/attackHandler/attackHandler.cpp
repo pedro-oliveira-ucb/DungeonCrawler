@@ -2,6 +2,7 @@
 #include <mutex>
 
 #include "../entitiesHandler/entitiesHandler.h"
+#include "../../Managers/collisionManager/collisionManager.h"
 
 #include "../../../Utils/Log/Log.h"
 
@@ -24,6 +25,20 @@ void attackHandler::updateAttacks( )
 		else
 		{
 			if ( attack->IsActive( ) ) {
+
+				std::vector<CBaseEntity *> targets = CollisionManager::Get( ).GetNearbyEntities( attack->getEntityPosition( ) );
+
+				if ( !targets.empty( ) ) {
+					for ( int i = 0; i < targets.size( ); i++ ) {
+
+						if ( targets.at( i ) == nullptr )
+							continue;
+
+						if ( CollisionManager::Get( ).checkCollision( attack , targets.at( i ) , attack->getEntityPosition())) {
+							targets.at( i )->Hit( ( int ) attack->getDamage( ) );
+						}
+					}	
+				}
 
 				attack->updateAttackPosition( );
 				attack->getEntityAnimations( )->updateAnimation( false );

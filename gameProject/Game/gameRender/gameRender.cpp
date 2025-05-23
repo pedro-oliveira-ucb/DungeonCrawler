@@ -2,6 +2,8 @@
 
 #include "../../Utils/Log/Log.h"
 
+#include "../../Globals/Globals.h"
+
 #include "RenderEntities/RenderEntities.h"
 
 #include "../gameObjects/entitiesHandler/entitiesHandler.h"
@@ -31,7 +33,14 @@ void gameRender::soundEvents( ) {
 	}
 }
 
+void gameRender::renderCustomCursor( ) {
+	DrawCircle( GetMouseX( ) , GetMouseY( ) , 10 , BLUE );
+}
+
 void gameRender::render( ) {
+
+	
+
 	static float zoomLevel = 1.0f;
 
 	// Zoom com scroll do mouse
@@ -55,5 +64,8 @@ void gameRender::render( ) {
 
 	entititiesRender.render( );
 
+	renderCustomCursor( );
+
 	EndMode2D( );
+
 }

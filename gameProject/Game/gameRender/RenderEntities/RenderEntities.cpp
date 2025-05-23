@@ -109,13 +109,6 @@ void renderEntity( CBaseEntity * entity, bool DrawInfo = false, float sizeFactor
             pos.y + sinf( entityLookingAngle.getRadians( ) ) * 50 ,
             GREEN
         );
-
-        DrawCircle(
-            globals.mousePosX ,
-            globals.mousePosY ,
-            5 ,
-            BLUE
-        );
     }
 }
 
@@ -138,7 +131,7 @@ void renderAttacks( ) {
         if ( !attackPtr->IsActive( ) )
             continue;
 
-        renderEntity( attackPtr, true);
+        renderEntity( attackPtr, false);
     }
 }
 
@@ -158,7 +151,10 @@ void renderEnemies( ) {
         if ( CEnemyPtr->getEntityAnimations( ) == nullptr )
             continue;
 
-        renderEntity( CEnemyPtr , true );
+        if ( !CEnemyPtr->isAlive( ) && CEnemyPtr->deathAnimationFinished( ) )
+            continue;
+
+        renderEntity( CEnemyPtr , false );
     }
 
 }
