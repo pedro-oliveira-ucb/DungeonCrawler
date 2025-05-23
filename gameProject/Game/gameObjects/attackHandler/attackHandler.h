@@ -1,30 +1,39 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <unordered_map>
 #include "../../../Utils/singleton.h"
 
 #include "../../SDK/Entities/Attacks/CBaseAttack/CBaseAttack.h"
 
+struct availableAttackHolder {
+    CBaseAttackType type;
+    std::shared_ptr<CBaseAttack> attack;
+    availableAttackHolder( CBaseAttackType t , std::shared_ptr<CBaseAttack> a )
+        : type( t ) , attack( a ) {
+    }
+};
 
 class attackHandler : public CSingleton<attackHandler>
 {
-	std::vector<std::pair<CBaseEntity * ,std::shared_ptr<CBaseAttack>>> runningAttacks;
+    std::vector<std::pair<CBaseEntity * , std::shared_ptr<CBaseAttack>>> runningAttacks;
 
-	std::vector<std::shared_ptr<CBaseAttack>> availableEnemiesAttacks;
-	std::vector<std::shared_ptr<CBaseAttack>> availableLocalPlayerAttacks;
+    std::vector<availableAttackHolder> availableEnemiesAttacks;
+    std::vector<availableAttackHolder> availableLocalPlayerAttacks;
 
 public:
+    int runningAttacksSize( );
+    std::shared_ptr<CBaseAttack> getRunningAttack( int index );
 
-	int runningAttacksSize( );
-	std::shared_ptr<CBaseAttack> getRunningAttack( int index );
+    // Retorna todos os ataques que o Player pode usar
+    std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> getAvailableLocalPlayerAttack( );
 
-	std::vector<std::shared_ptr<CBaseAttack>> &getAvailableLocalPlayerAttack( );
-	std::shared_ptr<CBaseAttack> getAvailableEnemyAttack( int index );
+    // Retorna um ataque que o inimigo pode usar (aqui só 1 por exemplo)
+    std::shared_ptr<availableAttackHolder> getAvailableEnemyAttack( );
 
-	void addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> attack );
-	void addAvailableEnemyAttack( std::shared_ptr<CBaseAttack> attack );
+    void addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> attack );
+    void addAvailableEnemyAttack( std::shared_ptr<CBaseAttack> attack );
 
-	void updateAttacks( );
-	std::shared_ptr<CBaseAttack> throwNewAttack( CBaseEntity * sender , CBaseAttack * attack );
+    void updateAttacks( );
+    std::shared_ptr<CBaseAttack> throwNewAttack( CBaseEntity * sender , CBaseAttack * attack );
 };
-

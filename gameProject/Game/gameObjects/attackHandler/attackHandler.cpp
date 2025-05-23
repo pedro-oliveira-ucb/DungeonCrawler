@@ -1,6 +1,8 @@
 #include "attackHandler.h"
 #include <mutex>
 
+#include "../entitiesHandler/entitiesHandler.h"
+
 #include "../../../Utils/Log/Log.h"
 
 std::mutex attackHandlerMutex;
@@ -22,6 +24,7 @@ void attackHandler::updateAttacks( )
 		else
 		{
 			if ( attack->IsActive( ) ) {
+
 				attack->updateAttackPosition( );
 				attack->getEntityAnimations( )->updateAnimation( false );
 			}
@@ -52,21 +55,49 @@ std::shared_ptr<CBaseAttack> attackHandler::getRunningAttack( int index )
 	return nullptr;
 }
 
-std::vector<std::shared_ptr<CBaseAttack>> &attackHandler::getAvailableLocalPlayerAttack( ) {
-	return this->availableLocalPlayerAttacks;
+std::unordered_map<CBaseAttackType, std::shared_ptr<CBaseAttack>>  attackHandler::getAvailableLocalPlayerAttack( ) {
+	//run this once, and store it
+	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> result;
+	for ( int i = 0; i < this->availableLocalPlayerAttacks.size(); i++ ) {
+		availableAttackHolder * attack = &this->availableLocalPlayerAttacks.at( i );
+
+		result.emplace( std::make_pair( attack->attack->getAttackType( ) , attack->attack ) );
+	}
+
+	return result;
 }
 
 std::shared_ptr<CBaseAttack> attackHandler::throwNewAttack( CBaseEntity * sender , CBaseAttack * attack )
 {
-	std::lock_guard<std::mutex> lock( attackHandlerMutex );
+
 	std::shared_ptr<CBaseAttack> newAttack = attack->Clone( );
 	newAttack->Active( sender );
-	runningAttacks.push_back( std::make_pair( sender , newAttack ) );
+	{
+		std::lock_guard<std::mutex> lock( attackHandlerMutex );
+		runningAttacks.push_back( std::make_pair( sender , newAttack ) );
+	}
 
 	return newAttack;
 }
 
 void attackHandler::addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> attack ) {
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );
-	this->availableLocalPlayerAttacks.emplace_back( attack );
+	this->availableLocalPlayerAttacks.emplace_back( availableAttackHolder( attack->getAttackType( ) , attack ) );
+}
+
+std::shared_ptr<availableAttackHolder> attackHandler::getAvailableEnemyAttack() {
+    // Exemplo: retornará o primeiro ataque disponível pro inimigo
+    // Ajuste se quiser vários tipos
+    std::lock_guard<std::mutex> lock(attackHandlerMutex);
+    if (!availableEnemiesAttacks.empty()) {
+        return std::make_shared<availableAttackHolder>(availableEnemiesAttacks[0]);
+    }
+    return nullptr;
+}
+
+void attackHandler::addAvailableEnemyAttack(std::shared_ptr<CBaseAttack> attack) {
+    std::lock_guard<std::mutex> lock(attackHandlerMutex);
+    this->availableEnemiesAttacks.emplace_back(
+        availableAttackHolder(attack->getAttackType(), attack)
+    );
 }

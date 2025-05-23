@@ -3,17 +3,16 @@
 
 #include "LocalPlayerInitializer/LocalPlayerInitializer.h"
 #include "AttacksInitializer/AttacksInitializer.h"
+#include "EnemiesInitializer/EnemiesInitializer.h"
 
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
 
-#include "../../World/World.h"
-#include "../../gameWorld/gameWorld.h"
-#include "../../gameResources/gameResourceManager/gameResourceManager.h"
+#include "../../Managers/gameResourceManager/gameResourceManager.h"
 #include "../../../Utils/Log/Log.h"
 
 std::optional<std::pair<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation>>> generateAnimationPair( CBaseEntityAnimationType type , std::string Name ) {
 
-	std::shared_ptr< rSpriteAnimation> clip = _gameResourceManager.getSpritesManager( ).getClip( Name );
+	std::shared_ptr< rSpriteAnimation> clip = _gameResourceManager.getSpritesManager( )->getClip( Name );
 
 	if ( clip.get( ) != nullptr )
 	{
@@ -69,15 +68,20 @@ bool EntitiesInitializer::initialize( ) {
 		return false;
 	}
 
-	CPlayerEntity * localPlayer = LocalPlayerInitializer::Get( ).generate( "localPlayer" );
-	if ( !localPlayer ) {
-		Log::Print( "[EntitiesInitializer] Failed to generate localplayer" );
+	if ( !LocalPlayerInitializer::Get( ).initialize( ) ) {
+		Log::Print( "[EntitiesInitializer] Failed to initialize localplayer" );
 		return false;
 	}
-	_gameWorld.localplayer = localPlayer;
-	Log::Print( "[EntitiesInitializer] localPlayer generated" );
 
-	entitiesHandler::Get().setLocalPlayer( localPlayer );
+	Log::Print( "[EntitiesInitializer] localPlayer initialized" );
+
+	if ( !EnemiesInitializer::Get( ).initialize( ) ) {
+		Log::Print( "[EntitiesInitializer] Failed to initialize enemies" );
+		return false;
+	}
+
+	Log::Print( "[EntitiesInitializer] enemies initialized" );
+
 
 	return true;
 }

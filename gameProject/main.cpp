@@ -1,5 +1,8 @@
 #include <iostream>
 #include <thread>
+#include <sstream>  // Necessário para std::stringstream
+#include <iomanip>  // Necessário para std::setw e std::setfill
+
 
 #include "Game/game.h"
 #include "Game/gameRender/gameRender.h"
@@ -24,6 +27,50 @@ void waitGameLoad( ) {
 	}
 }
 
+void extractStyleSheet( std::string spritesheetPath ) {
+	const int spriteWidth = 128;   // Largura de cada sprite
+	const int spriteHeight = 128;  // Altura de cada sprite
+
+	// Carrega o spritesheet
+	Image spritesheet = LoadImage( spritesheetPath.c_str() );
+	if ( spritesheet.data == nullptr ) {
+		TraceLog( LOG_ERROR , "Spritesheet não encontrado!" );
+		return;
+	}
+
+	int columns = spritesheet.width / spriteWidth;
+	int rows = spritesheet.height / spriteHeight;
+	int totalSprites = columns * rows;
+
+	int spriteIndex = 0;
+	for ( int y = 0; y < rows; y++ ) {
+		for ( int x = 0; x < columns; x++ ) {
+			Rectangle sourceRec = {
+				( float ) x * spriteWidth,
+				( float ) y * spriteHeight,
+				( float ) spriteWidth,
+				( float ) spriteHeight
+			};
+
+			// Extrai o sprite
+			Image sprite = ImageFromImage( spritesheet , sourceRec );
+
+			// Nome do arquivo com 3 dígitos (ex: sprite_001.png)
+			std::stringstream filename;
+			filename << spriteIndex << ".png";
+
+			// Salva o sprite como imagem
+			ExportImage( sprite , filename.str( ).c_str( ) );
+
+			UnloadImage( sprite );
+			spriteIndex++;
+		}
+	}
+
+	// Libera recursos
+	UnloadImage( spritesheet );
+}
+
 int main( void ) {
 
 	Log::Print( "[Render] Initialized window!" );
@@ -32,7 +79,9 @@ int main( void ) {
 
 	//	raylib::SetConfigFlags( raylib::FLAG_FULLSCREEN_MODE ); // Define a flag de fullscreen
 	InitWindow( globals.screenWidth , globals.screenHeight , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
+	InitAudioDevice( );      // Initialize audio device
 
+	extractStyleSheet( "style.png" );
 
 	DisableCursor( );
 
@@ -51,6 +100,8 @@ int main( void ) {
 				break;
 			}
 
+			gameRender::Get( ).soundEvents( );
+
 			Vector2 mousePos = GetMousePosition( );
 
 			globals.mousePosX = mousePos.x;
@@ -59,7 +110,7 @@ int main( void ) {
 
 			BeginDrawing( );
 			//remove old draws?
-			ClearBackground( WHITE );
+			ClearBackground( BLACK );
 
 			gameRender::Get().render( );
 			

@@ -5,13 +5,22 @@
 #include <vector>
 #include <string>
 
-class GameEvents {
+class IGameEvent {
 public:
-    using Callback = std::function<void( )>;
+    virtual ~IGameEvent() = default;
+    virtual void Execute() = 0;
+    virtual std::string GetName() const = 0;
+};
 
-    void on( const std::string & eventName , Callback callback );
-    void emit( const std::string & eventName );
+class CallbackEvent : public IGameEvent {
+    std::function<void()> callback;
+    std::string name;
+public:
+    CallbackEvent(const std::string& eventName, std::function<void()> cb)
+        : name(eventName), callback(cb) {}
 
-private:
-    std::unordered_map<std::string , std::vector<Callback>> listeners;
+    void Execute() override {
+        if (callback) callback();
+    }
+    std::string GetName() const override { return name; }
 };

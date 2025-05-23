@@ -1,5 +1,8 @@
 #include "LocalPlayerInitializer.h"
 
+#include "../../../SDK/Events/EventManager.h"
+#include "../../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
 
 #include <optional>
 
@@ -26,7 +29,15 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 		CBaseEntityAnimationType::ATTACKING_FORWARD ,
 		CBaseEntityAnimationType::ATTACKING_BACKWARD ,
 		CBaseEntityAnimationType::ATTACKING_LEFT ,
-		CBaseEntityAnimationType::ATTACKING_RIGHT
+		CBaseEntityAnimationType::ATTACKING_RIGHT,
+		CBaseEntityAnimationType::HURT_FORWARD ,
+		CBaseEntityAnimationType::HURT_BACKWARD ,
+		CBaseEntityAnimationType::HURT_LEFT ,
+		CBaseEntityAnimationType::HURT_RIGHT,
+		CBaseEntityAnimationType::DEAD_FORWARD ,
+		CBaseEntityAnimationType::DEAD_BACKWARD ,
+		CBaseEntityAnimationType::DEAD_LEFT ,
+		CBaseEntityAnimationType::DEAD_RIGHT
 	};
 
 	std::optional<CBaseEntityAnimationConstructor> animation = createEntityAnimationConstructor( "localPlayer", requiredAnimations );
@@ -41,7 +52,55 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 	builder.entityType = CBaseEntityType::PLAYER;
 	builder.health = 100;
 	builder.movementSpeed = 10;
-	builder.Name = "Player";
+	builder.Name = animationName;
 
 	return new CPlayerEntity( builder );
+}
+
+bool LocalPlayerInitializer::initializeEvents( ) {
+	std::string eventName;
+
+	eventName = "localPlayer_hurt";
+	EventManager::Get().RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ ] ( ) {
+
+			gameSoundsQueue.addEventToQueue( "localPlayer_hurt" );
+		}
+	) );
+
+	eventName = "localPlayer_dead";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ ] ( ) {
+
+			gameSoundsQueue.addEventToQueue( "localPlayer_dead" );
+		}
+	) );
+
+	eventName = "localPlayer_attack_miss";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ ] ( ) {
+
+			gameSoundsQueue.addEventToQueue( "localPlayer_attack_miss" );
+		}
+	) );
+
+	return true;
+}
+
+
+bool LocalPlayerInitializer::initialize( ) {
+	CPlayerEntity * player = generate( "localPlayer" );
+	if ( !player ) {
+		return false;
+	}
+	entitiesHandler::Get().setLocalPlayer( player );
+
+	if ( !this->initializeEvents( ) ) {
+		return false;
+	}
+
+	return true;
 }

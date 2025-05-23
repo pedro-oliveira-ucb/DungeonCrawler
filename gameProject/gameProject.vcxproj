@@ -134,29 +134,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EnemiesInitializer\EnemiesInitializer.cpp" />
+    <ClCompile Include="Game\gameObjects\gameSoundEventsHandler\gameSoundsEventHandler.cpp" />
+    <ClCompile Include="Game\Managers\LevelManager\LevelManager.cpp" />
     <ClCompile Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.cpp" />
     <ClCompile Include="Game\SDK\Entities\Attacks\CMeleeAttack\CMeleeAttack.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rSound\rSound.cpp" />
-    <ClCompile Include="Game\SDK\Events\GameEvents.cpp" />
     <ClCompile Include="Game\gameObjects\entitiesHandler\entitiesHandler.cpp" />
     <ClCompile Include="Game\gameObjects\attackHandler\attackHandler.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.cpp" />
     <ClCompile Include="Game\SDK\Entities\Attacks\CBaseAttack\CBaseAttack.cpp" />
-    <ClCompile Include="Game\gameWorld\gameWorld.cpp" />
     <ClCompile Include="Game\gameRender\gameRender.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.cpp" />
     <ClCompile Include="Game\gameWindow\gameWindow.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\gameInitializer\gameInitializer.cpp" />
-    <ClCompile Include="Game\gameResources\gameResourceManager\gameResourceManager.cpp" />
+    <ClCompile Include="Game\Managers\gameResourceManager\gameResourceManager.cpp" />
     <ClCompile Include="Game\gameThreads\eventHandlers\eventHandlers.cpp" />
     <ClCompile Include="Game\gameThreads\gameThreads.cpp" />
     <ClCompile Include="Game\gameThreads\CBaseThread\CBaseThread.cpp" />
     <ClCompile Include="Game\gameControls\keybindHandler\keybindHandler.cpp" />
     <ClCompile Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntityAnimation.cpp" />
+    <ClCompile Include="Game\SDK\Entities\CEnemyEntity\CEnemyEntity.cpp" />
     <ClCompile Include="Game\SDK\math\gAngle\GAngle.cpp" />
     <ClCompile Include="Globals\Globals.cpp" />
-    <ClCompile Include="Game\gameResources\gameResourceManager\rSpritesManager\rSpritesManager.cpp" />
+    <ClCompile Include="Game\Managers\gameResourceManager\rSpritesManager\rSpritesManager.cpp" />
     <ClCompile Include="Game\gameResources\rBaseResource\rBaseResource.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.cpp" />
@@ -166,7 +168,7 @@
     <ClCompile Include="Game\gameThreads\updateEntities\updateEntities.cpp" />
     <ClCompile Include="Game\gameThreads\updateAttacks\updateAttacks.cpp" />
     <ClCompile Include="Game\SDK\math\math.cpp" />
-    <ClCompile Include="Game\gameResources\gameResourceManager\rSoundsManager\rSoundsManager.cpp" />
+    <ClCompile Include="Game\Managers\gameResourceManager\rSoundsManager\rSoundsManager.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
     <ClCompile Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.cpp" />
@@ -174,24 +176,27 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game\gameThreads\updatePosition\updatePosition.cpp" />
     <ClCompile Include="Game\SDK\math\Vector2D\GVector2D.cpp" />
-    <ClCompile Include="Game\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EnemiesInitializer\EnemiesInitializer.h" />
+    <ClInclude Include="Game\gameObjects\gameSoundEventsHandler\gameSoundsEventHandler.h" />
+    <ClInclude Include="Game\Managers\LevelManager\LevelManager.h" />
     <ClInclude Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.h" />
     <ClInclude Include="Game\SDK\Entities\Attacks\CMeleeAttack\CMeleeAttack.h" />
     <ClInclude Include="Game\gameResources\gameResource\rSound\rSound.h" />
+    <ClInclude Include="Game\SDK\Entities\CEnemyEntity\CEnemyEntity.h" />
+    <ClInclude Include="Game\SDK\Events\EventManager.h" />
     <ClInclude Include="Game\SDK\Events\GameEvents.h" />
     <ClInclude Include="Game\gameObjects\entitiesHandler\entitiesHandler.h" />
     <ClInclude Include="Game\gameObjects\attackHandler\attackHandler.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.h" />
     <ClInclude Include="Game\SDK\Entities\Attacks\CBaseAttack\CBaseAttack.h" />
-    <ClInclude Include="Game\gameWorld\gameWorld.h" />
     <ClInclude Include="Game\gameRender\gameRender.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.h" />
     <ClInclude Include="Game\gameWindow\gameWindow.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\gameInitializer\gameInitializer.h" />
-    <ClInclude Include="Game\gameResources\gameResourceManager\gameResourceManager.h" />
+    <ClInclude Include="Game\Managers\gameResourceManager\gameResourceManager.h" />
     <ClInclude Include="Game\gameThreads\eventHandlers\eventHandlers.h" />
     <ClInclude Include="Game\gameThreads\gameThreads.h" />
     <ClInclude Include="Game\gameThreads\CBaseThread\CBaseThread.h" />
@@ -199,7 +204,7 @@
     <ClInclude Include="Game\SDK\Animation\CBaseEntityAnimation\CBaseEntityAnimation.h" />
     <ClInclude Include="Game\SDK\math\gAngle\GAngle.h" />
     <ClInclude Include="Globals\Globals.h" />
-    <ClInclude Include="Game\gameResources\gameResourceManager\rSpritesManager\rSpritesManager.h" />
+    <ClInclude Include="Game\Managers\gameResourceManager\rSpritesManager\rSpritesManager.h" />
     <ClInclude Include="Game\gameResources\rBaseResource\rBaseResource.h" />
     <ClInclude Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.h" />
     <ClInclude Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.h" />
@@ -209,7 +214,7 @@
     <ClInclude Include="Game\gameThreads\updateEntities\updateEntities.h" />
     <ClInclude Include="Game\gameThreads\updateAttacks\updateAttacks.h" />
     <ClInclude Include="Game\SDK\math\math.h" />
-    <ClInclude Include="Game\gameResources\gameResourceManager\rSoundsManager\rSoundsManager.h" />
+    <ClInclude Include="Game\Managers\gameResourceManager\rSoundsManager\rSoundsManager.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />
     <ClInclude Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.h" />
@@ -217,7 +222,6 @@
     <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h" />
     <ClInclude Include="Game\SDK\math\Vector2D\GVector2D.h" />
     <ClInclude Include="Utils\singleton.h" />
-    <ClInclude Include="Game\World\World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

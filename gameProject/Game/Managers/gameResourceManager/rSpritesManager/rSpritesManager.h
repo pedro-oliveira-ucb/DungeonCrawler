@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <memory>
 
-#include "../../rBaseResource/rBaseResource.h"
-#include "../../gameResource/rSprites/rSpriteAnimation/rSpriteAnimation.h"
+#include "../../../gameResources/rBaseResource/rBaseResource.h"
+#include "../../../gameResources/gameResource/rSprites/rSpriteAnimation/rSpriteAnimation.h"
 
 class rSpritesManager : public rBaseResource
 {

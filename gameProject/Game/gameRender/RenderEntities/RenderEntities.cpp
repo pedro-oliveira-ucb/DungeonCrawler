@@ -3,14 +3,12 @@
 #include <raylib/raylib.h>
 #include <cmath>
 
+#include "../../Managers/LevelManager/LevelManager.h"
+
 #include "../../../Utils/Log/Log.h"
-
-#include "../../gameObjects/attackHandler/attackHandler.h"
-
-#include "../../World/World.h"
 #include "../../../Globals/Globals.h"
-#include "../../gameWorld/gameWorld.h"
-#include "../../SDK/Entities/CPlayerEntity/CPlayerEntity.h"
+#include "../../gameObjects/attackHandler/attackHandler.h"
+#include "../../gameObjects/entitiesHandler/entitiesHandler.h"
 
 #define M_PI 3.14159265358979323846f
 
@@ -52,9 +50,19 @@ void renderEntity( CBaseEntity * entity, bool DrawInfo = false, float sizeFactor
     GAngle entityLookingAngle = entity->getLookingAngle( );
     GAngle entityMovingAngle = entity->getMovementAngle( );
 
-    float baseAngle = entity->getEntityLookingDirectionBaseAngle();
+    float rotationAngle = 0.0f;
+    float baseAngle = entity->getEntityLookingDirectionBaseAngle( );
     float lookingAngleDeg = entity->getLookingAngle( ).getDegrees( );
-    float rotationAngle = AngleDiff( lookingAngleDeg , baseAngle );
+
+    switch ( entity->getEntityType( ) ) {
+    case CBaseEntityType::ATTACK:
+        rotationAngle = lookingAngleDeg - 90;
+        break;
+    default:
+        rotationAngle = AngleDiff( lookingAngleDeg , baseAngle );
+        break;
+    }
+
 
     Vector2 position = { pos.x, pos.y };
     Vector2 origin = { size.x / 2.0f, size.y / 2.0f };
@@ -118,6 +126,7 @@ void renderAttacks( ) {
 
         if(attack.get() == nullptr )
 			continue;
+
 		CBaseAttack * attackPtr = attack.get( );
 
         if ( attackPtr == nullptr )
@@ -126,13 +135,38 @@ void renderAttacks( ) {
 		if ( attackPtr->getEntityAnimations( ) == nullptr )
 			continue;
 
-        renderEntity( attackPtr, true, 0.1 );
+        if ( !attackPtr->IsActive( ) )
+            continue;
+
+        renderEntity( attackPtr, true);
     }
 }
 
+void renderEnemies( ) {
+	std::vector<std::shared_ptr<CEnemyEntity>> enemies = levelManager.getEnemies();
+    for ( int i = 0; i < enemies.size(); i++ ) {
+        std::shared_ptr<CEnemyEntity> enemy = enemies.at(i);
+
+        if ( enemy.get( ) == nullptr )
+            continue;
+
+        CEnemyEntity * CEnemyPtr = enemy.get( );
+
+        if ( CEnemyPtr == nullptr )
+            continue;
+
+        if ( CEnemyPtr->getEntityAnimations( ) == nullptr )
+            continue;
+
+        renderEntity( CEnemyPtr , true );
+    }
+
+}
+
 void RenderEntities::render( ) {
-	renderEntity( _gameWorld.localplayer, true );
+	renderEntity( entitiesHandler::Get().getLocalPlayer() , true );
 	renderAttacks( );
+    renderEnemies( );
 	/*for ( int i = 0; i < _gameWorld.entities.size( ); i++ ) {
 		CBaseEntity * entity = _gameWorld.entities.at( i );
 		if ( entity == nullptr ) {

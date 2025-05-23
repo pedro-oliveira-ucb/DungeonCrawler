@@ -4,6 +4,7 @@
 
 #include <Windows.h>
 
+
 std::unordered_map<keybind_identifier , bool> toggleStates;
 std::unordered_map<keybind_identifier , bool> lastKeyDown;
 

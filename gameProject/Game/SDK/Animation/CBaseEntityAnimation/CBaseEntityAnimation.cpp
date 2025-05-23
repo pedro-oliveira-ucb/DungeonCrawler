@@ -85,67 +85,49 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 		this->currentAnimation = this->animations.at( this->currentAnimationType ).get( );
 	}
 }
+
+static const std::string_view animationPaths[ ] = {
+	"idle_forward",     // 0
+	"idle_backward",    // 1
+	"idle_left",        // 2
+	"idle_right",       // 3
+	"walking_forward",  // 4
+	"walking_backward", // 5
+	"walking_left",     // 6
+	"walking_right",    // 7
+	"attacking_forward",// 8
+	"attacking_backward",//9
+	"attacking_left",   //10
+	"attacking_right",  //11
+	"hurt_backward",    //12
+	"hurt_forward",     //13
+	"hurt_left",        //14
+	"hurt_right",        //15
+	"dead_backward",    //12
+	"dead_forward",     //13
+	"dead_left",        //14
+	"dead_right"        //15
+};
+
 std::string CBaseEntityAnimation::getAnimationTypeName( CBaseEntityAnimationType anim ) {
-	switch ( anim ) {
-	case IDLE_FORWARD:
-		return "IDLE_FORWARD";
-	case IDLE_BACKWARD:
-		return "IDLE_BACKWARD";
-	case IDLE_LEFT:
-		return "IDLE_LEFT";
-	case IDLE_RIGHT:
-		return "IDLE_RIGHT";
-	case WALKING_FORWARD:
-		return "WALKING_FORWARD";
-	case WALKING_BACKWARD:
-		return "WALKING_BACKWARD";
-	case WALKING_LEFT:
-		return "WALKING_LEFT";
-	case WALKING_RIGHT:
-		return "WALKING_RIGHT";
-	case ATTACKING_FORWARD:
-		return "ATTACKING_FORWARD";
-	case ATTACKING_BACKWARD:
-		return "ATTACKING_BACKWARD";
-	case ATTACKING_LEFT:
-		return "ATTACKING_LEFT";
-	case ATTACKING_RIGHT:
-		return "ATTACKING_RIGHT";
-	default:
-		return "UNKNOWN_ANIMATION_TYPE";
+	int index = static_cast< int >( anim );
+	if ( index >= 0 && index < static_cast< int >( std::size( animationPaths ) ) ) {
+		return std::string( animationPaths[ index ] );
 	}
+	return "";
 }
 
+
+
 std::string CBaseEntityAnimation::getAnimationTypePath( CBaseEntityAnimationType anim ) {
-	switch ( anim ) {
-	case IDLE_FORWARD:
-		return "idle_forward";
-	case IDLE_BACKWARD:
-		return "idle_backward";
-	case IDLE_LEFT:
-		return "idle_left";
-	case IDLE_RIGHT:
-		return "idle_right";
-	case WALKING_FORWARD:
-		return "walking_forward";
-	case WALKING_BACKWARD:
-		return "walking_backward";
-	case WALKING_LEFT:
-		return "walking_left";
-	case WALKING_RIGHT:
-		return "walking_right";
-	case ATTACKING_FORWARD:
-		return "attacking_forward";
-	case ATTACKING_BACKWARD:
-		return "attacking_backward";
-	case ATTACKING_LEFT:
-		return "attacking_left";
-	case ATTACKING_RIGHT:
-		return "attacking_right";
-	default:
-		return "";
+	int index = static_cast< int >( anim );
+	if ( index >= 0 && index < static_cast< int >( std::size( animationPaths ) ) ) {
+		return std::string( animationPaths[ index ] );
 	}
+	return "";
 }
+
+
 
 CBaseEntityAnimationType CBaseEntityAnimation::getReverseAnimation( CBaseEntityAnimationType anim ) {
 	switch ( anim ) {

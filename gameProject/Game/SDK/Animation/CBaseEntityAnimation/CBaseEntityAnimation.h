@@ -9,18 +9,26 @@
 
 
 enum CBaseEntityAnimationType {
-	IDLE_FORWARD,
-	IDLE_BACKWARD,
-	IDLE_LEFT,
-	IDLE_RIGHT,
-	WALKING_FORWARD,
-	WALKING_BACKWARD,
-	WALKING_LEFT,
-	WALKING_RIGHT,
-	ATTACKING_FORWARD,
-	ATTACKING_BACKWARD,
-	ATTACKING_LEFT,
-	ATTACKING_RIGHT,
+	IDLE_FORWARD ,
+	IDLE_BACKWARD ,
+	IDLE_LEFT ,
+	IDLE_RIGHT ,
+	WALKING_FORWARD ,
+	WALKING_BACKWARD ,
+	WALKING_LEFT ,
+	WALKING_RIGHT ,
+	ATTACKING_FORWARD ,
+	ATTACKING_BACKWARD ,
+	ATTACKING_LEFT ,
+	ATTACKING_RIGHT ,
+	HURT_BACKWARD ,
+	HURT_FORWARD ,
+	HURT_LEFT ,
+	HURT_RIGHT ,
+	DEAD_BACKWARD ,
+	DEAD_FORWARD,
+	DEAD_LEFT,
+	DEAD_RIGHT
 };
 
 struct CBaseEntityAnimationConstructor {
@@ -43,18 +51,19 @@ class CBaseEntityAnimation {
 
 	int animationCycle = 0;
 
+
 public:
 	
 	int getAnimationCycle( ) { return this->animationCycle; }
 
 	CBaseEntityAnimation( ){}
+	CBaseEntityAnimation( CBaseEntityAnimationConstructor builder );
 
 	static std::string getAnimationTypeName( CBaseEntityAnimationType anim );
 	static std::string getAnimationTypePath( CBaseEntityAnimationType anim );
 	static CBaseEntityAnimationType getReverseAnimation( CBaseEntityAnimationType anim );
 	static bool isDifferentAnimationType( CBaseEntityAnimationType animA , CBaseEntityAnimationType animB );
 
-	CBaseEntityAnimation( CBaseEntityAnimationConstructor builder );
 
 	void updateAnimation( bool loop = true, bool reverse = false );
 	

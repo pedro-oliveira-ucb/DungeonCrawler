@@ -10,12 +10,16 @@
 
 class CPlayerEntity : public CBaseEntity {
 
-    std::vector<std::shared_ptr<CBaseAttack>> attacks; // Lista de ataques do jogador
+    std::unordered_map<CBaseAttackType, std::shared_ptr<CBaseAttack>> attacks; // Lista de ataques do jogador
     bool attacking = false;
     bool inAttackLoadingAnimation = false;
     bool alreadyThrowedAttack = false;
-    int currentLoadingAttack = -1;
+    CBaseAttackType currentLoadingAttack;
     int AnimationCycleOnAttackInit = -1;
+    int lastTimeAttacking = -1;
+    bool beingHit = false;
+
+    int AnimationCycleOnHurtInit = -1;
 
 	CBaseAttack * currentAttack = nullptr; // Ataque atual do jogador
 
@@ -24,10 +28,13 @@ public:
 
     CPlayerEntity( CBaseEntityConstructor builder );
 
-    void UseAttack( int index ); // Usa um ataque específico
+    void UseAttack( CBaseAttackType ); // Usa um ataque específico
 
     bool isAttacking( );
 
     void updateEntity( ) override;
 
+    void Hit( int damage );
+
+    void Respawn(  );
 };

@@ -26,6 +26,8 @@ T * AttacksInitializer::generateAttack( std::string animationName , CBaseAttackC
 		return nullptr;
 	}
 
+	animation.value( ).currentAnimationType = ATTACKING_FORWARD;
+
 	CBaseEntityConstructor builder;
 
 	builder.entityAnimations = animation.value( );
@@ -70,8 +72,8 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 		attackBuilder.damage = 30;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 1.0f;
-		attackBuilder.range = 30.f;
-		attackBuilder.speed = 10;
+		attackBuilder.range = 1000.f;
+		attackBuilder.speed = 50;
 		attackBuilder.type = CBaseAttackType_Ranged;
 		attackBuilder.Name = "MagicAttack";
 		//attack damage area

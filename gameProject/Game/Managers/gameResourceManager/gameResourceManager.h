@@ -14,7 +14,8 @@ class gameResourceManager
 public:
 
 	bool initialize( std::string path );
-	rSpritesManager &getSpritesManager( );
+	rSpritesManager * getSpritesManager( );
+	rSoundsManager * getSoundManager( );
 
 };
 

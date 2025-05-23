@@ -16,7 +16,9 @@ enum CBaseEntityType {
 enum CBaseEntityState {
 	STOPPED,
 	MOVING,
-	ATTACKING
+	ATTACKING,
+	HURT,
+	DEAD
 };
 
 enum CBaseEntityMovementDirection {
@@ -82,6 +84,7 @@ class CBaseEntity
 	GAngle lookingAngle;
 	float movementAngle;
 	CBaseEntityHitbox entityHitbox;
+	float maxHealth = 100;
 
 public:
 	virtual void updateEntity( );
@@ -98,6 +101,8 @@ public:
 	void addMoveRequest( CBaseEntityMovementDirection movement );
 	void clearMovementRequest( );
 	void move( );
+
+	bool isAlive( );
 
 	float getMovementAngle( );
 
@@ -118,4 +123,5 @@ public:
 	void setEntityMovementDirection( CBaseEntityMovementDirection move );
 	void setHealth( int health );
 	void setEntityPosition( GVector2D pos );
+	float getMaxHealth( );
 };

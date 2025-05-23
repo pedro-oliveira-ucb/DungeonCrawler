@@ -34,8 +34,13 @@ void CMeleeAttack::updateAttackPosition( ) {
 		bool animationFinished = this->getEntityAnimations( )->getAnimationCycle( );
 
 		if ( positionDelta > this->getRange( ) || animationFinished ) {
-			Log::Print( "[%s] Attack out of range" , this->GetEntityName( ).c_str( ) );
+			if ( positionDelta > this->getRange( ) )
+			{
+				Log::Print( "[%s] Max attack range!" , this->GetEntityName( ).c_str( ) );
+			}
+
 			if ( animationFinished ) {
+				Log::Print( "[%s] Attack animation finished!" , this->GetEntityName( ).c_str( ) );
 				this->Deactive( );
 			}
 			return;
@@ -49,7 +54,20 @@ void CMeleeAttack::updateAttackPosition( ) {
 }
 
 void CMeleeAttack::otherActiveLogic( CBaseEntity * sender) {
+	float angleRad = this->getLookingAngle( ).getRadians( );
+	float speed = this->getSpeed( );
 
+	GVector2D senderSize = sender->getEntityAnimations( )->getCurrentTextureSize( );
+
+	GVector2D newDirection(
+		cosf( angleRad ) * (senderSize.x),
+		sinf( angleRad ) * (senderSize.y)
+	);
+
+	GVector2D nextPosition = this->getEntityPosition( ) + newDirection;
+
+	this->setEntityPosition( nextPosition );
+	this->setInitialPosition( nextPosition );
 }
 
 void CMeleeAttack::otherDeactiveLogic( ) {

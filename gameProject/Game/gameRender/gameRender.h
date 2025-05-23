@@ -5,5 +5,6 @@ class gameRender : public CSingleton<gameRender>
 {
 public:
 	void render( );
+	void soundEvents( );
 };
 

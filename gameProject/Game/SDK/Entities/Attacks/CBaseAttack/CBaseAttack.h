@@ -3,7 +3,11 @@
 #include "../../../math/gAngle/GAngle.h"
 #include "../../CBaseEntity/CBaseEntity.h"
 
+
+
+
 enum CBaseAttackType {
+	CBaseAttackType_None,
 	CBaseAttackType_Melee ,
 	CBaseAttackType_Ranged ,
 	CBaseAttackType_Spell
@@ -19,6 +23,7 @@ struct CBaseAttackConstructor {
 	GVector2D area;
 	CBaseAttackType type;
 };
+
 
 class CBaseAttack : public CBaseEntity {
 
@@ -59,3 +64,4 @@ public:
 
 	void setInitialPosition( GVector2D position );
 };
+

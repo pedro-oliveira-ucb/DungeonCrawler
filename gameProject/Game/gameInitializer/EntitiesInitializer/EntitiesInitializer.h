@@ -1,7 +1,7 @@
 //#pragma once
 #include "../../../Utils/singleton.h"
 
-class EntitiesInitializer
+class EntitiesInitializer : public CSingleton<EntitiesInitializer>
 {
 public:
 	bool initialize( );

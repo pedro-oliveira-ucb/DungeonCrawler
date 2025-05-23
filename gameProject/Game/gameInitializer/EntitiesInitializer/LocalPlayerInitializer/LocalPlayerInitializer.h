@@ -4,7 +4,11 @@
 
 class LocalPlayerInitializer : public CSingleton<LocalPlayerInitializer>
 {
-public:
 	CPlayerEntity * generate( std::string animationName );
+
+	bool initializeEvents( );
+
+public:
+	bool initialize( );
 };
 

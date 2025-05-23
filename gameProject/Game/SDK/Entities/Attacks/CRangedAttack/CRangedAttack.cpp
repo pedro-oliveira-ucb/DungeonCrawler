@@ -13,6 +13,7 @@ void CRangedAttack::updateAttackPosition( ) {
 	if ( this->IsActive( ) ) {
 		float angleRad = this->getLookingAngle( ).getRadians( );
 		float speed = this->getSpeed( );
+
 		GVector2D initialPos = this->getInitialPosition( );
 
 		GVector2D newDirection(
@@ -51,17 +52,15 @@ void CRangedAttack::otherActiveLogic( CBaseEntity * sender ) {
 
 	GVector2D senderSize = sender->getEntityAnimations( )->getCurrentTextureSize( );
 
-
 	GVector2D newDirection(
-		cosf( angleRad ) * speed + senderSize.x,
-		sinf( angleRad ) * speed + senderSize.y
+		cosf( angleRad ) * speed,
+		sinf( angleRad ) * speed
 	);
 
 	GVector2D nextPosition = this->getEntityPosition( ) + newDirection;
 
 	this->setEntityPosition( nextPosition );
 	this->setInitialPosition( nextPosition );
-
 }
 
 std::shared_ptr<CBaseAttack> CRangedAttack::Clone( ) {

@@ -2,11 +2,10 @@
 
 #include "../../gameControls/keybindHandler/keybindHandler.h"
 #include "../../gameControls/mouseMovement/mouseMovement.h"
-#include "../../gameWorld/gameWorld.h"
+
 
 #include "../../../Globals/Globals.h"
 #include "../../../Utils/Log/Log.h"
-#include "../../gameWorld/gameWorld.h"
 
 void updateEntities::threadFunction( ) {
 

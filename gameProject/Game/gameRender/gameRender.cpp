@@ -5,6 +5,8 @@
 #include "RenderEntities/RenderEntities.h"
 
 #include "../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
+#include "../Managers/gameResourceManager/gameResourceManager.h"
 
 RenderEntities entititiesRender;
 
@@ -14,29 +16,44 @@ RenderEntities entititiesRender;
 
 Camera2D camera = { 0 };
 
+bool check = false;
+
+void gameRender::soundEvents( ) {
+
+	std::string soundEvent = gameSoundsQueue.getLatestOnQueue( );
+	while ( !soundEvent.empty( ) ) {
+
+		if ( !_gameResourceManager.getSoundManager( )->playSound( soundEvent ) ) {
+			Log::Print( "[soundEvents] cant play %s", soundEvent.c_str() );
+		}
+
+		soundEvent = gameSoundsQueue.getLatestOnQueue( );
+	}
+}
+
 void gameRender::render( ) {
-    static float zoomLevel = 1.0f;
+	static float zoomLevel = 1.0f;
 
-    // Zoom com scroll do mouse
-    zoomLevel += GetMouseWheelMove( ) * 0.1f;
-    zoomLevel = Clamp( zoomLevel , 1.f , 2.0f );
-    camera.zoom = zoomLevel;
+	// Zoom com scroll do mouse
+	zoomLevel += GetMouseWheelMove( ) * 0.1f;
+	zoomLevel = Clamp( zoomLevel , 1.f , 2.0f );
+	camera.zoom = zoomLevel;
 
 
-    CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
-    GVector2D localPos = local->getEntityPosition( );
-    if (local != nullptr ) {
-        // Define o ponto no mundo a ser seguido
-        camera.target = { localPos.x, localPos.y };
+	CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
+	GVector2D localPos = local->getEntityPosition( );
+	if ( local != nullptr ) {
+		// Define o ponto no mundo a ser seguido
+		camera.target = { localPos.x, localPos.y };
 
-        // Centraliza a câmera no meio da tela
-        camera.offset = { GetScreenWidth( ) / 2.0f, GetScreenHeight( ) / 2.0f };
-    }
-    camera.rotation = 0.0f;
+		// Centraliza a câmera no meio da tela
+		camera.offset = { GetScreenWidth( ) / 2.0f, GetScreenHeight( ) / 2.0f };
+	}
+	camera.rotation = 0.0f;
 
-    BeginMode2D( camera );
+	BeginMode2D( camera );
 
-    entititiesRender.render( );
+	entititiesRender.render( );
 
-    EndMode2D( );
+	EndMode2D( );
 }

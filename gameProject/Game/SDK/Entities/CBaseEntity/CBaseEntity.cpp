@@ -66,6 +66,10 @@ float CBaseEntity::getEntityLookingDirectionBaseAngle( ) {
 	return 0.f;
 }
 
+float CBaseEntity::getMaxHealth( ) {
+	return this->maxHealth;
+}
+
 CBaseEntityAnimation * CBaseEntity::getEntityAnimations( ) {
 	return &this->entityAnimations;
 }
@@ -155,57 +159,48 @@ void CBaseEntity::updateEntity( ) {
 
 }
 
-CBaseEntityAnimationType CBaseEntity::getAnimationTypeBasedOnStateAndDirection( CBaseEntityState entityState , DIRECTION entityDirection ) {
-	switch ( entityState ) {
-	case CBaseEntityState::MOVING:
-		switch ( entityDirection ) {
-		case DIRECTION::FORWARD:
-			return WALKING_FORWARD;
-		case DIRECTION::BACKWARD:
-			return WALKING_BACKWARD;
-		case DIRECTION::LEFT:
-			return WALKING_LEFT;
-		case DIRECTION::RIGHT:
-			return WALKING_RIGHT;
-		default:
-			return IDLE_FORWARD; // Padrão
-		}
-	case CBaseEntityState::STOPPED:
-		switch ( entityDirection ) {
-		case DIRECTION::FORWARD:
-			return IDLE_FORWARD;
-		case DIRECTION::BACKWARD:
-			return IDLE_BACKWARD;
-		case DIRECTION::LEFT:
-			return IDLE_LEFT;
-		case DIRECTION::RIGHT:
-			return IDLE_RIGHT;
-		default:
-			return IDLE_FORWARD; // Padrão
-		}
-	case CBaseEntityState::ATTACKING:
-		switch ( entityDirection ) {
-		case DIRECTION::FORWARD:
-			return ATTACKING_FORWARD;
-		case DIRECTION::BACKWARD:
-			return ATTACKING_BACKWARD;
-		case DIRECTION::LEFT:
-			return ATTACKING_LEFT;
-		case DIRECTION::RIGHT:
-			return ATTACKING_RIGHT;
-		default:
-			return ATTACKING_FORWARD; // Padrão
-		}
+CBaseEntityAnimationType animationTable[ 5 ][ 4 ] = {
+	// STOPPED
+	{ IDLE_LEFT, IDLE_RIGHT, IDLE_FORWARD, IDLE_BACKWARD },
+	// MOVING
+	{ WALKING_LEFT, WALKING_RIGHT, WALKING_FORWARD, WALKING_BACKWARD },
+	// ATTACKING
+	{ ATTACKING_LEFT, ATTACKING_RIGHT, ATTACKING_FORWARD, ATTACKING_BACKWARD },
+	// HURT
+	{ HURT_LEFT, HURT_RIGHT, HURT_FORWARD, HURT_BACKWARD },
+	//DEAD
+	{ DEAD_LEFT, DEAD_RIGHT, DEAD_FORWARD, DEAD_BACKWARD }
+};
 
-	default:
-		return IDLE_FORWARD; // Padrão
+CBaseEntityAnimationType CBaseEntity::getAnimationTypeBasedOnStateAndDirection( CBaseEntityState state , DIRECTION direction ) {
+	if ( state < CBaseEntityState::STOPPED || state > CBaseEntityState::DEAD ||
+		direction < DIRECTION::LEFT || direction > DIRECTION::BACKWARD ) {
+		return IDLE_FORWARD; // fallback
 	}
+
+	return animationTable[ state ][ direction ];
+}
+
+bool CBaseEntity::isAlive( ) {
+	return this->health > 0;
 }
 
 
 void CBaseEntity::setLookingAngle( float degress )
 {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+	if ( !this->isAlive( ) )
+		return;
+
+	if ( degress > -45 && degress <= 45 )
+		this->entityLookingDirection = ( DIRECTION::RIGHT );
+	else if ( degress > 45 && degress <= 135 )
+		this->entityLookingDirection = ( DIRECTION::BACKWARD );
+	else if ( degress > 135 || degress <= -135 )
+		this->entityLookingDirection = ( DIRECTION::LEFT );
+	else
+		this->entityLookingDirection = ( DIRECTION::FORWARD );
+
 	this->lookingAngle.setDegrees( degress );
 }
 
