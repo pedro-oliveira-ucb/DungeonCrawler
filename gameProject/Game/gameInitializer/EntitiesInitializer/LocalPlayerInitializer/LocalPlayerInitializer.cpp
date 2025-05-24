@@ -8,7 +8,7 @@
 
 
 
-std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>> 
+std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>>
 generateAnimationPair( CBaseEntityAnimationType type , std::string Name );
 
 
@@ -22,25 +22,51 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 		CBaseEntityAnimationType::IDLE_BACKWARD ,
 		CBaseEntityAnimationType::IDLE_LEFT ,
 		CBaseEntityAnimationType::IDLE_RIGHT ,
+
+		// Walking
 		CBaseEntityAnimationType::WALKING_FORWARD ,
 		CBaseEntityAnimationType::WALKING_BACKWARD ,
 		CBaseEntityAnimationType::WALKING_LEFT ,
-		CBaseEntityAnimationType::WALKING_RIGHT,
+		CBaseEntityAnimationType::WALKING_RIGHT ,
+
+		// Running
+		CBaseEntityAnimationType::RUNNING_FORWARD ,
+		CBaseEntityAnimationType::RUNNING_BACKWARD ,
+		CBaseEntityAnimationType::RUNNING_LEFT ,
+		CBaseEntityAnimationType::RUNNING_RIGHT ,
+
+		// Attacking (stationary)
 		CBaseEntityAnimationType::ATTACKING_FORWARD ,
 		CBaseEntityAnimationType::ATTACKING_BACKWARD ,
 		CBaseEntityAnimationType::ATTACKING_LEFT ,
-		CBaseEntityAnimationType::ATTACKING_RIGHT,
+		CBaseEntityAnimationType::ATTACKING_RIGHT ,
+
+		// Attacking while walking
+		CBaseEntityAnimationType::ATTACKING_WALKING_FORWARD ,
+		CBaseEntityAnimationType::ATTACKING_WALKING_BACKWARD ,
+		CBaseEntityAnimationType::ATTACKING_WALKING_LEFT ,
+		CBaseEntityAnimationType::ATTACKING_WALKING_RIGHT ,
+
+		// Attacking while running
+		CBaseEntityAnimationType::ATTACKING_RUNNING_FORWARD ,
+		CBaseEntityAnimationType::ATTACKING_RUNNING_BACKWARD ,
+		CBaseEntityAnimationType::ATTACKING_RUNNING_LEFT ,
+		CBaseEntityAnimationType::ATTACKING_RUNNING_RIGHT ,
+
+		// Hurt
 		CBaseEntityAnimationType::HURT_FORWARD ,
 		CBaseEntityAnimationType::HURT_BACKWARD ,
 		CBaseEntityAnimationType::HURT_LEFT ,
-		CBaseEntityAnimationType::HURT_RIGHT,
+		CBaseEntityAnimationType::HURT_RIGHT ,
+
+		// Dead
 		CBaseEntityAnimationType::DEAD_FORWARD ,
 		CBaseEntityAnimationType::DEAD_BACKWARD ,
 		CBaseEntityAnimationType::DEAD_LEFT ,
 		CBaseEntityAnimationType::DEAD_RIGHT
 	};
 
-	std::optional<CBaseEntityAnimationConstructor> animation = createEntityAnimationConstructor( "localPlayer", requiredAnimations );
+	std::optional<CBaseEntityAnimationConstructor> animation = createEntityAnimationConstructor( "localPlayer" , requiredAnimations );
 	if ( !animation ) {
 		return nullptr;
 	}
@@ -61,7 +87,7 @@ bool LocalPlayerInitializer::initializeEvents( ) {
 	std::string eventName;
 
 	eventName = "localPlayer_hurt";
-	EventManager::Get().RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 		eventName ,
 		[ ] ( ) {
 
@@ -105,7 +131,7 @@ bool LocalPlayerInitializer::initialize( ) {
 	if ( !player ) {
 		return false;
 	}
-	entitiesHandler::Get().setLocalPlayer( player );
+	entitiesHandler::Get( ).setLocalPlayer( player );
 
 	if ( !this->initializeEvents( ) ) {
 		return false;

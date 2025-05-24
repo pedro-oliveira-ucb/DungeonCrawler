@@ -1,7 +1,12 @@
 #pragma once
 
+#include <mutex>
+
+#include <unordered_set>
+
 #include "../../../math/gAngle/GAngle.h"
 #include "../../CBaseEntity/CBaseEntity.h"
+
 
 
 
@@ -27,6 +32,8 @@ struct CBaseAttackConstructor {
 
 class CBaseAttack : public CBaseEntity {
 
+	std::mutex cBaseAttackMutex;
+
 	std::string Name;
 	float damage;
 	float range;
@@ -40,6 +47,8 @@ class CBaseAttack : public CBaseEntity {
 
 	virtual void otherActiveLogic( CBaseEntity * );
 	virtual void otherDeactiveLogic( );
+
+	std::unordered_set<CBaseEntity *> hitEntities;
 
 public:
 	CBaseAttack( CBaseEntityConstructor builder , CBaseAttackConstructor attackBuilder );
@@ -56,6 +65,21 @@ public:
 	std::string getName( ) const;
 
 	CBaseAttackType getAttackType( );
+
+	bool hasAlreadyHit( CBaseEntity * entity ) {
+		std::lock_guard<std::mutex>( this->cBaseAttackMutex );
+		return hitEntities.find( entity ) != hitEntities.end( );
+	}
+
+	void registerHit( CBaseEntity * entity ) {
+		std::lock_guard<std::mutex>( this->cBaseAttackMutex );
+		hitEntities.insert( entity );
+	}
+
+	void resetHits( ) {
+		std::lock_guard<std::mutex>( this->cBaseAttackMutex );
+		hitEntities.clear( );
+	}
 
 	void Deactive( );
 	virtual void updateAttackPosition( ); // Atualiza o estado do ataque

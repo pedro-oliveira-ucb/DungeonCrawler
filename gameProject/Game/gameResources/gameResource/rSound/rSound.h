@@ -1,19 +1,24 @@
 #pragma once
+#include <mutex>
+#include <vector>
 #include <string>
 
 
 class rSound
 {
-    std::string soundPath;
-    void * soundAddress; // tipo opaco
-    void initializeSound( );
+	bool initialized = false;
+
+	std::string soundPath;
+	void * soundAddress; // tipo opaco
+	void initializeSound( );
+	
+
 public:
-    rSound( const rSound & ) = delete;
-    rSound & operator=( const rSound & ) = delete;
+	rSound( const rSound & ) = delete;
+	rSound & operator=( const rSound & ) = delete;
 
-    rSound( std::string model );
-    ~rSound( );
+	rSound( std::string model );
+	~rSound( );
 
-    void playSound( );
-    void * getSound( ); // retorna tipo opaco
+	void playSound( );
 };

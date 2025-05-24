@@ -13,7 +13,10 @@ public:
     void UpdateEntities( std::vector<CBaseEntity *> & entities );
     bool CanMoveTo( CBaseEntity * entity , GVector2D & newPos );
     void ProcessCollisions( );
+
+
     std::vector<CBaseEntity *> GetNearbyEntities( const GVector2D & pos );
+    std::vector<CBaseEntity *> GetAllEntities( );
     bool checkCollision( CBaseEntity * a , CBaseEntity * b , GVector2D newPosA );
 
 private:

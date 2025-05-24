@@ -18,12 +18,7 @@ bool gameResourceManager::initialize( std::string path ) {
         return false;
     }
 
-    if ( !this->soundsMananger.get( )->playSound( "localPlayer_hurt" ) ) {
-        Log::Print( "[gameResourceManager] Cant find localPlayer_hurt !" );
-    }
-
  
-
     return true;
 }
 
@@ -34,3 +29,4 @@ rSpritesManager *gameResourceManager::getSpritesManager( ) {
 rSoundsManager *gameResourceManager::getSoundManager( ) {
     return this->soundsMananger.get();
 }
+

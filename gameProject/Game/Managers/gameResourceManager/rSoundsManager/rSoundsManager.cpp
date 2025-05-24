@@ -59,17 +59,17 @@ bool rSoundsManager::initialize( )
 	return true;
 }
 
-std::shared_ptr<rSound> rSoundsManager::loadSound( std::string name ) {
+void rSoundsManager::loadSound( std::string name ) {
 	fs::path clipPath = name;
 
 	if ( clipPath.empty( ) ) {
 		Log::Print( "[rSpritesManager] Failed to load clip %s, path is empty!" , name.c_str( ) );
-		return nullptr;
+		return;
 	}
 
 	if ( !fs::exists( clipPath ) || !fs::is_directory( clipPath ) ) {
 		Log::Print( "[rSpritesManager] Folder not found: %s" , clipPath.string( ).c_str( ) );
-		return nullptr;
+		return;
 	}
 
 	std::string soundFilePath;
@@ -82,7 +82,7 @@ std::shared_ptr<rSound> rSoundsManager::loadSound( std::string name ) {
 	}
 
 	if ( soundFilePath.empty( ) ) {
-		return nullptr;
+		return;
 	}
 
 	fs::path basePath = this->getPath( );
@@ -91,6 +91,9 @@ std::shared_ptr<rSound> rSoundsManager::loadSound( std::string name ) {
 	std::replace( relativePath.begin( ) , relativePath.end( ) , '\\' , '_' );
 
 	rSound * sound = new rSound( soundFilePath );
+	if ( sound == nullptr )
+		return;
+
 	std::shared_ptr<rSound> soundPtr( sound );
 
 	this->sounds.emplace( std::make_pair( relativePath.c_str( ) , soundPtr ) );

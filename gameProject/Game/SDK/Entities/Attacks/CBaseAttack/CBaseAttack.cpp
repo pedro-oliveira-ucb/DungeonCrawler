@@ -1,6 +1,9 @@
 #include "CBaseAttack.h"
 
+#include "../../../Events/EventManager.h"
+
 #include "../../../Utils/Log/Log.h"
+
 
 CBaseAttack::CBaseAttack( CBaseEntityConstructor builder , CBaseAttackConstructor attackBuilder )
 	: CBaseEntity( builder )
@@ -51,6 +54,8 @@ void CBaseAttack::otherDeactiveLogic( ) {
 }
 
 void CBaseAttack::Active( CBaseEntity * sender ) {
+	EventManager::Get( ).Trigger( this->GetEntityName() + "_attackThrow" );
+
 	this->active = true;
 	this->setLookingAngle( sender->getLookingAngle( ).getDegrees() );
 	this->setEntityLookingDirection( sender->getEntityLookingDirection( ) );

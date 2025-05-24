@@ -1,8 +1,7 @@
 #include "CBaseEntityAnimation.h"
 #include <mutex>
 
-
-
+#include "../../../../Utils/Log/Log.h"
 
 CBaseEntityAnimation::CBaseEntityAnimation( const  CBaseEntityAnimation & other ) {
 	this->animations = other.animations;
@@ -11,7 +10,6 @@ CBaseEntityAnimation::CBaseEntityAnimation( const  CBaseEntityAnimation & other 
 	this->currentAnimationStep = 0;
 	setCurrentAnimationType( other.currentAnimationType , true );
 }
-
 
 CBaseEntityAnimation::CBaseEntityAnimation( CBaseEntityAnimationConstructor builder ) {
 	this->animations = builder.animations;
@@ -39,13 +37,16 @@ void CBaseEntityAnimation::updateAnimation( bool loop , bool reverse ) {
 
 	if ( this->currentAnimationStep < this->currentAnimation->size( ) - 1 ) {
 		this->currentAnimationStep++;
+
+		if ( this->currentAnimationStep == this->currentAnimation->size( ) - 1 ) {
+			this->animationCycle++;
+		}
+	}
+	else if ( loop ) {
+		this->currentAnimationStep = 0;
 	}
 	else {
-		this->animationCycle++;
-
-		if ( loop ) {
-			this->currentAnimationStep = 0;
-		}
+		this->currentAnimationStep = this->currentAnimation->size( ) - 1;
 	}
 
 	if ( this->currentAnimation == nullptr || this->currentAnimation->getFrame( this->currentAnimationStep ).get( ) == nullptr ) {
@@ -94,52 +95,68 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 			return;
 		}
 
-		this->currentAnimation = this->animations.at( this->currentAnimationType ).get( );
+		this->currentAnimation = this->animations.at( this->currentAnimationType );
 	}
 }
 
-static const std::string_view animationPaths[ ] = {
-	"idle_forward",     // 0
-	"idle_backward",    // 1
-	"idle_left",        // 2
-	"idle_right",       // 3
-	"walking_forward",  // 4
-	"walking_backward", // 5
-	"walking_left",     // 6
-	"walking_right",    // 7
-	"attacking_forward",// 8
-	"attacking_backward",//9
-	"attacking_left",   //10
-	"attacking_right",  //11
-	"hurt_backward",    //12
-	"hurt_forward",     //13
-	"hurt_left",        //14
-	"hurt_right",        //15
-	"dead_backward",    //12
-	"dead_forward",     //13
-	"dead_left",        //14
-	"dead_right"        //15
+// Mapeamento de animações para caminhos de arquivo
+std::unordered_map<CBaseEntityAnimationType , std::string> animationPaths = {
+	// Idle
+	{ IDLE_FORWARD,             "idle_forward" },
+	{ IDLE_BACKWARD,            "idle_backward" },
+	{ IDLE_LEFT,                "idle_left" },
+	{ IDLE_RIGHT,               "idle_right" },
+	// Walking
+	{ WALKING_FORWARD,          "walking_forward" },
+	{ WALKING_BACKWARD,         "walking_backward" },
+	{ WALKING_LEFT,             "walking_left" },
+	{ WALKING_RIGHT,            "walking_right" },
+	// Running
+	{ RUNNING_FORWARD,          "running_forward" },
+	{ RUNNING_BACKWARD,         "running_backward" },
+	{ RUNNING_LEFT,             "running_left" },
+	{ RUNNING_RIGHT,            "running_right" },
+	// Attacking stationary
+	{ ATTACKING_FORWARD,        "attacking_forward" },
+	{ ATTACKING_BACKWARD,       "attacking_backward" },
+	{ ATTACKING_LEFT,           "attacking_left" },
+	{ ATTACKING_RIGHT,          "attacking_right" },
+	// Attacking walking
+	{ ATTACKING_WALKING_FORWARD,"attacking_walking_forward" },
+	{ ATTACKING_WALKING_BACKWARD,"attacking_walking_backward" },
+	{ ATTACKING_WALKING_LEFT,   "attacking_walking_left" },
+	{ ATTACKING_WALKING_RIGHT,  "attacking_walking_right" },
+	// Attacking running
+	{ ATTACKING_RUNNING_FORWARD,"attacking_running_forward" },
+	{ ATTACKING_RUNNING_BACKWARD,"attacking_running_backward" },
+	{ ATTACKING_RUNNING_LEFT,   "attacking_running_left" },
+	{ ATTACKING_RUNNING_RIGHT,  "attacking_running_right" },
+	// Hurt
+	{ HURT_FORWARD,             "hurt_forward" },
+	{ HURT_BACKWARD,            "hurt_backward" },
+	{ HURT_LEFT,                "hurt_left" },
+	{ HURT_RIGHT,               "hurt_right" },
+	// Dead
+	{ DEAD_FORWARD,             "dead_forward" },
+	{ DEAD_BACKWARD,            "dead_backward" },
+	{ DEAD_LEFT,                "dead_left" },
+	{ DEAD_RIGHT,               "dead_right" }
 };
 
 std::string CBaseEntityAnimation::getAnimationTypeName( CBaseEntityAnimationType anim ) {
-	int index = static_cast< int >( anim );
-	if ( index >= 0 && index < static_cast< int >( std::size( animationPaths ) ) ) {
-		return std::string( animationPaths[ index ] );
+	if ( animationPaths.find( anim ) != animationPaths.end( ) ) {
+		return animationPaths[ anim ];
 	}
+
 	return "";
 }
-
-
 
 std::string CBaseEntityAnimation::getAnimationTypePath( CBaseEntityAnimationType anim ) {
-	int index = static_cast< int >( anim );
-	if ( index >= 0 && index < static_cast< int >( std::size( animationPaths ) ) ) {
-		return std::string( animationPaths[ index ] );
+	if ( animationPaths.find( anim ) != animationPaths.end( ) ) {
+		return animationPaths[ anim ];
 	}
 	return "";
 }
-
-
 
 CBaseEntityAnimationType CBaseEntityAnimation::getReverseAnimation( CBaseEntityAnimationType anim ) {
 	switch ( anim ) {

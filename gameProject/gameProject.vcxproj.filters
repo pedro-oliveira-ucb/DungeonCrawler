@@ -39,9 +39,6 @@
     <ClCompile Include="Process\Thread.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameThreads\eventHandlers\eventHandlers.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Log\Log.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -108,9 +105,6 @@
     <ClCompile Include="Game\gameObjects\attackHandler\attackHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameThreads\updateAttacks\updateAttacks.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Game\gameObjects\entitiesHandler\entitiesHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -165,9 +159,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Process\Thread.hpp">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\gameThreads\eventHandlers\eventHandlers.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Utils\Log\Log.h">
@@ -237,9 +228,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameObjects\attackHandler\attackHandler.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\gameThreads\updateAttacks\updateAttacks.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameObjects\entitiesHandler\entitiesHandler.h">

@@ -10,22 +10,31 @@ CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder )
 	: CBaseEntity( builder )
 {
 	this->attacks = attackHandler::Get( ).getAvailableLocalPlayerAttack( );
-}
+	if ( this->attacks.empty( ) )
+		return;
 
+	for ( auto it = this->attacks.begin( ); it != attacks.end( ); ++it ) {
+		this->attackUseTime.emplace( it->first , 0 );
+	}
+}
 
 void CPlayerEntity::UseAttack( CBaseAttackType attack ) {
 	std::lock_guard<std::mutex> lock( localPlayerMutex );
 	if ( this->inAttackLoadingAnimation )
 		return;
 
-	if ( this->getEntityState( ) == CBaseEntityState::ATTACKING )
+	if ( this->hasEntityState( CBaseEntityState::ATTACKING ) )
 		return;
+
+	if ( this->attackUseTime.at( attack ) < this->attacks.at( attack )->getCooldown( ) ) {
+		return;
+	}
 
 	if ( !CBaseEntityAnimation::isDifferentAnimationType( this->getEntityAnimations( )->getCurrentAnimationType( ) ,
 		CBaseEntityAnimationType::ATTACKING_BACKWARD ) )
 		return;
 
-	if ( this->isBeingHit() ) {
+	if ( this->isBeingHit( ) ) {
 		return;
 	}
 
@@ -41,139 +50,212 @@ float AngleDiff( float a , float b ) {
 	return diff - 180.0f;
 }
 
-
-void CPlayerEntity::updateEntity( ) {
-	std::lock_guard<std::mutex> lock( localPlayerMutex );
-	float lookingAngle = this->getLookingAngle( ).getDegrees( );
-	DIRECTION localDirection = this->getEntityLookingDirection( );
-	CBaseEntityState EntityState = this->getEntityState( );
-
-	if ( this->inAttackLoadingAnimation && EntityState != CBaseEntityState::ATTACKING )
-	{
-		//Started attacking rn
+void CPlayerEntity::updateAnimationCycles( std::uint32_t previousEntityState ) {
+	// Detecta o início de uma animação de ataque
+	if ( this->inAttackLoadingAnimation && !( previousEntityState & CBaseEntityState::ATTACKING ) ) {
 		this->AnimationCycleOnAttackInit = this->getEntityAnimations( )->getAnimationCycle( );
 	}
 
-	if ( this->isBeingHit() && EntityState != CBaseEntityState::HURT )
-	{
-		//Started attacking rn
+	// Detecta quando o jogador começa a receber dano
+	if ( this->isBeingHit( ) && !( previousEntityState & CBaseEntityState::HURT ) ) {
 		this->AnimationCycleOnHurtInit = this->getEntityAnimations( )->getAnimationCycle( );
 	}
+}
 
+void CPlayerEntity::updateMovementSounds( std::uint32_t previousEntityState ) {
+	// Emite eventos de som de passos quando o jogador está em movimento
+	if ( ( previousEntityState & CBaseEntityState::MOVING ) || ( previousEntityState & CBaseEntityState::RUNNING ) ) {
+		bool running = ( previousEntityState & CBaseEntityState::RUNNING );
+		int stepTrigger = running ? 1 : 2;
 
-	bool blockMovement = false;
-	bool loopAnimation = true;
-	bool updateAnimation = true;
-	bool reverseAnimation = false;
-
-	if ( !this->isAlive( ) ) {
-		EntityState = CBaseEntityState::DEAD;
-		loopAnimation = false;
+		if ( this->AnimationCycleOnStep != this->getEntityAnimations( )->getAnimationCycle( ) ) {
+			this->AnimationCycleOnStep = this->getEntityAnimations( )->getAnimationCycle( );
+		}
+		else {
+			if ( this->AnimationCycleSinceLastStep <= stepTrigger ) {
+				this->AnimationCycleSinceLastStep++;
+			}
+			else {
+				EventManager::Get( ).Trigger( this->GetEntityName( ) + "_walking" );
+				this->AnimationCycleSinceLastStep = 0;
+			}
+		}
 	}
 	else {
-		float delta = AngleDiff( lookingAngle , this->getMovementAngle( ) );
+		this->AnimationCycleSinceLastStep = 0;
+	}
+}
+
+void CPlayerEntity::updateCurrentAttackState( ) {
+	// Verifica e atualiza o estado de ataque atual
+	if ( this->currentAttack != nullptr ) {
+		this->attacking = true;
+		if ( this->currentAttack->getEntityAnimations( )->getAnimationCycle( ) ) {
+			this->currentAttack = nullptr;
+			this->attacking = false;
+		}
+	}
+}
+
+void CPlayerEntity::handleDeadState( std::uint32_t & state ) {
+	state = CBaseEntityState::DEAD;
+	loopAnimation = false;
+}
+
+void CPlayerEntity::handleMovementState( std::uint32_t & state ) {
+	float delta = AngleDiff( lookingAngle , this->getMovementAngle( ) );
+
+	if ( this->hasMovementRequest( ) ) {
+		state |= this->isSprinting( ) ? CBaseEntityState::RUNNING : CBaseEntityState::MOVING;
 		reverseAnimation = ( fabsf( delta ) > 90.0f );
+	}
+	else {
+		state |= CBaseEntityState::STOPPED;
+	}
+}
 
-		if ( this->currentAttack != nullptr ) {
-			this->attacking = true;
-			if ( this->currentAttack->getEntityAnimations( )->getAnimationCycle( ) ) {
-				this->currentAttack = nullptr;
-				this->attacking = false;
-			}
+void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
+	bool hurtAnimationEnded = this->getEntityAnimations( )->getAnimationCycle( ) > this->AnimationCycleOnHurtInit;
+
+	if ( !hurtAnimationEnded ) {
+		state |= CBaseEntityState::HURT;
+	}
+	else {
+		this->stopBeingHit( );
+	}
+
+	reverseAnimation = false;
+}
+
+std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & state ) {
+	state |= CBaseEntityState::ATTACKING;
+	bool attackAnimationEnded = this->getEntityAnimations( )->getAnimationCycle( ) > this->AnimationCycleOnAttackInit;
+	std::shared_ptr<CBaseAttack> newAttack = nullptr;
+
+	switch ( this->attacks.at( this->currentLoadingAttack )->getAttackType( ) ) {
+	case CBaseAttackType_Melee:
+		// Para ataques corpo-a-corpo, lança o ataque imediatamente
+		if ( !this->alreadyThrowedAttack ) {
+			newAttack = attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
 		}
 
-		if ( EntityState == CBaseEntityState::MOVING ) {
-			if(this->AnimationCycleOnStep != this->getEntityAnimations( )->getAnimationCycle( )) {
-				this->AnimationCycleOnStep = this->getEntityAnimations( )->getAnimationCycle( );
-				EventManager::Get( ).Trigger( this->GetEntityName( ) + "_walking" );
-			}
+		// Finaliza o estado de ataque quando a animação termina
+		if ( this->alreadyThrowedAttack && attackAnimationEnded ) {
+			this->inAttackLoadingAnimation = false;
+			this->alreadyThrowedAttack = false;
+			state &= ~CBaseEntityState::ATTACKING;
+		}
+		break;
+
+	case CBaseAttackType_Ranged:
+		// Para ataques à distância, lança o ataque quando a animação termina
+		if ( attackAnimationEnded ) {
+			newAttack = attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
+			this->inAttackLoadingAnimation = false;
+			state &= ~CBaseEntityState::ATTACKING;
+		}
+		break;
+	}
+
+	// Configura parâmetros de animação baseados no estado de ataque
+	if ( state & CBaseEntityState::ATTACKING ) {
+		//loopAnimation = false;
+		reverseAnimation = false;
+	}
+	else {
+		this->attackUseTime.at( this->currentLoadingAttack ) = 0;
+	}
+
+	return newAttack;
+}
+
+std::uint32_t CPlayerEntity::determineEntityState( float lookingAngle , DIRECTION localDirection ) {
+	std::uint32_t newEntityState = 0;
+
+	if ( !this->isAlive( ) ) {
+		handleDeadState( newEntityState );
+	}
+	else {
+		handleMovementState( newEntityState );
+
+		if ( this->isBeingHit( ) ) {
+			handleHurtState( newEntityState );
 		}
 
-		if ( this->hasMovementRequest( ) ) {
-			EntityState = CBaseEntityState::MOVING;
-		}
-		else
-			EntityState = CBaseEntityState::STOPPED;
-
-		if ( this->isBeingHit() ) {
-			bool hurtAnimationEnded = this->getEntityAnimations( )->getAnimationCycle( ) > this->AnimationCycleOnHurtInit;
-
-			if ( !hurtAnimationEnded )
-				EntityState = CBaseEntityState::HURT;
-			else
-				this->stopBeingHit();
-		}
-		else if ( this->inAttackLoadingAnimation ) {
-			EntityState = CBaseEntityState::ATTACKING;
-			bool attackAnimationEnded = this->getEntityAnimations( )->getAnimationCycle( ) > this->AnimationCycleOnAttackInit;
-
-			//Log::Print( "Current animationCyle: %d, AttackInit: %d, ended: %d" , this->getEntityAnimations( )->getAnimationCycle( ) , this->AnimationCycleOnAttackInit, attackAnimationEnded );
-
-			std::shared_ptr<CBaseAttack> newAttack = nullptr;
-
-			switch ( this->attacks.at( this->currentLoadingAttack )->getAttackType( ) ) {
-			case CBaseAttackType_Melee:
-				//insta throw on melee
-				if ( !this->alreadyThrowedAttack ) {
-					newAttack = attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
-					blockMovement = true;
-				}
-
-				//end attacking state when the animation & attack animation has ended
-				if ( this->alreadyThrowedAttack && !this->attacking ) {
-					this->inAttackLoadingAnimation = false;
-					this->alreadyThrowedAttack = false;
-					return;
-				}
-
-				break;
-			case CBaseAttackType_Ranged:
-				// throw attack when the attack animation ended
-				if ( attackAnimationEnded ) {
-					// if we dont throw it yet
-					newAttack = attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
-					this->inAttackLoadingAnimation = false;
-				}
-
-				break;
-			}
+		if ( this->inAttackLoadingAnimation ) {
+			std::shared_ptr<CBaseAttack> newAttack = handleAttackState( newEntityState );
 
 			if ( newAttack.get( ) != nullptr ) {
 				this->currentAttack = newAttack.get( );
 				this->alreadyThrowedAttack = true;
+				this->attacking = true;
 			}
-
-			loopAnimation = false;
 		}
 
-
-		switch ( EntityState ) {
-		case  CBaseEntityState::ATTACKING:
-
-			break;
-		case CBaseEntityState::MOVING:
-
-			break;
-		case CBaseEntityState::STOPPED:
-
-			break;
-		}
-
-		if ( !blockMovement )
+		// Gerencia o movimento do jogador
+		if ( !blockMovement ) {
 			this->move( );
-		else
+		}
+		else {
 			this->clearMovementRequest( );
-
+		}
 	}
 
+	return newEntityState;
+}
 
-	CBaseEntityAnimationType updatedAnimationType = CBaseEntity::getAnimationTypeBasedOnStateAndDirection( EntityState , localDirection );
+void CPlayerEntity::updateEntityAnimationAndState( ) {
+	// Determina o tipo de animação baseado no novo estado e direção
+	CBaseEntityAnimationType updatedAnimationType = CBaseEntity::getAnimationTypeBasedOnStateAndDirection( newEntityState , localDirection );
 
-	this->setEntityState( EntityState );
+	Log::Print( "EntityState: %s" , CBaseEntityAnimation::getAnimationTypeName( updatedAnimationType ).c_str( ) );
+
+	// Atualiza os estados e animações da entidade
+	this->setEntityStates( newEntityState );
 	this->setEntityLookingDirection( localDirection );
 	this->getEntityAnimations( )->setCurrentAnimationType( updatedAnimationType , false );
-	if ( updateAnimation )
+
+	if ( updateAnimation ) {
 		this->getEntityAnimations( )->updateAnimation( loopAnimation , reverseAnimation );
+	}
+}
+
+void CPlayerEntity::updateAttackCooldowns( ) {
+	// Incrementa os contadores de cooldown para todos os ataques
+	for ( auto it = this->attacks.begin( ); it != attacks.end( ); ++it ) {
+		this->attackUseTime.at( it->first )++;
+	}
+}
+
+void CPlayerEntity::updateEntity( ) {
+	std::lock_guard<std::mutex> lock( localPlayerMutex );
+	this->lookingAngle = this->getLookingAngle( ).getDegrees( );
+	this->localDirection = this->getEntityLookingDirection( );
+	std::uint32_t previousEntityState = this->getEntityStates( );
+
+	// Atualiza os ciclos de animação e estados iniciais
+	updateAnimationCycles( previousEntityState );
+
+	// Gerencia eventos de som de movimento
+	updateMovementSounds( previousEntityState );
+
+	// Atualiza o estado do ataque atual
+	updateCurrentAttackState( );
+
+	// Variáveis para controle do comportamento da entidade
+	this->blockMovement = false;
+	this->loopAnimation = true;
+	this->updateAnimation = true;
+	this->reverseAnimation = false;
+
+	// Determina o novo estado da entidade
+	this->newEntityState = determineEntityState( lookingAngle , localDirection );
+
+	// Atualiza a animação e o estado da entidade
+	updateEntityAnimationAndState( );
+
+	// Atualiza os cooldowns dos ataques
+	updateAttackCooldowns( );
 }
 
 bool CPlayerEntity::isAttacking( ) {
@@ -183,7 +265,15 @@ bool CPlayerEntity::isAttacking( ) {
 
 void CPlayerEntity::Respawn( ) {
 	this->setHealth( this->getMaxHealth( ) );
-	this->setEntityState( CBaseEntityState::STOPPED );
+
+	this->clearEntityStates( );
+	this->addEntityState( CBaseEntityState::STOPPED );
+
+	CBaseEntityAnimationType updatedAnimationType =
+		CBaseEntity::getAnimationTypeBasedOnStateAndDirection(
+			this->getEntityStates( ) , this->getEntityLookingDirection( )
+		);
+
 	this->setEntityLookingDirection( DIRECTION::FORWARD );
 	this->getEntityAnimations( )->setCurrentAnimationType( CBaseEntityAnimationType::IDLE_FORWARD , false );
 	this->getEntityAnimations( )->updateAnimation( true , false );

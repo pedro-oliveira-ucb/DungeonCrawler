@@ -30,7 +30,6 @@ bool gameInitializer::initializeResources( ) {
 
 	Log::Print( "[gameInitializer] entities initialized!" );
 
-
 	return true;
 }
 

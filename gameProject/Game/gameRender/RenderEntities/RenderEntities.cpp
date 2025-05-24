@@ -1,173 +1,164 @@
 ﻿#include "RenderEntities.h"
-
-#include <raylib/raylib.h>
 #include <cmath>
-
 #include "../../Managers/LevelManager/LevelManager.h"
-
 #include "../../../Utils/Log/Log.h"
 #include "../../../Globals/Globals.h"
 #include "../../gameObjects/attackHandler/attackHandler.h"
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include <SFML/Graphics.hpp>
 
-#define M_PI 3.14159265358979323846f
+
+using namespace sf;
+
+// Adicione estas declarações/externs se necessário
+extern sf::Font g_font; // Fonte global precisa ser carregada previamente
 
 float angleDiff( const GVector2D & a , const GVector2D & b ) {
     float dot = a.x * b.x + a.y * b.y;
-    float det = a.x * b.y - a.y * b.x; // Determinant (equivalente ao cross product em 2D)
-    return atan2( det , dot ); // Retorna ângulo em radianos, entre -π e π
+    float det = a.x * b.y - a.y * b.x;
+    return atan2( det , dot );
 }
 
 float angleDiff360( const GVector2D & a , const GVector2D & b ) {
     float angle = atan2( a.x * b.y - a.y * b.x , a.x * b.x + a.y * b.y );
-    if ( angle < 0 ) angle += 2 * M_PI;
-    return angle; // radianos
+    if ( angle < 0 ) angle += 2 * static_cast< float >( M_PI );
+    return angle;
 }
-
-
 
 float AngleDiff( float a , float b );
 
-void renderEntity( CBaseEntity * entity, bool DrawInfo = false, float sizeFactor = 1.0f ) {
-    if ( entity == nullptr ) {
-        return;
-    }
+// Parâmetros corrigidos com ordem correta
+void renderEntity( CBaseEntity * entity , sf::RenderWindow * window , bool DrawInfo = false , float sizeFactor = 1.0f ) {
+    if ( !entity || !window ) return;
 
     CBaseEntityAnimation * entityAnimation = entity->getEntityAnimations( );
+    if ( !entityAnimation ) return;
 
-    if ( entityAnimation == nullptr ) {
-        return;
-    }
+    sf::Texture * texture = static_cast< sf::Texture * >( entityAnimation->getCurrentTexture( ) );
+    if ( !texture ) return;
 
-    if ( entityAnimation->getCurrentTexture( ) == nullptr ) {
-        return;
-    }
-
-    Texture2D * texture = static_cast< Texture2D * >( entityAnimation->getCurrentTexture( ) );
     GVector2D size = entityAnimation->getCurrentTextureSize( ) * sizeFactor;
     GVector2D pos = entity->getEntityPosition( );
 
-    GAngle entityLookingAngle = entity->getLookingAngle( );
-    GAngle entityMovingAngle = entity->getMovementAngle( );
+    // Configuração do sprite
+    sf::Sprite sprite( *texture ); // Usando construtor com textura
 
+    // Definindo origem e posição com conversão explícita para sf::Vector2f
+    sprite.setOrigin( sf::Vector2f( size.x / 2.0f , size.y / 2.0f ) );
+    sprite.setPosition( sf::Vector2f( pos.x , pos.y ) );
+
+    // Cálculo de rotação
     float rotationAngle = 0.0f;
-    float baseAngle = entity->getEntityLookingDirectionBaseAngle( );
-    float lookingAngleDeg = entity->getLookingAngle( ).getDegrees( );
-
     switch ( entity->getEntityType( ) ) {
     case CBaseEntityType::ATTACK:
-        rotationAngle = lookingAngleDeg - 90;
+        rotationAngle = entity->getLookingAngle( ).getDegrees( ) - 90.0f;
         break;
     default:
-        rotationAngle = AngleDiff( lookingAngleDeg , baseAngle );
+        rotationAngle = AngleDiff( entity->getLookingAngle( ).getDegrees( ) ,
+            entity->getEntityLookingDirectionBaseAngle( ) );
         break;
     }
 
+	sprite.rotate( sf::degrees( rotationAngle ) ); // Corrigido para degrees
 
-    Vector2 position = { pos.x, pos.y };
-    Vector2 origin = { size.x / 2.0f, size.y / 2.0f };
+    // Escala baseada no fator de tamanho
+    sf::Vector2u texSize = texture->getSize( );
+    if ( texSize.x > 0 && texSize.y > 0 ) {
+        sprite.setScale(
+            sf::Vector2f( ( size.x / static_cast< float >( texSize.x ) ) * sizeFactor ,
+                ( size.y / static_cast< float >( texSize.y ) ) * sizeFactor )
+        );
+    }
 
-    DrawTexturePro(
-        *texture ,
-        { 0, 0, ( float ) texture->width, ( float ) texture->height } , // source = tamanho real da textura
-        { position.x, position.y, size.x, size.y } ,               // dest = tamanho desejado (escalado)
-        origin ,
-        rotationAngle ,
-        WHITE
-    );
+    window->draw( sprite );
 
     if ( DrawInfo ) {
-        DrawRectangleLines(
-            pos.x - size.x / 2.0f ,
-            pos.y - size.y / 2.0f ,
-            size.x ,
-            size.y ,
-            BLUE
-        );
+        // Desenhar informações de debug
+        //float offSet = 0.0f;
 
-        DrawRectangleLines(
-            pos.x - size.x / 2 ,
-            pos.y - size.y / 2 ,
-            size.x ,
-            size.y ,
-            BLUE
-        );
+        //// Texto do nome
+        //sf::Text text(g_font);
+        //text.setFont( g_font );
+        //text.setCharacterSize( 12 );
+        //text.setFillColor( sf::Color::Black );
 
-        //Moving angle
-        DrawLine(
-            pos.x ,
-            pos.y ,
-            pos.x + cosf( entityMovingAngle.getRadians( ) ) * 50 ,
-            pos.y + sinf( entityMovingAngle.getRadians( ) ) * 50 ,
-            RED
-        );
-        //Looking angle
-        DrawLine(
-            pos.x ,
-            pos.y ,
-            pos.x + cosf( entityLookingAngle.getRadians( ) ) * 50 ,
-            pos.y + sinf( entityLookingAngle.getRadians( ) ) * 50 ,
-            GREEN
-        );
+        //// Nome da entidade
+        //text.setString( entity->GetEntityName( ) );
+        //text.setPosition( sf::Vector2f( pos.x - size.x / 2.0f , pos.y + size.y / 2.0f + offSet ) );
+        //window->draw( text );
+        //offSet += 12.0f;
+
+        //// Tipo de animação
+        //text.setString( entityAnimation->getAnimationTypeName(
+        //    entityAnimation->getCurrentAnimationType( ) ) );
+        //text.setPosition( sf::Vector2f( pos.x - size.x / 2.0f , pos.y + size.y / 2.0f + offSet ) );
+        //window->draw( text );
+
+        //// Borda azul
+        //sf::RectangleShape border( sf::Vector2f( size.x , size.y ) );
+        //border.setPosition( sf::Vector2f( pos.x - size.x / 2.0f , pos.y - size.y / 2.0f ) );
+        //border.setFillColor( sf::Color::Transparent );
+        //border.setOutlineColor( sf::Color::Blue );
+        //border.setOutlineThickness( 1.0f );
+        //window->draw( border );
+
+        //// Linhas de direção
+        //const float lineLength = 50.0f;
+        //GAngle movingAngle = entity->getMovementAngle( );
+        //GAngle lookingAngle = entity->getLookingAngle( );
+
+
+        //// Movimento (vermelho)
+        //sf::VertexArray movingLine( sf:: , 2 );
+        //movingLine[ 0 ].position = sf::Vector2f( pos.x , pos.y );
+        //movingLine[ 1 ].position = sf::Vector2f(
+        //    pos.x + cosf( movingAngle.getRadians( ) ) * lineLength ,
+        //    pos.y + sinf( movingAngle.getRadians( ) ) * lineLength
+        //);
+        //movingLine[ 0 ].color = sf::Color::Red;
+        //movingLine[ 1 ].color = sf::Color::Red;
+        //window->draw( movingLine );
+
+        //// Visão (verde)
+        //sf::VertexArray lookingLine( sf::Lines , 2 );
+        //lookingLine[ 0 ].position = sf::Vector2f( pos.x , pos.y );
+        //lookingLine[ 1 ].position = sf::Vector2f(
+        //    pos.x + cosf( lookingAngle.getRadians( ) ) * lineLength ,
+        //    pos.y + sinf( lookingAngle.getRadians( ) ) * lineLength
+        //);
+        //lookingLine[ 0 ].color = sf::Color::Green;
+        //lookingLine[ 1 ].color = sf::Color::Green;
+        //window->draw( lookingLine );
     }
 }
 
-void renderAttacks( ) {
-    int attacksSize = attackHandler::Get().runningAttacksSize();
-    for ( int i = 0; i < attacksSize; i++ ) {
-		std::shared_ptr<CBaseAttack> attack = attackHandler::Get( ).getRunningAttack( i );
-
-        if(attack.get() == nullptr )
-			continue;
-
-		CBaseAttack * attackPtr = attack.get( );
-
-        if ( attackPtr == nullptr )
-            continue;
-
-		if ( attackPtr->getEntityAnimations( ) == nullptr )
-			continue;
-
-        if ( !attackPtr->IsActive( ) )
-            continue;
-
-        renderEntity( attackPtr, false);
+// Funções restantes com ajustes de chamada
+void renderAttacks( sf::RenderWindow * window ) {
+    for ( int i = 0; i < attackHandler::Get( ).runningAttacksSize( ); i++ ) {
+        auto attack = attackHandler::Get( ).getRunningAttack( i );
+        if ( attack && attack->IsActive( ) ) {
+            renderEntity( attack.get( ) , window , true );
+        }
     }
 }
 
-void renderEnemies( ) {
-	std::vector<std::shared_ptr<CEnemyEntity>> enemies = levelManager.getEnemies();
-    for ( int i = 0; i < enemies.size(); i++ ) {
-        std::shared_ptr<CEnemyEntity> enemy = enemies.at(i);
-
-        if ( enemy.get( ) == nullptr )
-            continue;
-
-        CEnemyEntity * CEnemyPtr = enemy.get( );
-
-        if ( CEnemyPtr == nullptr )
-            continue;
-
-        if ( CEnemyPtr->getEntityAnimations( ) == nullptr )
-            continue;
-
-        if ( !CEnemyPtr->isAlive( ) && CEnemyPtr->deathAnimationFinished( ) )
-            continue;
-
-        renderEntity( CEnemyPtr , false );
+void renderEnemies( sf::RenderWindow * window ) {
+    for ( auto & enemy : levelManager.getEnemies( ) ) {
+        if ( enemy && enemy->isAlive( ) && !enemy->deathAnimationFinished( ) ) {
+            renderEntity( enemy.get( ) , window , true );
+        }
     }
-
 }
 
 void RenderEntities::render( ) {
-	renderEntity( entitiesHandler::Get().getLocalPlayer() , true );
-	renderAttacks( );
-    renderEnemies( );
-	/*for ( int i = 0; i < _gameWorld.entities.size( ); i++ ) {
-		CBaseEntity * entity = _gameWorld.entities.at( i );
-		if ( entity == nullptr ) {
-			continue;
-		}
-		renderEntity( entity );
-	}*/
+    if ( !globals.windowPointer ) return;
+
+    sf::RenderWindow * window = static_cast< sf::RenderWindow * >( globals.windowPointer );
+
+    if ( auto player = entitiesHandler::Get( ).getLocalPlayer( ) ) {
+        renderEntity( player , window , true );
+    }
+
+    renderAttacks( window );
+    renderEnemies( window );
 }

@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include <mutex>
 
 #include "../../../gameResources/gameResource/rSound/rSound.h"
 #include "../../../gameResources/rBaseResource/rBaseResource.h"
@@ -10,7 +11,9 @@
 
 class rSoundsManager : public rBaseResource
 {
-	std::shared_ptr<rSound> loadSound( std::string name );
+	std::mutex mtx;
+
+	void loadSound( std::string name );
 
 	std::unordered_map<std::string , std::shared_ptr<rSound>> sounds;
 

@@ -10,27 +10,55 @@
 
 
 enum CBaseEntityAnimationType {
+	// Idle
 	IDLE_FORWARD ,
 	IDLE_BACKWARD ,
 	IDLE_LEFT ,
 	IDLE_RIGHT ,
+
+	// Walking
 	WALKING_FORWARD ,
 	WALKING_BACKWARD ,
 	WALKING_LEFT ,
 	WALKING_RIGHT ,
+
+	// Running
+	RUNNING_FORWARD ,
+	RUNNING_BACKWARD ,
+	RUNNING_LEFT ,
+	RUNNING_RIGHT ,
+
+	// Attacking (stationary)
 	ATTACKING_FORWARD ,
 	ATTACKING_BACKWARD ,
 	ATTACKING_LEFT ,
 	ATTACKING_RIGHT ,
-	HURT_BACKWARD ,
+
+	// Attacking while walking
+	ATTACKING_WALKING_FORWARD ,
+	ATTACKING_WALKING_BACKWARD ,
+	ATTACKING_WALKING_LEFT ,
+	ATTACKING_WALKING_RIGHT ,
+
+	// Attacking while running
+	ATTACKING_RUNNING_FORWARD ,
+	ATTACKING_RUNNING_BACKWARD ,
+	ATTACKING_RUNNING_LEFT ,
+	ATTACKING_RUNNING_RIGHT ,
+
+	// Hurt
 	HURT_FORWARD ,
+	HURT_BACKWARD ,
 	HURT_LEFT ,
 	HURT_RIGHT ,
+
+	// Dead
+	DEAD_FORWARD ,
 	DEAD_BACKWARD ,
-	DEAD_FORWARD,
-	DEAD_LEFT,
+	DEAD_LEFT ,
 	DEAD_RIGHT
 };
+
 
 struct CBaseEntityAnimationConstructor {
 	std::unordered_map<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation>> animations;
@@ -42,7 +70,7 @@ struct CBaseEntityAnimationConstructor {
 class CBaseEntityAnimation {
 	std::mutex animationMutex;
 	std::unordered_map<CBaseEntityAnimationType, std::shared_ptr<rSpriteAnimation> > animations;
-	rSpriteAnimation * currentAnimation;
+	std::shared_ptr<rSpriteAnimation> currentAnimation;
 
 	GVector2D spriteSize;
 	int animationFPS = 10;

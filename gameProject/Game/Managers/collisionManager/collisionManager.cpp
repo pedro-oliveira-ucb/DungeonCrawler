@@ -66,6 +66,11 @@ bool CollisionManager::CanMoveTo( CBaseEntity * entity , GVector2D & newPos ) {
     return true;
 }
 
+std::vector<CBaseEntity *> CollisionManager::GetAllEntities( ) {
+    std::lock_guard<std::mutex> lock( mutex );
+    return this->allEntities;
+}
+
 void CollisionManager::ProcessCollisions( ) {
     std::lock_guard<std::mutex> lock( mutex );
 

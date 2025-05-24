@@ -14,11 +14,12 @@ enum CBaseEntityType {
 };
 
 enum CBaseEntityState {
-	STOPPED,
-	MOVING,
-	ATTACKING,
-	HURT,
-	DEAD
+	STOPPED = 1 << 0 , // 00001
+	MOVING = 1 << 1 , // 00010
+	RUNNING = 1 << 2 , // 00100
+	ATTACKING = 1 << 3 , // 00100
+	HURT = 1 << 4 , // 01000
+	DEAD = 1 << 5  // 10000
 };
 
 enum CBaseEntityMovementDirection {
@@ -78,7 +79,7 @@ class CBaseEntity
 	CBaseEntityType entityType;
 	CBaseEntityMovementDirection entityMovementDirection = MOVEMENT_FORWARD;
 	DIRECTION entityLookingDirection;
-	CBaseEntityState entityState;
+	std::uint32_t entityState = STOPPED;
 	CBaseEntityAnimation entityAnimations;
 	std::vector<CBaseEntityMovementDirection> movementsRequest;
 	GAngle lookingAngle;
@@ -87,12 +88,12 @@ class CBaseEntity
 	float maxHealth = 100;
 	bool beingHit = false;
 	bool finishedDeathAnimation = false;
-
+	bool sprinting = false;
 public:
 
 	virtual void updateEntity( );
 
-	static CBaseEntityAnimationType getAnimationTypeBasedOnStateAndDirection( CBaseEntityState entityState , DIRECTION entityDirection );
+	static CBaseEntityAnimationType getAnimationTypeBasedOnStateAndDirection( std::uint32_t states , DIRECTION entityDirection );
 
 	CBaseEntity( const CBaseEntity & other );
 	CBaseEntity( CBaseEntityConstructor builder );
@@ -117,7 +118,45 @@ public:
 	CBaseEntityType getEntityType( );
 	CBaseEntityMovementDirection getEntityMovementDirection();
 	CBaseEntityAnimation * getEntityAnimations( );
-	CBaseEntityState getEntityState( );
+
+	bool isSprinting( ) {
+		std::scoped_lock lock( cBaseMutex );
+		return this->sprinting;
+	}
+
+	void setSprinting( bool sprinting ) {
+		std::scoped_lock lock( cBaseMutex );
+		this->sprinting = sprinting;
+	}
+
+	void addEntityState( CBaseEntityState state ) {
+		std::scoped_lock lock( cBaseMutex );
+		entityState |= state;
+	}
+
+	void removeEntityState( CBaseEntityState state ) {
+		std::scoped_lock lock( cBaseMutex );
+		entityState &= ~state;
+	}
+
+	bool hasEntityState( CBaseEntityState state ) const {
+		return ( entityState & state ) != 0;
+	}
+
+	void clearEntityStates( ) {
+		std::scoped_lock lock( cBaseMutex );
+		entityState = 0;
+	}
+
+	std::uint32_t getEntityStates( ) const {
+		return entityState;
+	}
+
+	void setEntityStates( std::uint32_t states ) {
+		std::scoped_lock lock( cBaseMutex );
+		entityState = states;
+	}
+
 	DIRECTION getEntityLookingDirection( );
 	GAngle getLookingAngle( );
 	float getMovementSpeed( ) { return this->movementSpeed; }
@@ -126,7 +165,7 @@ public:
 
 	void setEntityLookingDirection( DIRECTION direction );
 	void setLookingAngle( float degrees );
-	void setEntityState( CBaseEntityState state );
+	
 	void setEntityMovementDirection( CBaseEntityMovementDirection move );
 	void setHealth( int health );
 	void setEntityPosition( GVector2D pos );

@@ -20,8 +20,9 @@ public:
 
     void Trigger( const std::string & trigger ) {
         std::vector<std::shared_ptr<IGameEvent>> eventsToExecute;
-        std::lock_guard<std::mutex> lock( mutex );
+       
         {           
+            std::lock_guard<std::mutex> lock( mutex );
             if ( eventMap.count( trigger ) ) {
                 eventsToExecute = eventMap[ trigger ]; // Copia os eventos para executar fora do lock
             }

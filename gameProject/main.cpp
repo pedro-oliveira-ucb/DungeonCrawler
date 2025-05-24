@@ -1,17 +1,17 @@
 #include <iostream>
 #include <thread>
-#include <sstream>  // Necessário para std::stringstream
-#include <iomanip>  // Necessário para std::setw e std::setfill
-
+#include <sstream>
+#include <iomanip>
 
 #include "Game/game.h"
 #include "Game/gameRender/gameRender.h"
 #include "Globals/Globals.h"
 #include "Utils/Log/Log.h"
 
-Game game;
+#include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
 
-#include <raylib/raylib.h>
+Game game;
 
 void idle( ) {
 	Log::Print( "[main] Entering idle!" );
@@ -27,61 +27,38 @@ void waitGameLoad( ) {
 	}
 }
 
-void extractStyleSheet( std::string spritesheetPath ) {
-	const int spriteWidth = 128;   // Largura de cada sprite
-	const int spriteHeight = 128;  // Altura de cada sprite
-
-	// Carrega o spritesheet
-	Image spritesheet = LoadImage( spritesheetPath.c_str() );
-	if ( spritesheet.data == nullptr ) {
-		TraceLog( LOG_ERROR , "Spritesheet não encontrado!" );
-		return;
-	}
-
-	int columns = spritesheet.width / spriteWidth;
-	int rows = spritesheet.height / spriteHeight;
-	int totalSprites = columns * rows;
-
-	int spriteIndex = 0;
-	for ( int y = 0; y < rows; y++ ) {
-		for ( int x = 0; x < columns; x++ ) {
-			Rectangle sourceRec = {
-				( float ) x * spriteWidth,
-				( float ) y * spriteHeight,
-				( float ) spriteWidth,
-				( float ) spriteHeight
-			};
-
-			// Extrai o sprite
-			Image sprite = ImageFromImage( spritesheet , sourceRec );
-
-			// Nome do arquivo com 3 dígitos (ex: sprite_001.png)
-			std::stringstream filename;
-			filename << spriteIndex << ".png";
-
-			// Salva o sprite como imagem
-			ExportImage( sprite , filename.str( ).c_str( ) );
-
-			UnloadImage( sprite );
-			spriteIndex++;
-		}
-	}
-
-	// Libera recursos
-	UnloadImage( spritesheet );
-}
+sf::Font g_font( "arial.ttf" );
 
 int main( void ) {
 
 	Log::Print( "[Render] Initialized window!" );
 
-	SetConfigFlags( FLAG_VSYNC_HINT );
 
-	//	raylib::SetConfigFlags( raylib::FLAG_FULLSCREEN_MODE ); // Define a flag de fullscreen
-	InitWindow( globals.screenWidth , globals.screenHeight , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
-	InitAudioDevice( );      // Initialize audio device
 
-	DisableCursor( );
+	//sf::SoundBuffer buffer;
+	//buffer.loadFromStream( stream );
+
+	//// Display sound information
+	//std::cout << "killdeer.wav:" << '\n'
+	//	<< " " << buffer.getDuration( ).asSeconds( ) << " seconds" << '\n'
+	//	<< " " << buffer.getSampleRate( ) << " samples / sec" << '\n'
+	//	<< " " << buffer.getChannelCount( ) << " channels" << '\n';
+
+	//// Create a sound instance and play it
+	//sf::Sound sound( buffer );
+	//sound.play( );
+
+	//// Loop while the sound is playing
+	//while ( sound.getStatus( ) == sf::Sound::Status::Playing )
+	//{
+	//	// Leave some CPU time for other processes
+	//	sf::sleep( sf::milliseconds( 100 ) );
+
+	//	// Display the playing position
+	//	std::cout << "\rPlaying... " << sound.getPlayingOffset( ).asSeconds( ) << " sec        " << std::flush;
+	//}
+
+	//std::cout << '\n' << std::endl;
 
 	Log::Print( "[main] starting game!" );
 	game.start( );
@@ -89,35 +66,43 @@ int main( void ) {
 
 	waitGameLoad( );
 
-	while ( !globals.exitGame ) {
-		while ( !WindowShouldClose( ) )
+	// Create the main window
+	sf::RenderWindow window( sf::VideoMode( { 1920, 1080 } ) , "SFML window" );
+	globals.windowPointer = &window;
+
+	// Start the game loop
+	while ( window.isOpen( ) )
+	{
+		// Process events
+		while ( const std::optional event = window.pollEvent( ) )
 		{
-			if ( globals.updateWindow ) {
-				globals.updateWindow = false;
-				break;
+			// Close window: exit
+			if ( event->is<sf::Event::Closed>( ) )
+				window.close( );
+
+			// Detecta scroll do mouse
+			if ( event->is<sf::Event::MouseWheelScrolled>( ) ) {
+				globals.mouseWheelDelta += event->getIf<sf::Event::MouseWheelScrolled>( )->delta;
 			}
-
-			gameRender::Get( ).soundEvents( );
-
-			Vector2 mousePos = GetMousePosition( );
-
-			globals.mousePosX = mousePos.x;
-			globals.mousePosY = mousePos.y;
-
-			BeginDrawing( );
-			//remove old draws?
-			ClearBackground( GRAY );
-
-			gameRender::Get().render( );
-			
-			//DrawText( "Janela em fullscreen!" , 100 , 100 , 20 , BLACK );
-			EndDrawing( );
-
 		}
+
+		gameRender::Get( ).soundEvents( );
+
+		auto mousePos = sf::Mouse::getPosition( );
+
+		globals.mousePosX = mousePos.x;
+		globals.mousePosY = mousePos.y;
+
+		gameRender::Get( ).render( window );
+
+		// Clear screen
+		window.clear( );
+
+		// Update the window
+		window.display( );
 	}
 
-	CloseWindow( );
-
+	window.close( );
 	idle( );
 	return 1;
 }

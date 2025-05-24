@@ -15,6 +15,9 @@ public:
 	float mousePosY;
 
 	void * resourceManagerPointer = nullptr;
+	void * windowPointer = nullptr;
+
+	float mouseWheelDelta = 0.0f; // <-- Adicionado para armazenar o scroll atual
 };
 
 extern Globals globals;

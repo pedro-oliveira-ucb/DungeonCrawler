@@ -33,8 +33,6 @@ std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstruct
 	std::vector<CBaseEntityAnimationType> requiredAnimations ) {
 	CBaseEntityAnimationConstructor builder;
 
-	std::unordered_map<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation> > animations;
-
 	for ( int i = 0; i < requiredAnimations.size( ); i++ ) {
 		CBaseEntityAnimationType anim = requiredAnimations.at( i );
 
@@ -44,20 +42,18 @@ std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstruct
 			fullAnimationName += "_" + animationTypePath;
 		}
 
-		auto animation =
+		std::optional<std::pair<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation>>> animation =
 			generateAnimationPair( anim , fullAnimationName );
-		if ( !animation ) {
+		if ( !animation.has_value() ) {
 			Log::Print( "[EntitiesInitializer] Failed to initialize %s" , animationName.c_str( ) );
 			return std::nullopt;
 		}
 
-		animations.emplace( animation.value( ) );
+		builder.animations.emplace( animation.value( ) );
 	}
 
-	builder.animations = animations;
 	builder.animationFPS = 24;
 	builder.currentAnimationType = IDLE_FORWARD;
-
 	return builder;
 }
 

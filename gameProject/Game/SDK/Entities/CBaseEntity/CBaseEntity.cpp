@@ -9,7 +9,7 @@
 
 
 CBaseEntity::CBaseEntity( const CBaseEntity & other ) :
-	entityAnimations( other.entityAnimations ) 
+	entityAnimations( other.entityAnimations )
 {
 	this->Name = other.Name;
 	this->entityPosition = other.entityPosition;
@@ -52,10 +52,10 @@ int CBaseEntity::getHealth( ) {
 	return this->health;
 }
 
-CBaseEntityState CBaseEntity::getEntityState( ) {
-	std::lock_guard<std::mutex> lock( this->cBaseMutex );
-	return this->entityState;
-}
+//CBaseEntityState CBaseEntity::getEntityState( ) {
+//	std::lock_guard<std::mutex> lock( this->cBaseMutex );
+//	return this->entityState;
+//}
 
 CBaseEntityType CBaseEntity::getEntityType( ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
@@ -126,9 +126,10 @@ void CBaseEntity::setEntityMovementDirection( CBaseEntityMovementDirection move 
 	this->entityMovementDirection = move;
 }
 
-void CBaseEntity::setEntityState( CBaseEntityState state ) {
-	this->entityState = state;
-}
+//
+//void CBaseEntity::setEntityState( CBaseEntityState state ) {
+//	this->entityState = state;
+//}
 
 void CBaseEntity::addMoveRequest( CBaseEntityMovementDirection movement ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
@@ -148,19 +149,21 @@ void CBaseEntity::move( ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	GVector2D finalMovement = GVector2D( 0.f , 0.f );
 
+	float moveSpeed = this->sprinting ? this->movementSpeed * 2 : this->movementSpeed; // Ajuste a velocidade conforme necessário
+
 	for ( auto move : this->movementsRequest ) {
 		switch ( move ) {
 		case CBaseEntityMovementDirection::MOVEMENT_FORWARD:
-			finalMovement.y -= movementSpeed;
+			finalMovement.y -= moveSpeed;
 			break;
 		case CBaseEntityMovementDirection::MOVEMENT_BACKWARD:
-			finalMovement.y += movementSpeed;
+			finalMovement.y += moveSpeed;
 			break;
 		case CBaseEntityMovementDirection::MOVEMENT_LEFT:
-			finalMovement.x -= movementSpeed;
+			finalMovement.x -= moveSpeed;
 			break;
 		case CBaseEntityMovementDirection::MOVEMENT_RIGHT:
-			finalMovement.x += movementSpeed;
+			finalMovement.x += moveSpeed;
 			break;
 		}
 	}
@@ -190,27 +193,57 @@ void CBaseEntity::updateEntity( ) {
 
 }
 
-CBaseEntityAnimationType animationTable[ 5 ][ 4 ] = {
-	// STOPPED
-	{ IDLE_LEFT, IDLE_RIGHT, IDLE_FORWARD, IDLE_BACKWARD },
-	// MOVING
-	{ WALKING_LEFT, WALKING_RIGHT, WALKING_FORWARD, WALKING_BACKWARD },
-	// ATTACKING
-	{ ATTACKING_LEFT, ATTACKING_RIGHT, ATTACKING_FORWARD, ATTACKING_BACKWARD },
-	// HURT
-	{ HURT_LEFT, HURT_RIGHT, HURT_FORWARD, HURT_BACKWARD },
-	//DEAD
-	{ DEAD_LEFT, DEAD_RIGHT, DEAD_FORWARD, DEAD_BACKWARD }
-};
-
-CBaseEntityAnimationType CBaseEntity::getAnimationTypeBasedOnStateAndDirection( CBaseEntityState state , DIRECTION direction ) {
-	if ( state < CBaseEntityState::STOPPED || state > CBaseEntityState::DEAD ||
-		direction < DIRECTION::LEFT || direction > DIRECTION::BACKWARD ) {
-		return IDLE_FORWARD; // fallback
+CBaseEntityAnimationType CBaseEntity::getAnimationTypeBasedOnStateAndDirection( uint32_t states , DIRECTION direction ) {
+	// Converte direção em índice (0 = forward, 1 = backward, 2 = left, 3 = right)
+	int dirIndex = 0;
+	switch ( direction ) {
+	case FORWARD:  dirIndex = 0; break;
+	case BACKWARD: dirIndex = 1; break;
+	case LEFT:     dirIndex = 2; break;
+	case RIGHT:    dirIndex = 3; break;
 	}
 
-	return animationTable[ state ][ direction ];
+	// PRIORIDADE: DEAD > HURT > ATTACKING > RUNNING > MOVING > STOPPED
+
+	// Dead
+	if ( states & DEAD ) {
+		int idx = static_cast< int >( DEAD_FORWARD ) + dirIndex;
+		return static_cast< CBaseEntityAnimationType >( idx );
+	}
+	// Hurt
+	if ( states & HURT ) {
+		int idx = static_cast< int >( HURT_FORWARD ) + dirIndex;
+		return static_cast< CBaseEntityAnimationType >( idx );
+	}
+	// Attacking
+	if ( states & ATTACKING ) {
+		bool running = states & RUNNING;
+		bool walking = states & MOVING;
+		int baseAnim = static_cast< int >( ATTACKING_FORWARD );
+		if ( running ) {
+			baseAnim = static_cast< int >( ATTACKING_RUNNING_FORWARD );
+		}
+		else if ( walking ) {
+			baseAnim = static_cast< int >( ATTACKING_WALKING_FORWARD );
+		}
+		int idx = baseAnim + dirIndex;
+		return static_cast< CBaseEntityAnimationType >( idx );
+	}
+	// Running
+	if ( states & RUNNING ) {
+		int idx = static_cast< int >( RUNNING_FORWARD ) + dirIndex;
+		return static_cast< CBaseEntityAnimationType >( idx );
+	}
+	// Moving (walking)
+	if ( states & MOVING ) {
+		int idx = static_cast< int >( WALKING_FORWARD ) + dirIndex;
+		return static_cast< CBaseEntityAnimationType >( idx );
+	}
+	// Stopped (idle)
+	int idx = static_cast< int >( IDLE_FORWARD ) + dirIndex;
+	return static_cast< CBaseEntityAnimationType >( idx );
 }
+
 
 bool CBaseEntity::isAlive( ) {
 	return this->health > 0;

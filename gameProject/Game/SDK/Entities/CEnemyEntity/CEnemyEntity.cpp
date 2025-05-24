@@ -79,7 +79,7 @@ void CEnemyEntity::updateEntity( ) {
 	GVector2D playerPos = player->getEntityPosition( );
 	GVector2D toPlayer = playerPos - myPos;
 	float distance = toPlayer.length( );
-	CBaseEntityState newState = this->getEntityState( );
+	auto newState = this->getEntityStates( );
 
 	bool loopAnimation = true;
 
@@ -104,7 +104,6 @@ void CEnemyEntity::updateEntity( ) {
 		if ( newState != CBaseEntityState::HURT && this->isBeingHit( ) ) {
 			this->AnimationCycleOnHurtInit = this->getEntityAnimations( )->getAnimationCycle( );
 		}
-
 
 		if ( distance > 40.0f ) {
 			GVector2D toPlayer = playerPos - myPos;
@@ -139,7 +138,6 @@ void CEnemyEntity::updateEntity( ) {
 			else {
 				this->stopBeingHit( );
 			}
-			loopAnimation = false;
 		}
 		// Verifica se está em animação de ataque
 		else if ( this->inAttackLoadingAnimation ) {
@@ -152,8 +150,8 @@ void CEnemyEntity::updateEntity( ) {
 				}
 				this->inAttackLoadingAnimation = false;
 			}
-			loopAnimation = false;
 		}
+
 	}
 	else {
 		loopAnimation = false;
@@ -163,7 +161,7 @@ void CEnemyEntity::updateEntity( ) {
 		}
 	}
 	// Atualiza estado e animação
-	this->setEntityState( newState );
+	this->setEntityStates( newState );
 	CBaseEntityAnimationType updatedAnimationType =
 		CBaseEntity::getAnimationTypeBasedOnStateAndDirection(
 			newState , this->getEntityLookingDirection( )
@@ -177,12 +175,13 @@ void CEnemyEntity::updateEntity( ) {
 void CEnemyEntity::Respawn( ) {
 	this->setHealth( this->getMaxHealth( ) );
 	this->setDeathAnimationFinished( false );
-	this->setEntityState( CBaseEntityState::STOPPED );
+	this->clearEntityStates( );
+	this->addEntityState( CBaseEntityState::STOPPED );
 
 	CBaseEntityAnimationType updatedAnimationType =
-	CBaseEntity::getAnimationTypeBasedOnStateAndDirection(
-		this->getEntityState() , this->getEntityLookingDirection( )
-	);
+		CBaseEntity::getAnimationTypeBasedOnStateAndDirection(
+			this->getEntityStates( ) , this->getEntityLookingDirection( )
+		);
 
 	this->getEntityAnimations( )->setCurrentAnimationType( updatedAnimationType );
 }
