@@ -67,7 +67,7 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 	};
 
 	std::optional<CBaseEntityAnimationConstructor> animation = createEntityAnimationConstructor( "localPlayer" , requiredAnimations );
-	if ( !animation ) {
+	if ( !animation.has_value( ) || !animation ) {
 		return nullptr;
 	}
 
@@ -77,7 +77,7 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 	builder.entityPosition = GVector2D( 500 , 500 );
 	builder.entityType = CBaseEntityType::PLAYER;
 	builder.health = 100;
-	builder.movementSpeed = 10;
+	builder.movementSpeed = 100;
 	builder.Name = animationName;
 
 	return new CPlayerEntity( builder );

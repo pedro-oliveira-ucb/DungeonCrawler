@@ -7,7 +7,7 @@
 
 #include "../../../Utils/Log/Log.h"
 
-#include <SFML/Audio.hpp>
+#include <raylib/raylib.h>
 
 #include <filesystem>
 
@@ -21,54 +21,60 @@ rSound::rSound( std::string model )
 
 rSound::~rSound( ) {
 	if ( initialized ) {
-		delete static_cast< sf::SoundBuffer * >( soundAddress );
-        this->soundAddress = nullptr;
+	
 	}
 }
 void rSound::initializeSound( ) {
-    if ( !initialized ) {
-        Log::Print( "Trying to load sound from path: %s" , soundPath.c_str( ) );
+	if ( !initialized ) {
+		Log::Print( "Trying to load sound from path: %s" , soundPath.c_str( ) );
 
-        if ( soundPath.empty( ) ) {
-            Log::Print( "Error: Provided sound path is empty." );
-            return;
-        }
+		if ( soundPath.empty( ) ) {
+			Log::Print( "Error: Provided sound path is empty." );
+			return;
+		}
 
-        std::filesystem::path path( soundPath );
-    
-        if ( !fs::exists( path ) ) {
-            Log::Print( "Error: Sound file does not exist: %s" , path.string( ).c_str( ) );
-            return;
-        }
+		std::filesystem::path path( soundPath );
 
-        sf::SoundBuffer * buffer = new sf::SoundBuffer( );
-        sf::FileInputStream stream( path );
+		if ( !fs::exists( path ) ) {
+			Log::Print( "Error: Sound file does not exist: %s" , path.string( ).c_str( ) );
+			return;
+		}
 
-        if ( !buffer->loadFromStream( stream ) ) {
-            Log::Print( "Error: Failed to load sound from: %s" , path.string( ).c_str( ) );
-            throw std::runtime_error( "failed to load sound" );
-            return;
-        }
+		if ( !fs::is_regular_file( path ) ) {
+			Log::Print( "Error: Provided path is not a regular file: %s" , path.string( ).c_str( ) );
+			return;
+		}
 
-        this->soundAddress = static_cast< void * >( buffer );
-        this->initialized = true;
-    }
+		this->sounds.emplace_back( std::make_unique<Sound>( LoadSound( soundPath.c_str() ) ));
+
+		for( int i =0; i < MAX_SOUNDS ; i++ ) {
+			this->sounds.emplace_back( std::make_unique<Sound>( LoadSoundAlias( *this->sounds.front().get() ) ));
+		}
+
+		this->initialized = true;
+	}
 }
 
 
 
 void rSound::playSound( ) {
+	std::lock_guard<std::mutex> lock( soundMutex );
 	if ( !initialized ) {
 		initializeSound( );
 	}
 
-	sf::SoundBuffer * buffer = static_cast< sf::SoundBuffer * > ( this->soundAddress );
-	if(buffer == nullptr) {
-		Log::Print( "Error: Sound buffer is null" );
+	if ( this->sounds.empty( ) ) {
+		Log::Print( "Error: Sound buffer is empty" );
 		return;
 	}
 
-	sf::Sound som = sf::Sound( *buffer);
-    som.play( );
-}
+	// Procura um som disponível (não está tocando)
+	for ( auto & soundPtr : this->sounds ) {
+		if ( !IsSoundPlaying( *soundPtr ) ) {
+			PlaySound( *soundPtr );
+			return;
+		}
+	}
 
+	Log::Print( "Warning: All sound instances are currently playing, skipping playback" );
+}

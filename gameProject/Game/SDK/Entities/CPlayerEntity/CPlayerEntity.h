@@ -11,7 +11,7 @@
 class CPlayerEntity : public CBaseEntity {
 
     std::unordered_map<CBaseAttackType, std::shared_ptr<CBaseAttack>> attacks; // Lista de ataques do jogador
-	std::unordered_map<CBaseAttackType , long int> attackUseTime; // Lista de ciclos de animação dos ataques do jogador
+	std::unordered_map<CBaseAttackType , std::chrono::steady_clock::time_point> attackUseTime; // Lista de ciclos de animação dos ataques do jogador
 
     bool attacking = false;
     bool inAttackLoadingAnimation = false;
@@ -35,11 +35,15 @@ class CPlayerEntity : public CBaseEntity {
     bool reverseAnimation = false;
     float lookingAngle = 0.0f;
     std::uint32_t newEntityState;
+    std::uint32_t previousEntityState;
+	CBaseEntityAnimationType previousAnimationType;
+
+
 
 private:
     // Funções auxiliares para modularizar updateEntity
-    void updateAnimationCycles(std::uint32_t previousEntityState);
-    void updateMovementSounds(std::uint32_t previousEntityState);
+    void updateAnimationCycles();
+    void updateMovementSounds();
     void updateCurrentAttackState();
     
     std::uint32_t determineEntityState(float lookingAngle, DIRECTION localDirection);

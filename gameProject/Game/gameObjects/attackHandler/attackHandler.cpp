@@ -48,8 +48,7 @@ void attackHandler::updateAttacks( )
 					}
 				}
 
-				attack->updateAttackPosition( );
-				attack->getEntityAnimations( )->updateAnimation( false );
+				attack->updateEntity( );
 			}
 			else
 			{

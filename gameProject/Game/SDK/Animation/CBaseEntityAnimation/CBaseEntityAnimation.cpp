@@ -3,24 +3,33 @@
 
 #include "../../../../Utils/Log/Log.h"
 
-CBaseEntityAnimation::CBaseEntityAnimation( const  CBaseEntityAnimation & other ) {
+CBaseEntityAnimation::CBaseEntityAnimation( const CBaseEntityAnimation & other ) {
 	this->animations = other.animations;
 	this->currentAnimationType = other.currentAnimationType;
 	this->animationFPS = other.animationFPS;
 	this->currentAnimationStep = 0;
+	this->timeSinceLastFrame = 0.0f;
+	this->animationState = AnimationState::PLAYING;
+	this->lastUpdateTime = std::chrono::steady_clock::now( );
+	this->lastUpdateTime = std::chrono::steady_clock::now( );
 	setCurrentAnimationType( other.currentAnimationType , true );
 }
 
 CBaseEntityAnimation::CBaseEntityAnimation( CBaseEntityAnimationConstructor builder ) {
-	this->animations = builder.animations;
+	for ( auto it = builder.animations.begin( ); it != builder.animations.end( ); ++it ) {
+		this->animations.emplace( it->first , it->second );
+	}
+
 	this->animationFPS = builder.animationFPS;
 	this->currentAnimationType = builder.currentAnimationType;
 	this->currentAnimationStep = 0;
+	this->timeSinceLastFrame = 0.0f;
+	this->animationState = AnimationState::PLAYING;
 	setCurrentAnimationType( builder.currentAnimationType , true );
 }
 
 GVector2D CBaseEntityAnimation::getCurrentTextureSize( ) {
-	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
+	std::lock_guard<std::mutex> lock( animationMutex );
 	return this->spriteSize;
 }
 
@@ -33,31 +42,85 @@ CBaseEntityAnimationType CBaseEntityAnimation::getCurrentAnimationType( ) {
 }
 
 void CBaseEntityAnimation::updateAnimation( bool loop , bool reverse ) {
-	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
+	auto currentTime = std::chrono::steady_clock::now( );
+	float deltaTime = std::chrono::duration<float>( currentTime - lastUpdateTime ).count( );
+	lastUpdateTime = currentTime;
 
-	if ( this->currentAnimationStep < this->currentAnimation->size( ) - 1 ) {
-		this->currentAnimationStep++;
+	// Chama a implementação com deltaTime calculado
+	updateAnimationWithDeltaTime( deltaTime , loop , reverse );
+}
 
-		if ( this->currentAnimationStep == this->currentAnimation->size( ) - 1 ) {
-			this->animationCycle++;
+
+int CBaseEntityAnimation::getCurrentAnimationStep( ) {
+	std::lock_guard<std::mutex> lock( animationMutex );
+	return currentAnimationStep;
+}
+
+void CBaseEntityAnimation::updateAnimationWithDeltaTime( float deltaTime , bool loop , bool reverse ) {
+	/*if ( animationState != AnimationState::PLAYING )
+		return;*/
+
+	std::lock_guard<std::mutex> lock( animationMutex );
+
+	this->looping = loop;
+	this->playingReverse = reverse;
+
+	timeSinceLastFrame += deltaTime;
+
+	// Tempo necessário para cada frame baseado no FPS
+	float frameTime = 1.0f / static_cast< float >( animationFPS );
+
+	if ( timeSinceLastFrame >= frameTime ) {
+		int framesToAdvance = static_cast< int >( timeSinceLastFrame / frameTime );
+		timeSinceLastFrame -= framesToAdvance * frameTime;
+
+		if ( !currentAnimation ) return;
+
+		int totalFrames = currentAnimation->size( );
+		if ( totalFrames <= 0 ) return;
+
+		if ( !reverse ) {
+			// Reprodução para frente
+			if ( currentAnimationStep + framesToAdvance < totalFrames ) {
+				currentAnimationStep += framesToAdvance;
+			}
+			else if ( loop ) {
+				// Completa um ciclo
+				animationCycle++;
+				currentAnimationStep = ( currentAnimationStep + framesToAdvance ) % totalFrames;
+			}
+			else {
+				// Finaliza no último frame
+				currentAnimationStep = totalFrames - 1;
+				animationState = AnimationState::FINISHED;
+			}
+		}
+		else {
+			// Reprodução para trás
+			if ( currentAnimationStep >= framesToAdvance ) {
+				currentAnimationStep -= framesToAdvance;
+			}
+			else if ( loop ) {
+				// Completa um ciclo
+				animationCycle++;
+				currentAnimationStep = totalFrames - ( framesToAdvance - currentAnimationStep ) % totalFrames - 1;
+				if ( currentAnimationStep < 0 ) currentAnimationStep = 0;
+			}
+			else {
+				// Finaliza no primeiro frame
+				currentAnimationStep = 0;
+				animationState = AnimationState::FINISHED;
+			}
+		}
+
+		if ( currentAnimation->getFrame( currentAnimationStep ) ) {
+			this->spriteSize = currentAnimation->getFrame( currentAnimationStep )->getSpriteSize( );
 		}
 	}
-	else if ( loop ) {
-		this->currentAnimationStep = 0;
-	}
-	else {
-		this->currentAnimationStep = this->currentAnimation->size( ) - 1;
-	}
-
-	if ( this->currentAnimation == nullptr || this->currentAnimation->getFrame( this->currentAnimationStep ).get( ) == nullptr ) {
-		return;
-	}
-
-	this->spriteSize = this->currentAnimation->getFrame( this->currentAnimationStep )->getSpriteSize( );
 }
 
 void * CBaseEntityAnimation::getCurrentTexture( ) {
-	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
+	std::lock_guard<std::mutex> lock( animationMutex );
 
 	if ( this->currentAnimation == nullptr ) {
 		return nullptr;
@@ -70,14 +133,59 @@ void * CBaseEntityAnimation::getCurrentTexture( ) {
 	return this->currentAnimation->getFrame( this->currentAnimationStep )->getTexture( );
 }
 
+void CBaseEntityAnimation::resetAnimation( ) {
+	std::lock_guard<std::mutex> lock( animationMutex );
 
+	if ( !currentAnimation ) return;
+
+	currentAnimationStep = playingReverse ? ( currentAnimation->size( ) - 1 ) : 0;
+	timeSinceLastFrame = 0.0f;
+	animationCycle = 0;
+	animationState = AnimationState::PLAYING;
+}
+
+void CBaseEntityAnimation::pauseAnimation( ) {
+	std::lock_guard<std::mutex> lock( animationMutex );
+	if ( animationState == AnimationState::PLAYING )
+		animationState = AnimationState::PAUSED;
+}
+
+void CBaseEntityAnimation::resumeAnimation( ) {
+	std::lock_guard<std::mutex> lock( animationMutex );
+	if ( animationState == AnimationState::PAUSED )
+		animationState = AnimationState::PLAYING;
+}
+
+void CBaseEntityAnimation::stopAnimation( ) {
+	std::lock_guard<std::mutex> lock( animationMutex );
+
+	if ( !currentAnimation ) return;
+
+	currentAnimationStep = playingReverse ? ( currentAnimation->size( ) - 1 ) : 0;
+	timeSinceLastFrame = 0.0f;
+	animationState = AnimationState::FINISHED;
+}
+
+bool CBaseEntityAnimation::isAnimationPlaying( ) const {
+	return animationState == AnimationState::PLAYING;
+}
+
+bool CBaseEntityAnimation::isAnimationPaused( ) const {
+	return animationState == AnimationState::PAUSED;
+}
+
+bool CBaseEntityAnimation::isAnimationFinished( ) const {
+	return animationState == AnimationState::FINISHED;
+}
+
+// Implementação dos métodos estáticos e de configuração de animação permanecem os mesmos
 bool CBaseEntityAnimation::isDifferentAnimationType( CBaseEntityAnimationType animA , CBaseEntityAnimationType animB ) {
 	// check if it is different type walking, idle or attacking
 	return ( animA / 4 ) != ( animB / 4 );
 }
 
 void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType animationType , bool ignoreCheck ) {
-	std::lock_guard<std::mutex> lock( animationMutex ); // Lock the mutex to ensure thread safety
+	std::lock_guard<std::mutex> lock( animationMutex );
 
 	if ( animationType == this->currentAnimationType && !ignoreCheck ) {
 		return;
@@ -87,6 +195,8 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 		this->currentAnimationType = animationType;
 		if ( this->isDifferentAnimationType( this->currentAnimationType , animationType ) ) {
 			this->currentAnimationStep = 0;
+			this->timeSinceLastFrame = 0.0f;
+			this->animationState = AnimationState::PLAYING;
 		}
 
 		std::shared_ptr<rSpriteAnimation> animation = this->animations.at( this->currentAnimationType );

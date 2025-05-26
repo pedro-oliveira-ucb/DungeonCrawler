@@ -52,7 +52,12 @@ std::optional < CBaseEntityAnimationConstructor > createEntityAnimationConstruct
 		builder.animations.emplace( animation.value( ) );
 	}
 
-	builder.animationFPS = 24;
+	if ( builder.animations.empty( ) ) {
+		Log::Print( "[createEntityAnimationConstructor] animation generation failed" );
+		return std::nullopt;
+	}
+
+	builder.animationFPS = 10;
 	builder.currentAnimationType = IDLE_FORWARD;
 	return builder;
 }

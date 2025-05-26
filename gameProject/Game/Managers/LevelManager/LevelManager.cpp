@@ -1,6 +1,10 @@
 #include "LevelManager.h"
 #include <cstdlib>
 #include <ctime>
+#include <random>
+
+
+#include "../../../Globals/Globals.h"
 
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
 
@@ -25,6 +29,15 @@ LevelData LevelManager::getCurrentLevel( ) {
 	return levels[ currentLevelIndex ];
 }
 
+int RandomNumber( int min , int max )
+{
+	std::random_device rd;
+	std::mt19937 rng( rd( ) );
+	std::uniform_int_distribution<int> uni( min , max );
+	return uni( rng );
+}
+
+
 void LevelManager::moveToNextLevel( ) {
 	if ( !isLastLevel( ) ) {
 		++currentLevelIndex;
@@ -48,25 +61,24 @@ bool LevelManager::isLastLevel( ) {
 }
 
 void LevelManager::updateEnemies( ) {
-	bool hasEnemyToRespawn = false;
 
-	bool canRespawn = this->respawnTimer > levels[ currentLevelIndex ].RespawnTimer;
+
+	auto lastUse = this->respawnTimer;
+	// Calcula delta time em segundos
+	std::chrono::duration<float> delta = now - lastUse;
+
+	bool canRespawn = delta.count( ) >= levels[ currentLevelIndex ].RespawnTimer;
 
 	for ( auto & enemy : enemies ) {
 		enemy->updateEntity( );
 		if ( !enemy->isAlive( ) && this->respawnCount < levels[ currentLevelIndex ].RespawnCount ) {
-			hasEnemyToRespawn = true;
 			if ( canRespawn ) {
 				enemy->Respawn( );
-				this->respawnTimer = 0;
+				this->respawnTimer = now;
 				canRespawn = false;
 				this->respawnCount++;
 			}
 		}
-	}
-
-	if ( hasEnemyToRespawn ) {
-		this->respawnTimer++;
 	}
 }
 
@@ -86,28 +98,18 @@ void LevelManager::updateLevel( )
 }
 
 GVector2D getRandomAreaAroundLocalPlayer( ) {
+
 	auto player = entitiesHandler::Get( ).getLocalPlayer( );
 
-
 	if ( player == nullptr ) {
-		return GVector2D( 0 , 0 );
+		return GVector2D( 0, 0 );
 	}
+	GVector2D localPos = player->getEntityPosition( );
 
-	// Obtém a posição atual do jogador
-	GVector2D playerPos = player->getEntityPosition( );
+	int RandomX = RandomNumber( -850 , 850 );
+	int RandomY = RandomNumber( -850 , 850 );
 
-	// Define um raio ao redor do jogador para spawn aleatório (ajuste conforme necessário)
-	const float spawnRadius = 300.f;
-
-	// Gera um ângulo e distância aleatórios dentro do raio
-	float angle = static_cast< float >( rand( ) ) / RAND_MAX * 2.0f * 3.14159265f;
-	float distance = static_cast< float >( rand( ) ) / RAND_MAX * spawnRadius;
-
-	// Calcula as coordenadas x e y ao redor do jogador
-	float x = playerPos.x + cosf( angle ) * distance;
-	float y = playerPos.y + sinf( angle ) * distance;
-
-	return GVector2D( x , y );
+	return GVector2D( localPos.x + RandomX , localPos.y + RandomY );
 }
 
 
@@ -119,10 +121,11 @@ void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
 		entitiesHandler::Get( ).addSpawnedEntity( enemy.get( ) );
 		enemies.push_back( enemy );
 	}
-
+	
 	int i = 0;
 	for ( int i = 0; i < enemies.size( ); i++ ) {
-		enemies.at( i )->setEntityPosition( GVector2D( i * 128 , i * 128 ) );
+		
+		enemies.at( i )->setEntityPosition( getRandomAreaAroundLocalPlayer() );
 		enemies.at( i )->Respawn( );
 		i++;
 	}

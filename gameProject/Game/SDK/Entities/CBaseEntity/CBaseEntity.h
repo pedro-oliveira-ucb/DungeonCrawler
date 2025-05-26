@@ -89,6 +89,8 @@ class CBaseEntity
 	bool beingHit = false;
 	bool finishedDeathAnimation = false;
 	bool sprinting = false;
+
+	std::chrono::steady_clock::time_point lastMoveTime;
 public:
 
 	virtual void updateEntity( );
@@ -173,4 +175,6 @@ public:
 	void Hit( int damage );
 	bool isBeingHit( );
 	void stopBeingHit( );
+
+	std::string getEntityStateAsString() const;
 };

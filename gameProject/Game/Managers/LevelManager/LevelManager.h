@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <vector>
 #include <mutex> // Adicionado para uso de std::mutex
 #include "../../SDK/Entities/CEnemyEntity/CEnemyEntity.h"
@@ -21,7 +22,7 @@ private:
 
     bool started = false;
     int respawnCount = 0;
-    int respawnTimer = 0;
+    std::chrono::steady_clock::time_point respawnTimer;
 
     // Mutex para proteger as variáveis acima
     std::mutex managerMutex;

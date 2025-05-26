@@ -90,13 +90,9 @@ void rSoundsManager::loadSound( std::string name ) {
 	std::replace( relativePath.begin( ) , relativePath.end( ) , '/' , '_' );
 	std::replace( relativePath.begin( ) , relativePath.end( ) , '\\' , '_' );
 
-	rSound * sound = new rSound( soundFilePath );
-	if ( sound == nullptr )
-		return;
+	std::unique_ptr<rSound> soundPtr = std::make_unique<rSound>( soundFilePath );
 
-	std::shared_ptr<rSound> soundPtr( sound );
-
-	this->sounds.emplace( std::make_pair( relativePath.c_str( ) , soundPtr ) );
+	this->sounds.emplace( std::make_pair( relativePath , std::move(soundPtr) ) );
 }
 
 bool rSoundsManager::playSound( std::string  name ) {

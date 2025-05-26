@@ -1,4 +1,8 @@
 #pragma once
+#include <chrono>
+
+#define now std::chrono::high_resolution_clock::now( )
+
 class Globals
 {
 public:

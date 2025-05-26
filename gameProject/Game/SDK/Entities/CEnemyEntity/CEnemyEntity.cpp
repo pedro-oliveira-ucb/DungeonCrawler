@@ -121,7 +121,7 @@ void CEnemyEntity::updateEntity( ) {
 			this->move( );
 		}
 		else {
-			attackTimer -= 0.1f;
+			attackTimer -= 0.01f;
 			if ( attackTimer <= 0.0f && !this->isAttacking( ) ) {
 				this->UseAttack( CBaseAttackType_Melee );
 				attackTimer = attackCooldown;

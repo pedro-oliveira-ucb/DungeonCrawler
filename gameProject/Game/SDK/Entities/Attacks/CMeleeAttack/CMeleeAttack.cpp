@@ -1,6 +1,6 @@
 #include "CMeleeAttack.h"
 
-
+#include "../../../../../Globals/Globals.h"
 #include "../../../Utils/Log/Log.h"
 
 CMeleeAttack::CMeleeAttack( CBaseEntityConstructor entityBuilder ,
@@ -15,44 +15,53 @@ CMeleeAttack::CMeleeAttack( const CMeleeAttack & other )
 {
 }
 
-void CMeleeAttack::updateAttackPosition( ) {
-	if ( this->IsActive( ) ) {
+void CMeleeAttack::updateEntity( ) {
+    if ( this->IsActive( ) ) {
+      
+        // Calcular deltaTime em segundos
+        float deltaTime = 0.0f;
+        if ( this->lastUpdateTime.time_since_epoch( ).count( ) > 0 ) {
+            std::chrono::duration<float> delta = now - this->lastUpdateTime;
+            deltaTime = delta.count( );
+        }
 
-		float angleRad = this->getLookingAngle( ).getRadians( );
-		float speed = this->getSpeed( );
-		GVector2D initialPos = this->getInitialPosition( );
+        // Atualizar lastUpdateTime
+        this->lastUpdateTime = now;
 
-		GVector2D newDirection(
-			cosf( angleRad ) * speed ,
-			sinf( angleRad ) * speed
-		);
+        float angleRad = this->getLookingAngle( ).getRadians( );
+        float speed = this->getSpeed( ); // unidades por segundo
+        GVector2D initialPos = this->getInitialPosition( );
 
-		GVector2D nextPosition = this->getEntityPosition( ) + newDirection;
+        // Aplica deltaTime ao deslocamento
+        GVector2D newDirection(
+            std::cos( angleRad ) * speed * deltaTime ,
+            std::sin( angleRad ) * speed * deltaTime
+        );
 
-		float positionDelta = GVector2D( initialPos - nextPosition ).length( );
+        GVector2D nextPosition = this->getEntityPosition( ) + newDirection;
+        float positionDelta = GVector2D( initialPos - nextPosition ).length( );
 
-		bool animationFinished = this->getEntityAnimations( )->getAnimationCycle( );
+        bool animationFinished = this->getEntityAnimations( )->isAnimationFinished( );
 
-		if ( positionDelta > this->getRange( ) || animationFinished ) {
-			if ( positionDelta > this->getRange( ) )
-			{
-				Log::Print( "[%s] Max attack range!" , this->GetEntityName( ).c_str( ) );
-			}
+        if ( positionDelta > this->getRange( ) || animationFinished ) {
+            if ( positionDelta > this->getRange( ) ) {
+                Log::Print( "[%s] Max attack range!" , this->GetEntityName( ).c_str( ) );
+            }
 
-			if ( animationFinished ) {
-				Log::Print( "[%s] Attack animation finished!" , this->GetEntityName( ).c_str( ) );
-				this->Deactive( );
-			}
-			return;
-		}
+            if ( animationFinished ) {
+                Log::Print( "[%s] Attack animation finished!" , this->GetEntityName( ).c_str( ) );
+                this->Deactive( );
+            }
+            return;
+        }
 
-		this->setEntityPosition( nextPosition );
-		Log::Print( "[%s] Attack addPos: %f,%f, delta: %f, range: %f" ,
-			this->GetEntityName( ).c_str( ) , newDirection.x , newDirection.y , positionDelta , this->getRange( ) );
+        this->setEntityPosition( nextPosition );
+        Log::Print( "[%s] Attack addPos: %f,%f, delta: %f, range: %f" ,
+            this->GetEntityName( ).c_str( ) , newDirection.x , newDirection.y , positionDelta , this->getRange( ) );
 
-	}
+        this->getEntityAnimations( )->updateAnimation( false );
+    }
 }
-
 void CMeleeAttack::otherActiveLogic( CBaseEntity * sender) {
 	float angleRad = this->getLookingAngle( ).getRadians( );
 	float speed = this->getSpeed( );

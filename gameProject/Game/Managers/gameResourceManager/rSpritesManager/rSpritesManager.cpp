@@ -92,22 +92,22 @@ std::shared_ptr<rSpriteAnimation> rSpritesManager::loadClip( const std::string &
 			return a.first < b.first;
 		} );
 
+
 	std::vector<std::shared_ptr<rSprite>> sprites;
 	// Cria os rSprites com os arquivos encontrados
 	for ( const auto & [index , fullPath] : orderedFiles ) {
 		Log::Print( "[rSpriteAnimation] Loading sprite: %s" , fullPath.c_str( ) );
 		sprites.push_back( std::make_shared<rSprite>( fullPath ) );
 	}
+	availableSprites.push_back( std::move( sprites ) );
 
 	fs::path basePath = this->getPath( );
 	std::string relativePath = fs::relative( clipPath, basePath ).string( );
 	std::replace( relativePath.begin( ) , relativePath.end( ) , '/' , '_' );
 	std::replace( relativePath.begin( ) , relativePath.end( ) , '\\' , '_' );
 
-
-	rSpriteAnimation * animation = new rSpriteAnimation( sprites , 24);
+	rSpriteAnimation * animation = new rSpriteAnimation( availableSprites.back( ) , 24 );
 	std::shared_ptr< rSpriteAnimation> sharedAnimationPtr( animation );
-
 
 	this->spriteAnimations.emplace( relativePath.c_str() , sharedAnimationPtr );
 

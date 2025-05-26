@@ -3,11 +3,10 @@
 #include <vector>
 #include <mutex>
 #include <unordered_map>
+#include <chrono>
 
 #include "../../../gameResources/gameResource/rSprites/rSpriteAnimation/rSpriteAnimation.h"
 #include "../../math/Vector2D/GVector2D.h"
-
-
 
 enum CBaseEntityAnimationType {
 	// Idle
@@ -59,18 +58,23 @@ enum CBaseEntityAnimationType {
 	DEAD_RIGHT
 };
 
+enum class AnimationState {
+	PLAYING ,
+	PAUSED ,
+	FINISHED
+};
 
 struct CBaseEntityAnimationConstructor {
 	std::unordered_map<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation>> animations;
-
 	int animationFPS = 10;
 	CBaseEntityAnimationType currentAnimationType;
 };
 
 class CBaseEntityAnimation {
 	std::mutex animationMutex;
-	std::unordered_map<CBaseEntityAnimationType, std::shared_ptr<rSpriteAnimation> > animations;
+	std::unordered_map<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation>> animations;
 	std::shared_ptr<rSpriteAnimation> currentAnimation;
+	std::chrono::steady_clock::time_point lastUpdateTime;
 
 	GVector2D spriteSize;
 	int animationFPS = 10;
@@ -79,10 +83,13 @@ class CBaseEntityAnimation {
 	void * texture;
 
 	int animationCycle = 0;
-
+	float timeSinceLastFrame = 0.0f;
+	bool playingReverse = false;
+	bool looping = true;
+	AnimationState animationState = AnimationState::PLAYING;
 
 public:
-	
+
 	CBaseEntityAnimation & operator=( const CBaseEntityAnimation & other ) {
 		if ( this == &other )
 			return *this;
@@ -108,12 +115,23 @@ public:
 	static CBaseEntityAnimationType getReverseAnimation( CBaseEntityAnimationType anim );
 	static bool isDifferentAnimationType( CBaseEntityAnimationType animA , CBaseEntityAnimationType animB );
 
-	void updateAnimation( bool loop = true, bool reverse = false );
+	void updateAnimation( bool loop = true , bool reverse = false );
+	void updateAnimationWithDeltaTime( float deltaTime , bool loop = true, bool reverse = false);
 	void * getCurrentTexture( );
 	void setCurrentAnimationType( CBaseEntityAnimationType animationType , bool ignoreCheck = false );
 
+	// Novos controles de animação
+	void resetAnimation( );
+	void pauseAnimation( );
+	void resumeAnimation( );
+	void stopAnimation( );
+	bool isAnimationPlaying( ) const;
+	bool isAnimationPaused( ) const;
+	bool isAnimationFinished( ) const;
+
 	int getAnimationCycle( ) { return this->animationCycle; }
 	int getAnimationFPS( );
+	int getCurrentAnimationStep( );
 
 	GVector2D getCurrentTextureSize( );
 	CBaseEntityAnimationType getCurrentAnimationType( );

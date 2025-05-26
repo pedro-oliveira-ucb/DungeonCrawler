@@ -36,9 +36,7 @@ CBaseAttack::CBaseAttack( const CBaseAttack & other )
 	Log::Print( "[%s] Copy constructor called" , this->GetEntityName( ).c_str( ) );
 }
 
-void CBaseAttack::updateAttackPosition( ) {
 
-}
 
 std::shared_ptr<CBaseAttack> CBaseAttack::Clone() {
 		std::shared_ptr<CBaseAttack> clone = std::make_shared<CBaseAttack>( *this ); // Usa cópia

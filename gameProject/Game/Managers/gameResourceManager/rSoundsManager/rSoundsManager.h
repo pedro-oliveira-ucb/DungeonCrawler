@@ -15,7 +15,7 @@ class rSoundsManager : public rBaseResource
 
 	void loadSound( std::string name );
 
-	std::unordered_map<std::string , std::shared_ptr<rSound>> sounds;
+	std::unordered_map<std::string , std::unique_ptr<rSound>> sounds;
 
 public:
 	rSoundsManager( std::string path ) :rBaseResource( path ) { }

@@ -147,42 +147,59 @@ void CBaseEntity::clearMovementRequest( ) {
 
 void CBaseEntity::move( ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
-	GVector2D finalMovement = GVector2D( 0.f , 0.f );
 
-	float moveSpeed = this->sprinting ? this->movementSpeed * 2 : this->movementSpeed; // Ajuste a velocidade conforme necessário
+	// Tempo atual
+	auto now = std::chrono::high_resolution_clock::now( );
 
-	for ( auto move : this->movementsRequest ) {
+	// Calcular delta time
+	float deltaTime = 0.0f;
+	if ( this->lastMoveTime.time_since_epoch( ).count( ) > 0 ) {
+		std::chrono::duration<float> delta = now - this->lastMoveTime;
+		deltaTime = delta.count( );
+	}
+
+	// Atualiza o lastMoveTime
+	this->lastMoveTime = now;
+
+	// Movimento final
+	GVector2D finalMovement( 0.f , 0.f );
+	float moveSpeed = this->sprinting ? this->movementSpeed * 2.0f : this->movementSpeed;
+	float scaledSpeed = moveSpeed * deltaTime;
+
+	// Ignorar duplicatas
+	std::set<CBaseEntityMovementDirection> uniqueMoves( this->movementsRequest.begin( ) , this->movementsRequest.end( ) );
+
+	for ( const auto & move : uniqueMoves ) {
 		switch ( move ) {
 		case CBaseEntityMovementDirection::MOVEMENT_FORWARD:
-			finalMovement.y -= moveSpeed;
+			finalMovement.y -= scaledSpeed;
 			break;
 		case CBaseEntityMovementDirection::MOVEMENT_BACKWARD:
-			finalMovement.y += moveSpeed;
+			finalMovement.y += scaledSpeed;
 			break;
 		case CBaseEntityMovementDirection::MOVEMENT_LEFT:
-			finalMovement.x -= moveSpeed;
+			finalMovement.x -= scaledSpeed;
 			break;
 		case CBaseEntityMovementDirection::MOVEMENT_RIGHT:
-			finalMovement.x += moveSpeed;
+			finalMovement.x += scaledSpeed;
 			break;
 		}
 	}
 
 	this->movementsRequest.clear( );
 
-	if ( finalMovement.x != 0 || finalMovement.y != 0 ) {
+	if ( finalMovement.x != 0.0f || finalMovement.y != 0.0f ) {
 		GVector2D newPos = this->entityPosition + finalMovement;
 
-		// Usa o CollisionManager para checar se pode mover
 		if ( CollisionManager::Get( ).CanMoveTo( this , newPos ) ) {
 			float angleRadians = std::atan2( finalMovement.y , finalMovement.x );
 			float angleDegrees = angleRadians * ( 180.0f / static_cast< float >( M_PI ) );
 			this->movementAngle = angleDegrees;
 			this->entityPosition = newPos;
 		}
-		// Se colidir, não move
 	}
 }
+
 
 bool CBaseEntity::hasMovementRequest( ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
@@ -302,5 +319,44 @@ void CBaseEntity::setEntityLookingDirection( DIRECTION direction )
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 
 	this->entityLookingDirection = direction;
+}
+
+std::string CBaseEntity::getEntityStateAsString() const {
+    std::string result;
+    
+    if (entityState == 0) {
+        return "Undefined";
+    }
+    
+    if (entityState & STOPPED) {
+        result += "STOPPED";
+    }
+    
+    if (entityState & MOVING) {
+        if (!result.empty()) result += " | ";
+        result += "MOVING";
+    }
+    
+    if (entityState & RUNNING) {
+        if (!result.empty()) result += " | ";
+        result += "RUNNING";
+    }
+    
+    if (entityState & ATTACKING) {
+        if (!result.empty()) result += " | ";
+        result += "ATTACKING";
+    }
+    
+    if (entityState & HURT) {
+        if (!result.empty()) result += " | ";
+        result += "HURT";
+    }
+    
+    if (entityState & DEAD) {
+        if (!result.empty()) result += " | ";
+        result += "DEAD";
+    }
+    
+    return result;
 }
 

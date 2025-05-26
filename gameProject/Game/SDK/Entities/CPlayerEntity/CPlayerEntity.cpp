@@ -2,6 +2,8 @@
 
 #include <mutex>
 
+#include "../../../../Globals/Globals.h"
+
 #include "../../../gameObjects/attackHandler/attackHandler.h"
 #include "../../Events/EventManager.h"
 #include "../../../Utils/Log/Log.h"
@@ -14,7 +16,7 @@ CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder )
 		return;
 
 	for ( auto it = this->attacks.begin( ); it != attacks.end( ); ++it ) {
-		this->attackUseTime.emplace( it->first , 0 );
+		this->attackUseTime.emplace( it->first , now );
 	}
 }
 
@@ -26,7 +28,14 @@ void CPlayerEntity::UseAttack( CBaseAttackType attack ) {
 	if ( this->hasEntityState( CBaseEntityState::ATTACKING ) )
 		return;
 
-	if ( this->attackUseTime.at( attack ) < this->attacks.at( attack )->getCooldown( ) ) {
+	if ( this->attackUseTime.find( attack ) == this->attackUseTime.end( ) )
+		return;
+
+	auto lastUse = this->attackUseTime.at( attack );
+	// Calcula delta time em segundos
+	std::chrono::duration<float> delta = now - lastUse;
+
+	if ( delta.count( ) < this->attacks.at( attack )->getCooldown( ) ) {
 		return;
 	}
 
@@ -50,7 +59,7 @@ float AngleDiff( float a , float b ) {
 	return diff - 180.0f;
 }
 
-void CPlayerEntity::updateAnimationCycles( std::uint32_t previousEntityState ) {
+void CPlayerEntity::updateAnimationCycles( ) {
 	// Detecta o início de uma animação de ataque
 	if ( this->inAttackLoadingAnimation && !( previousEntityState & CBaseEntityState::ATTACKING ) ) {
 		this->AnimationCycleOnAttackInit = this->getEntityAnimations( )->getAnimationCycle( );
@@ -62,11 +71,11 @@ void CPlayerEntity::updateAnimationCycles( std::uint32_t previousEntityState ) {
 	}
 }
 
-void CPlayerEntity::updateMovementSounds( std::uint32_t previousEntityState ) {
+void CPlayerEntity::updateMovementSounds( ) {
 	// Emite eventos de som de passos quando o jogador está em movimento
 	if ( ( previousEntityState & CBaseEntityState::MOVING ) || ( previousEntityState & CBaseEntityState::RUNNING ) ) {
 		bool running = ( previousEntityState & CBaseEntityState::RUNNING );
-		int stepTrigger = running ? 1 : 2;
+		int stepTrigger = running ? 10 : 20;
 
 		if ( this->AnimationCycleOnStep != this->getEntityAnimations( )->getAnimationCycle( ) ) {
 			this->AnimationCycleOnStep = this->getEntityAnimations( )->getAnimationCycle( );
@@ -115,7 +124,15 @@ void CPlayerEntity::handleMovementState( std::uint32_t & state ) {
 }
 
 void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
-	bool hurtAnimationEnded = this->getEntityAnimations( )->getAnimationCycle( ) > this->AnimationCycleOnHurtInit;
+	//Aguarda até a animacao ser de hurt
+	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::HURT_BACKWARD ) ) {
+		state |= CBaseEntityState::HURT;
+		this->loopAnimation = false;
+		this->getEntityAnimations( )->resetAnimation( );
+		return;
+	}
+
+	bool hurtAnimationEnded = this->getEntityAnimations( )->isAnimationFinished( );
 
 	if ( !hurtAnimationEnded ) {
 		state |= CBaseEntityState::HURT;
@@ -125,11 +142,30 @@ void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
 	}
 
 	reverseAnimation = false;
+	this->loopAnimation = false;
 }
 
 std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & state ) {
+
+	CBaseEntityAnimationType animbase = CBaseEntityAnimationType::ATTACKING_RUNNING_FORWARD;
+
+	if ( state & CBaseEntityState::MOVING ) {
+		animbase = CBaseEntityAnimationType::ATTACKING_WALKING_FORWARD;
+
+	}
+	else if ( state & CBaseEntityState::RUNNING ) {
+		animbase = CBaseEntityAnimationType::ATTACKING_RUNNING_FORWARD;
+	}
+
+	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::ATTACKING_BACKWARD ) ) {
+		state |= CBaseEntityState::ATTACKING;
+		this->loopAnimation = false;
+		this->getEntityAnimations( )->resetAnimation( );
+		return nullptr;
+	}
+
+	bool attackAnimationEnded = this->getEntityAnimations( )->isAnimationFinished( );
 	state |= CBaseEntityState::ATTACKING;
-	bool attackAnimationEnded = this->getEntityAnimations( )->getAnimationCycle( ) > this->AnimationCycleOnAttackInit;
 	std::shared_ptr<CBaseAttack> newAttack = nullptr;
 
 	switch ( this->attacks.at( this->currentLoadingAttack )->getAttackType( ) ) {
@@ -159,11 +195,11 @@ std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & s
 
 	// Configura parâmetros de animação baseados no estado de ataque
 	if ( state & CBaseEntityState::ATTACKING ) {
-		//loopAnimation = false;
+		loopAnimation = false;
 		reverseAnimation = false;
 	}
 	else {
-		this->attackUseTime.at( this->currentLoadingAttack ) = 0;
+		this->attackUseTime.at( this->currentLoadingAttack ) = now;
 	}
 
 	return newAttack;
@@ -208,7 +244,6 @@ void CPlayerEntity::updateEntityAnimationAndState( ) {
 	// Determina o tipo de animação baseado no novo estado e direção
 	CBaseEntityAnimationType updatedAnimationType = CBaseEntity::getAnimationTypeBasedOnStateAndDirection( newEntityState , localDirection );
 
-	Log::Print( "EntityState: %s" , CBaseEntityAnimation::getAnimationTypeName( updatedAnimationType ).c_str( ) );
 
 	// Atualiza os estados e animações da entidade
 	this->setEntityStates( newEntityState );
@@ -223,7 +258,7 @@ void CPlayerEntity::updateEntityAnimationAndState( ) {
 void CPlayerEntity::updateAttackCooldowns( ) {
 	// Incrementa os contadores de cooldown para todos os ataques
 	for ( auto it = this->attacks.begin( ); it != attacks.end( ); ++it ) {
-		this->attackUseTime.at( it->first )++;
+		// this->attackUseTime.at( it->first )++;
 	}
 }
 
@@ -231,13 +266,14 @@ void CPlayerEntity::updateEntity( ) {
 	std::lock_guard<std::mutex> lock( localPlayerMutex );
 	this->lookingAngle = this->getLookingAngle( ).getDegrees( );
 	this->localDirection = this->getEntityLookingDirection( );
-	std::uint32_t previousEntityState = this->getEntityStates( );
+	previousEntityState = this->getEntityStates( );
+	previousAnimationType = this->getEntityAnimations( )->getCurrentAnimationType( );
 
 	// Atualiza os ciclos de animação e estados iniciais
-	updateAnimationCycles( previousEntityState );
+	updateAnimationCycles( );
 
 	// Gerencia eventos de som de movimento
-	updateMovementSounds( previousEntityState );
+	updateMovementSounds( );
 
 	// Atualiza o estado do ataque atual
 	updateCurrentAttackState( );

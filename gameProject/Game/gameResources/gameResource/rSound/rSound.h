@@ -2,16 +2,21 @@
 #include <mutex>
 #include <vector>
 #include <string>
+#include <memory>
+#include <mutex>
 
+class Sound;
+
+#define MAX_SOUNDS 255
 
 class rSound
 {
+	std::mutex soundMutex;
 	bool initialized = false;
 
 	std::string soundPath;
-	void * soundAddress; // tipo opaco
+	std::vector<std::unique_ptr<Sound>> sounds;
 	void initializeSound( );
-	
 
 public:
 	rSound( const rSound & ) = delete;

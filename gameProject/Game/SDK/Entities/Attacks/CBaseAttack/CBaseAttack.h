@@ -82,7 +82,6 @@ public:
 	}
 
 	void Deactive( );
-	virtual void updateAttackPosition( ); // Atualiza o estado do ataque
 	virtual std::shared_ptr<CBaseAttack> Clone( );
 	void Active( CBaseEntity * sender );
 
