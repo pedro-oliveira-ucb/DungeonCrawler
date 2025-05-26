@@ -104,7 +104,8 @@ void CBaseEntityAnimation::updateAnimationWithDeltaTime( float deltaTime , bool 
 				// Completa um ciclo
 				animationCycle++;
 				currentAnimationStep = totalFrames - ( framesToAdvance - currentAnimationStep ) % totalFrames - 1;
-				if ( currentAnimationStep < 0 ) currentAnimationStep = 0;
+				if ( currentAnimationStep < 0 )
+					currentAnimationStep = 0;
 			}
 			else {
 				// Finaliza no primeiro frame
@@ -178,10 +179,46 @@ bool CBaseEntityAnimation::isAnimationFinished( ) const {
 	return animationState == AnimationState::FINISHED;
 }
 
+enum CBaseAnimationGroupType {
+	GROUP_IDLE ,
+	GROUP_WALKING ,
+	GROUP_RUNNING ,
+	GROUP_ATTACKING ,
+	GROUP_HURT ,
+	GROUP_DEAD ,
+	GROUP_UNKNOWN
+};
+
+CBaseAnimationGroupType getAnimationGroup( CBaseEntityAnimationType anim ) {
+	switch ( anim ) {
+	case IDLE_FORWARD: case IDLE_BACKWARD: case IDLE_LEFT: case IDLE_RIGHT:
+		return GROUP_IDLE;
+
+	case WALKING_FORWARD: case WALKING_BACKWARD: case WALKING_LEFT: case WALKING_RIGHT:
+		return GROUP_WALKING;
+
+	case RUNNING_FORWARD: case RUNNING_BACKWARD: case RUNNING_LEFT: case RUNNING_RIGHT:
+		return GROUP_RUNNING;
+
+	case ATTACKING_FORWARD: case ATTACKING_BACKWARD: case ATTACKING_LEFT: case ATTACKING_RIGHT:	
+	case ATTACKING_WALKING_FORWARD: case ATTACKING_WALKING_BACKWARD: case ATTACKING_WALKING_LEFT: case ATTACKING_WALKING_RIGHT: 
+	case ATTACKING_RUNNING_FORWARD: case ATTACKING_RUNNING_BACKWARD: case ATTACKING_RUNNING_LEFT: case ATTACKING_RUNNING_RIGHT:
+		return GROUP_ATTACKING;
+
+	case HURT_FORWARD: case HURT_BACKWARD: case HURT_LEFT: case HURT_RIGHT:
+		return GROUP_HURT;
+
+	case DEAD_FORWARD: case DEAD_BACKWARD: case DEAD_LEFT: case DEAD_RIGHT:
+		return GROUP_DEAD;
+
+	default:
+		return GROUP_UNKNOWN;
+	}
+}
+
 // Implementação dos métodos estáticos e de configuração de animação permanecem os mesmos
 bool CBaseEntityAnimation::isDifferentAnimationType( CBaseEntityAnimationType animA , CBaseEntityAnimationType animB ) {
-	// check if it is different type walking, idle or attacking
-	return ( animA / 4 ) != ( animB / 4 );
+	return getAnimationGroup( animA ) != getAnimationGroup( animB );
 }
 
 void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType animationType , bool ignoreCheck ) {
@@ -191,21 +228,22 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 		return;
 	}
 
-	if ( animations.find( animationType ) != animations.end( ) ) {
+	auto it = animations.find( animationType );
+	if ( it != animations.end( ) && it->second.get() != nullptr ) {
 		this->currentAnimationType = animationType;
 		if ( this->isDifferentAnimationType( this->currentAnimationType , animationType ) ) {
 			this->currentAnimationStep = 0;
 			this->timeSinceLastFrame = 0.0f;
 			this->animationState = AnimationState::PLAYING;
 		}
-
-		std::shared_ptr<rSpriteAnimation> animation = this->animations.at( this->currentAnimationType );
-
-		if ( animation.get( ) == nullptr ) {
-			return;
+		else if ( this->currentAnimation != nullptr && this->currentAnimation->size() != it->second->size() ) {
+			//update frame step on equal animations
+			float CurrentFramePercentage = ( this->currentAnimationStep / this->currentAnimation->size( ) );
+			int correctedFrameStep = static_cast< int >( CurrentFramePercentage * it->second->size( ) );
+			this->currentAnimationStep = correctedFrameStep;
 		}
 
-		this->currentAnimation = this->animations.at( this->currentAnimationType );
+		this->currentAnimation = it->second;
 	}
 }
 

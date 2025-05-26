@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameThreads\enemiesController\enemiesController.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EnemiesInitializer\EnemiesInitializer.cpp" />
     <ClCompile Include="Game\Managers\collisionManager\collisionManager.cpp" />
     <ClCompile Include="Game\gameObjects\gameSoundEventsHandler\gameSoundsEventHandler.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="Game\SDK\math\Vector2D\GVector2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\gameThreads\enemiesController\enemiesController.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EnemiesInitializer\EnemiesInitializer.h" />
     <ClInclude Include="Game\Managers\collisionManager\collisionManager.h" />
     <ClInclude Include="Game\gameObjects\gameSoundEventsHandler\gameSoundsEventHandler.h" />

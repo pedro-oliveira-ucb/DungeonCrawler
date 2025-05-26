@@ -1,9 +1,10 @@
 #pragma once
 
 #include <mutex>
+#include <unordered_map>
+
 
 #include "../../math/gAngle/GAngle.h"
-
 #include "../CBaseEntity/CBaseEntity.h"
 #include "../Attacks/CBaseAttack/CBaseAttack.h"
 
@@ -38,7 +39,7 @@ class CPlayerEntity : public CBaseEntity {
     std::uint32_t previousEntityState;
 	CBaseEntityAnimationType previousAnimationType;
 
-
+	float minimumAttackDistance = 0.0f; // Distância mínima para atacar
 
 private:
     // Funções auxiliares para modularizar updateEntity
@@ -56,10 +57,13 @@ private:
     void updateEntityAnimationAndState();
     void updateAttackCooldowns();
 
+	std::vector< CBaseAttackType > availableAttacksInternal;
+
 public:
     std::mutex localPlayerMutex;
 
-    CPlayerEntity( CBaseEntityConstructor builder );
+	CPlayerEntity( CBaseEntityConstructor builder , std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks );
+	CPlayerEntity( const CPlayerEntity & other );
 
     void UseAttack( CBaseAttackType ); // Usa um ataque específico
 
@@ -68,4 +72,8 @@ public:
     void updateEntity( ) override;
 
     void Respawn(  );
+
+	std::vector< CBaseAttackType> getAvailableAttacks( ); // Retorna os ataques disponíveis do jogador
+
+	float getMinimumDistanceToAttack( );
 };

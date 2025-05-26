@@ -1,46 +1,41 @@
 #pragma once
 
-#include "../CBaseEntity/CBaseEntity.h"
-#include "../Attacks/CBaseAttack/CBaseAttack.h"
 #include <unordered_map>
+
+#include "../CPlayerEntity/CPlayerEntity.h"
 #include <memory>
-#include <mutex>
 
-class CEnemyEntity : public CBaseEntity {
+enum CEnemyType {
+    MELEE_ENEMY ,
+    RANGED_ENEMY ,
+    MAGIC_ENEMY ,
+    BOSS_ENEMY ,            // Inimigo com muita vida e ataques variados
+    SUICIDE_ENEMY ,         // Corre até o jogador e explode
+    STEALTH_ENEMY ,         // Fica invisível ou se esconde até atacar
+    TANK_ENEMY ,            // Muito resistente, mas lento
+    SUMMONER_ENEMY ,        // Invoca outros inimigos
+    FLYING_ENEMY ,          // Pode voar, ignorando obstáculos do mapa
+    SNIPER_ENEMY ,          // Ataca de muito longe com precisão
+    HEALER_ENEMY ,          // Cura aliados próximos
+    POISON_ENEMY ,          // Aplica dano ao longo do tempo
+    SHIELDED_ENEMY ,        // Tem escudo que precisa ser quebrado antes de causar dano
+    TELEPORTER_ENEMY ,      // Pode se mover rapidamente entre pontos
+    TRICKSTER_ENEMY        // Usa ilusões, clones ou habilidades de confusão
+};
+
+class CEnemyEntity : public CPlayerEntity {
 private:
-    std::unordered_map<CBaseAttackType, std::shared_ptr<CBaseAttack>> attacks;
-    bool attacking = false;
-    bool inAttackLoadingAnimation = false;
-    bool alreadyThrowedAttack = false;
- 
 
-    CBaseAttackType currentLoadingAttack = CBaseAttackType::CBaseAttackType_None;
-    CBaseAttack* currentAttack = nullptr;
-
-    int AnimationCycleOnAttackInit = -1;
-    int AnimationCycleOnHurtInit   = -1;
-    int AnimationCycleOnDeathInit = -1;
-
-    float attackCooldown = 1.5f;  // Exemplo de cooldown
-    float attackDelay    = 0.5f;  // Exemplo de delay
-    float attackTimer    = 0.0f;  // Timer controlado no update
+    CEnemyType enemyType;
 
 public:
-    std::mutex enemyMutex;
 
-    GVector2D findBestDirectionToPlayer( GVector2D & toPlayer );
+    CEnemyType getEnemyType( );
 
-    CEnemyEntity(CBaseEntityConstructor builder);
+    static GVector2D findBestDirectionToPlayer( CBaseEntity * entity, GVector2D & toPlayer );
+
+    CEnemyEntity( CBaseEntityConstructor builder , std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks, CEnemyType type);
 	CEnemyEntity( const CEnemyEntity & other );
 
-    void updateEntity() override;
-
-    bool isAttacking();
-
-    void Respawn( );
-
     std::shared_ptr<CEnemyEntity> Clone( );
-
-    void UseAttack(CBaseAttackType type);
-
 };

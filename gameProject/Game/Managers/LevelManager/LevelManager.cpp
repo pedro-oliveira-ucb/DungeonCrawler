@@ -7,6 +7,7 @@
 #include "../../../Globals/Globals.h"
 
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../collisionManager/collisionManager.h"
 
 LevelManager::LevelManager( ) {
 
@@ -24,7 +25,6 @@ void LevelManager::loadLevels( ) {
 	levels.push_back( { 3, "Nightmare", 20, 20 } );
 }
 
-
 LevelData LevelManager::getCurrentLevel( ) {
 	return levels[ currentLevelIndex ];
 }
@@ -36,7 +36,6 @@ int RandomNumber( int min , int max )
 	std::uniform_int_distribution<int> uni( min , max );
 	return uni( rng );
 }
-
 
 void LevelManager::moveToNextLevel( ) {
 	if ( !isLastLevel( ) ) {
@@ -56,13 +55,10 @@ bool LevelManager::hasEnemyAlive( ) {
 }
 
 bool LevelManager::isLastLevel( ) {
-
 	return currentLevelIndex >= static_cast< int >( levels.size( ) ) - 1;
 }
 
 void LevelManager::updateEnemies( ) {
-
-
 	auto lastUse = this->respawnTimer;
 	// Calcula delta time em segundos
 	std::chrono::duration<float> delta = now - lastUse;
@@ -97,21 +93,29 @@ void LevelManager::updateLevel( )
 	updateEnemies( );
 }
 
-GVector2D getRandomAreaAroundLocalPlayer( ) {
+GVector2D getRandomAreaAroundLocalPlayer( CBaseEntity * ent ) {
 
 	auto player = entitiesHandler::Get( ).getLocalPlayer( );
 
 	if ( player == nullptr ) {
-		return GVector2D( 0, 0 );
+		return GVector2D( 0 , 0 );
 	}
 	GVector2D localPos = player->getEntityPosition( );
 
-	int RandomX = RandomNumber( -850 , 850 );
-	int RandomY = RandomNumber( -850 , 850 );
+	bool okayPlace = false;
+	GVector2D deriserdSpawnPlace;
 
-	return GVector2D( localPos.x + RandomX , localPos.y + RandomY );
+	while ( !okayPlace ) {
+		int RandomX = RandomNumber( -850 , 850 );
+		int RandomY = RandomNumber( -850 , 850 );
+		deriserdSpawnPlace = GVector2D( localPos.x + RandomX , localPos.y + RandomY );
+		if ( CollisionManager::Get( ).isSpaceFree( deriserdSpawnPlace , GVector2D(150, 150) ) ) {
+			okayPlace = true;
+		}
+	}
+
+	return deriserdSpawnPlace;
 }
-
 
 void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
 	auto enemyList = entitiesHandler::Get( ).getEnemies( );
@@ -119,13 +123,15 @@ void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
 		CEnemyEntity * rawEnemyPtr = enemyList.at( 0 );
 		std::shared_ptr<CEnemyEntity> enemy( rawEnemyPtr->Clone( ) );
 		entitiesHandler::Get( ).addSpawnedEntity( enemy.get( ) );
+		entitiesHandler::Get( ).addEnemy( enemy.get( ) );
 		enemies.push_back( enemy );
 	}
-	
+
+	std::vector<CBaseEntity *> entities = entitiesHandler::Get( ).getSpawnedEntities( );
+
 	int i = 0;
 	for ( int i = 0; i < enemies.size( ); i++ ) {
-		
-		enemies.at( i )->setEntityPosition( getRandomAreaAroundLocalPlayer() );
+		enemies.at( i )->setEntityPosition( getRandomAreaAroundLocalPlayer( enemies.at( i ).get( ) ) );
 		enemies.at( i )->Respawn( );
 		i++;
 	}

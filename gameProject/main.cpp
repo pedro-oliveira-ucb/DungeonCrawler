@@ -4,6 +4,7 @@
 #include <iomanip>  // Necessário para std::setw e std::setfill
 
 
+#include "Game/gameControls/keybindHandler/keybindHandler.h"
 #include "Game/game.h"
 #include "Game/gameRender/gameRender.h"
 #include "Globals/Globals.h"
@@ -97,12 +98,12 @@ int main( void ) {
 				break;
 			}
 
-			gameRender::Get( ).soundEvents( );
-
 			Vector2 mousePos = GetMousePosition( );
-
 			globals.mousePosX = mousePos.x;
 			globals.mousePosY = mousePos.y;
+
+			keybindHandler::Get( ).update( );
+			gameRender::Get( ).soundEvents( );
 
 			BeginDrawing( );
 			//remove old draws?
@@ -112,7 +113,6 @@ int main( void ) {
 
 			//DrawText( "Janela em fullscreen!" , 100 , 100 , 20 , BLACK );
 			EndDrawing( );
-
 		}
 	}
 

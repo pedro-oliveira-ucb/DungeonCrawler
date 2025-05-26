@@ -8,16 +8,42 @@
 #include "../../Events/EventManager.h"
 #include "../../../Utils/Log/Log.h"
 
-CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder )
-	: CBaseEntity( builder )
+
+CPlayerEntity::CPlayerEntity( const CPlayerEntity & other )
+	:CBaseEntity( other )
 {
-	this->attacks = attackHandler::Get( ).getAvailableLocalPlayerAttack( );
+	this->attacks = other.attacks;
+	this->minimumAttackDistance = other.minimumAttackDistance;
+	this->availableAttacksInternal = other.availableAttacksInternal;
+}
+
+CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder , std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks )
+	: CBaseEntity( builder ) // Chama explicitamente o construtor de CBaseEntity
+{
+	this->attacks = attacks;
 	if ( this->attacks.empty( ) )
 		return;
 
-	for ( auto it = this->attacks.begin( ); it != attacks.end( ); ++it ) {
+	float minAttackDis = 999999;
+
+	for ( auto it = this->attacks.begin( ); it != this->attacks.end( ); ++it ) {
+		if ( it->second->getRange( ) < minAttackDis ) {
+			minAttackDis = it->second->getRange( );
+		}
+		this->availableAttacksInternal.emplace_back( it->second->getAttackType( ) );
+
 		this->attackUseTime.emplace( it->first , now );
 	}
+
+	this->minimumAttackDistance = minAttackDis;
+}
+
+float CPlayerEntity::getMinimumDistanceToAttack( ) {
+	return this->minimumAttackDistance;
+}
+
+std::vector<CBaseAttackType> CPlayerEntity::getAvailableAttacks( ) {
+	return this->availableAttacksInternal;
 }
 
 void CPlayerEntity::UseAttack( CBaseAttackType attack ) {
@@ -75,7 +101,7 @@ void CPlayerEntity::updateMovementSounds( ) {
 	// Emite eventos de som de passos quando o jogador está em movimento
 	if ( ( previousEntityState & CBaseEntityState::MOVING ) || ( previousEntityState & CBaseEntityState::RUNNING ) ) {
 		bool running = ( previousEntityState & CBaseEntityState::RUNNING );
-		int stepTrigger = running ? 10 : 20;
+		int stepTrigger = running ? 15 : 16;
 
 		if ( this->AnimationCycleOnStep != this->getEntityAnimations( )->getAnimationCycle( ) ) {
 			this->AnimationCycleOnStep = this->getEntityAnimations( )->getAnimationCycle( );
@@ -99,7 +125,7 @@ void CPlayerEntity::updateCurrentAttackState( ) {
 	// Verifica e atualiza o estado de ataque atual
 	if ( this->currentAttack != nullptr ) {
 		this->attacking = true;
-		if ( this->currentAttack->getEntityAnimations( )->getAnimationCycle( ) ) {
+		if ( this->currentAttack->getEntityAnimations( )->isAnimationFinished( ) ) {
 			this->currentAttack = nullptr;
 			this->attacking = false;
 		}
@@ -116,7 +142,7 @@ void CPlayerEntity::handleMovementState( std::uint32_t & state ) {
 
 	if ( this->hasMovementRequest( ) ) {
 		state |= this->isSprinting( ) ? CBaseEntityState::RUNNING : CBaseEntityState::MOVING;
-		reverseAnimation = ( fabsf( delta ) > 90.0f );
+		// reverseAnimation = ( fabsf( delta ) > 90.0f );
 	}
 	else {
 		state |= CBaseEntityState::STOPPED;
@@ -147,17 +173,9 @@ void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
 
 std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & state ) {
 
-	CBaseEntityAnimationType animbase = CBaseEntityAnimationType::ATTACKING_RUNNING_FORWARD;
+	reverseAnimation = false;
 
-	if ( state & CBaseEntityState::MOVING ) {
-		animbase = CBaseEntityAnimationType::ATTACKING_WALKING_FORWARD;
-
-	}
-	else if ( state & CBaseEntityState::RUNNING ) {
-		animbase = CBaseEntityAnimationType::ATTACKING_RUNNING_FORWARD;
-	}
-
-	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::ATTACKING_BACKWARD ) ) {
+	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::ATTACKING_FORWARD ) ) {
 		state |= CBaseEntityState::ATTACKING;
 		this->loopAnimation = false;
 		this->getEntityAnimations( )->resetAnimation( );
@@ -165,7 +183,8 @@ std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & s
 	}
 
 	bool attackAnimationEnded = this->getEntityAnimations( )->isAnimationFinished( );
-	state |= CBaseEntityState::ATTACKING;
+
+
 	std::shared_ptr<CBaseAttack> newAttack = nullptr;
 
 	switch ( this->attacks.at( this->currentLoadingAttack )->getAttackType( ) ) {
@@ -173,13 +192,7 @@ std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & s
 		// Para ataques corpo-a-corpo, lança o ataque imediatamente
 		if ( !this->alreadyThrowedAttack ) {
 			newAttack = attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
-		}
-
-		// Finaliza o estado de ataque quando a animação termina
-		if ( this->alreadyThrowedAttack && attackAnimationEnded ) {
-			this->inAttackLoadingAnimation = false;
-			this->alreadyThrowedAttack = false;
-			state &= ~CBaseEntityState::ATTACKING;
+			this->alreadyThrowedAttack = true;
 		}
 		break;
 
@@ -187,20 +200,21 @@ std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & s
 		// Para ataques à distância, lança o ataque quando a animação termina
 		if ( attackAnimationEnded ) {
 			newAttack = attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
-			this->inAttackLoadingAnimation = false;
-			state &= ~CBaseEntityState::ATTACKING;
 		}
 		break;
 	}
 
-	// Configura parâmetros de animação baseados no estado de ataque
-	if ( state & CBaseEntityState::ATTACKING ) {
+	// Finaliza o estado de ataque quando a animação termina
+	if ( !attackAnimationEnded ) {
+		state |= CBaseEntityState::ATTACKING;
 		loopAnimation = false;
-		reverseAnimation = false;
 	}
 	else {
+		this->inAttackLoadingAnimation = false;
+		this->alreadyThrowedAttack = false;
 		this->attackUseTime.at( this->currentLoadingAttack ) = now;
 	}
+
 
 	return newAttack;
 }
@@ -216,14 +230,13 @@ std::uint32_t CPlayerEntity::determineEntityState( float lookingAngle , DIRECTIO
 
 		if ( this->isBeingHit( ) ) {
 			handleHurtState( newEntityState );
-		}
 
-		if ( this->inAttackLoadingAnimation ) {
+		}
+		else if ( this->inAttackLoadingAnimation ) {
 			std::shared_ptr<CBaseAttack> newAttack = handleAttackState( newEntityState );
 
 			if ( newAttack.get( ) != nullptr ) {
 				this->currentAttack = newAttack.get( );
-				this->alreadyThrowedAttack = true;
 				this->attacking = true;
 			}
 		}

@@ -37,6 +37,9 @@ void attackHandler::updateAttacks( )
 						if ( !targets.at( i )->isAlive( ) )
 							continue;
 
+						if ( targets.at( i ) == sender )
+							continue;
+
 						// Se já foi atingida, ignora
 						if ( attack->hasAlreadyHit( targets.at( i ) ) )
 							continue;
@@ -77,18 +80,6 @@ std::shared_ptr<CBaseAttack> attackHandler::getRunningAttack( int index )
 	return nullptr;
 }
 
-std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>>  attackHandler::getAvailableLocalPlayerAttack( ) {
-	//run this once, and store it
-	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> result;
-	for ( int i = 0; i < this->availableLocalPlayerAttacks.size( ); i++ ) {
-		availableAttackHolder * attack = &this->availableLocalPlayerAttacks.at( i );
-
-		result.emplace( std::make_pair( attack->attack->getAttackType( ) , attack->attack ) );
-	}
-
-	return result;
-}
-
 std::shared_ptr<CBaseAttack> attackHandler::throwNewAttack( CBaseEntity * sender , CBaseAttack * attack )
 {
 
@@ -107,19 +98,35 @@ void attackHandler::addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> 
 	this->availableLocalPlayerAttacks.emplace_back( availableAttackHolder( attack->getAttackType( ) , attack ) );
 }
 
-std::shared_ptr<availableAttackHolder> attackHandler::getAvailableEnemyAttack( ) {
-	// Exemplo: retornará o primeiro ataque disponível pro inimigo
-	// Ajuste se quiser vários tipos
+void attackHandler::addAvailableEnemyAttack( std::string enemyName,  std::shared_ptr<CBaseAttack> attack ) {
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );
-	if ( !availableEnemiesAttacks.empty( ) ) {
-		return std::make_shared<availableAttackHolder>( availableEnemiesAttacks[ 0 ] );
-	}
-	return nullptr;
+	this->availableEnemiesAttacks[ enemyName ].emplace_back( availableAttackHolder( attack->getAttackType( ) , attack ) );
 }
 
-void attackHandler::addAvailableEnemyAttack( std::shared_ptr<CBaseAttack> attack ) {
+std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>>  attackHandler::getAvailableLocalPlayerAttack( ) {
+	//run this once, and store it
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );
-	this->availableEnemiesAttacks.emplace_back(
-		availableAttackHolder( attack->getAttackType( ) , attack )
-	);
+	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> result;
+	for ( int i = 0; i < this->availableLocalPlayerAttacks.size( ); i++ ) {
+		availableAttackHolder * attack = &this->availableLocalPlayerAttacks.at( i );
+		result.emplace( std::make_pair( attack->attack->getAttackType( ) , attack->attack ) );
+	}
+
+	return result;
+}
+
+std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>>  attackHandler::getAvailableEnemyAttack( std::string enemyName ) {
+	//run this once, and store it
+	std::lock_guard<std::mutex> lock( attackHandlerMutex );
+	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> result;
+	auto it = this->availableEnemiesAttacks.find( enemyName );
+	if(it != this->availableEnemiesAttacks.end( )) {	
+		//run this once, and store it	
+		for ( int i = 0; i < it->second.size( ); i++ ) {
+			availableAttackHolder * attack = &it->second.at( i );
+			result.emplace( std::make_pair( attack->attack->getAttackType( ) , attack->attack ) );
+		}
+	}
+
+	return result;
 }

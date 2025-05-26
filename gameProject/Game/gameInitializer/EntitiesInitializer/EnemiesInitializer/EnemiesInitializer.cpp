@@ -2,9 +2,12 @@
 
 #include <optional>
 
+#include "../../../../Utils/Log/Log.h"
+
 #include "../../../SDK/Entities/CEnemyEntity/CEnemyEntity.h"
 #include "../../../SDK/Events/EventManager.h"
 #include "../../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../../gameObjects/attackHandler/attackHandler.h"
 #include "../../../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
 
 std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>>
@@ -15,7 +18,7 @@ std::optional<CBaseEntityAnimationConstructor> createEntityAnimationConstructor(
 	std::vector<CBaseEntityAnimationType> requiredAnimations
 );
 
-CEnemyEntity * EnemiesInitializer::generateEnemy( const std::string & animationName )
+CEnemyEntity * generateEnemy( CBaseEntityConstructor & builder , const std::string & animationName , CEnemyType enemyType )
 {
 	// Exemplo de lista de animações para o inimigo
 	std::vector<CBaseEntityAnimationType> requiredAnimations = {
@@ -31,6 +34,10 @@ CEnemyEntity * EnemiesInitializer::generateEnemy( const std::string & animationN
 		 CBaseEntityAnimationType::ATTACKING_BACKWARD ,
 		 CBaseEntityAnimationType::ATTACKING_LEFT ,
 		 CBaseEntityAnimationType::ATTACKING_RIGHT,
+		 CBaseEntityAnimationType::ATTACKING_WALKING_FORWARD ,
+		 CBaseEntityAnimationType::ATTACKING_WALKING_BACKWARD ,
+		 CBaseEntityAnimationType::ATTACKING_WALKING_LEFT ,
+		 CBaseEntityAnimationType::ATTACKING_WALKING_RIGHT,
 		 CBaseEntityAnimationType::HURT_FORWARD ,
 		 CBaseEntityAnimationType::HURT_BACKWARD ,
 		 CBaseEntityAnimationType::HURT_LEFT ,
@@ -44,54 +51,39 @@ CEnemyEntity * EnemiesInitializer::generateEnemy( const std::string & animationN
 	// Apenas exemplificado, reutilize a mesma lógica de criação utilizada em LocalPlayerInitializer.
 	// Caso use 'createEntityAnimationConstructor', aplique o mesmo padrão:
 	auto animation = createEntityAnimationConstructor( animationName , requiredAnimations );
-	if ( !animation ) { return nullptr; }
+	if ( !animation ) {
+		Log::Print( "[Enemy Initializer] %s animation generation failed!" , animationName.c_str( ) );
+		return nullptr; 
+	}
 
-	CBaseEntityConstructor builder;
 	builder.entityAnimations = animation.value( );
-	builder.entityPosition = GVector2D( 0 , 0 );
-	builder.entityType = CBaseEntityType::MOB;
-	builder.health = 100;
-	builder.movementSpeed = 5;
-	builder.Name = animationName;
+	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks = attackHandler::Get( ).getAvailableEnemyAttack( animationName );
+
+	if ( attacks.empty( ) ) {
+		Log::Print( "[Enemy Initializer] not attacks found for %s, generation failed!" , animationName.c_str( ) );
+		return nullptr;
+	}
 
 	// Cria a instância do inimigo
-	return new CEnemyEntity( builder );
+	return new CEnemyEntity( builder , attacks , enemyType );
 }
 
 bool EnemiesInitializer::initializeEvents( std::string enemyName )
 {
-	// Exemplo de registro de eventos relacionados ao inimigo
-	std::string eventName = enemyName + "_hurt";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ ] ( ) {
-			gameSoundsQueue.addEventToQueue( "BasicEnemy_hurt" );
-		}
-	) );
+	std::vector<std::string> eventsNames {
+		"hurt",
+		"dead"
+	};
 
-	eventName = enemyName + "_dead";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ ] ( ) {
-			gameSoundsQueue.addEventToQueue( "BasicEnemy_dead" );
-		}
-	) );
-
-	eventName = enemyName + "_meleeAttack";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ ] ( ) {
-			gameSoundsQueue.addEventToQueue( "BasicEnemy_meleeAttack" );
-		}
-	) );
-
-	eventName = enemyName + "_rangedAttack";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ ] ( ) {
-			gameSoundsQueue.addEventToQueue( "BasicEnemy_meleeAttack" );
-		}
-	) );
+	for ( std::string event : eventsNames ) {
+		std::string eventName = enemyName + "_" + event;
+		EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+			eventName ,
+			[ eventName ] ( ) {
+				gameSoundsQueue.addEventToQueue( eventName );
+			}
+		) );
+	}
 
 	return true;
 }
@@ -101,18 +93,26 @@ bool EnemiesInitializer::initialize( )
 	// Crie e registre um inimigo de exemplo (pode criar vários se quiser)
 	std::vector<std::string> enemyNames = { "BasicEnemy", "AdvancedEnemy" };
 
-	for ( const auto & enemyName : enemyNames ) {
-		auto * enemy = generateEnemy( enemyName );
-		if ( !enemy ) {
-			return false;
-		}
-		// Adiciona ao EntitiesHandler
-		entitiesHandler::Get( ).addEnemy( enemy );
-		// Registra eventos
-		if ( !initializeEvents( enemyName ) ) {
-			return false;
-		}
+
+	CBaseEntityConstructor builder;
+	builder.entityPosition = GVector2D( 0 , 0 );
+	builder.entityType = CBaseEntityType::MOB;
+	builder.health = 100;
+	builder.movementSpeed = 5;
+	builder.Name = "BasicEnemy";
+	auto * enemy = generateEnemy( builder , "BasicEnemy" , CEnemyType::MELEE_ENEMY );
+	if ( !enemy ) {
+		Log::Print( "[Enemies Initializer] Failed to create enemy BasicEnemy!" );
+		return false;
 	}
+	if ( !initializeEvents( "BasicEnemy" ) ){
+		Log::Print( "[Enemies Initializer] Failed to initialize enemy BasicEnemy events!" );
+		return false;
+	}
+	
+	entitiesHandler::Get( ).addEnemy( enemy );
+
+
 
 	return true;
 }

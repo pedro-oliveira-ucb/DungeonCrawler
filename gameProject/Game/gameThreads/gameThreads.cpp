@@ -5,16 +5,18 @@
 
 #include "updatePosition/updatePosition.h"
 #include "updateEntities/updateEntities.h"
+#include "enemiesController/enemiesController.h"
 #include "../../Utils/Log/Log.h"
 
 
 updatePositionEvent _updatePositionEvent;
 updateEntities _updateEntities;
+enemiesController _enemiesController;
 
 std::vector<std::pair<CBaseThread * , std::string> > _gameThreads {
 	{  &_updatePositionEvent, "updatePosition" },
-	{ &_updateEntities, "updateEntities" }
-	//{  &gameRender, "gameRender" }
+	{ &_updateEntities, "updateEntities" },
+	{ &_enemiesController, "enemiesController" }
 };
 
 bool gameThreads::deploy( ) {

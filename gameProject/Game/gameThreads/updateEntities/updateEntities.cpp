@@ -17,12 +17,17 @@ void updateEntities::threadFunction( ) {
 	Log::Print( "[updateEntities] Hello world!" );
 
 	while ( true ) {
-		std::vector<CBaseEntity *> entities = entitiesHandler::Get( ).getSpawnedEntities( );
-
-		CollisionManager::Get( ).UpdateEntities( entities );
-		CollisionManager::Get( ).ProcessCollisions( );
-
 		attackHandler::Get( ).updateAttacks( );
+
+		std::vector<CBaseEntity *> allEntities = entitiesHandler::Get( ).getSpawnedEntities( );
+		CPlayerEntity * localPlayer = entitiesHandler::Get( ).getLocalPlayer( );
+
+		if ( localPlayer != nullptr ) {
+			allEntities.emplace_back( entitiesHandler::Get( ).getLocalPlayer( ) );
+		}
+	
+		CollisionManager::Get( ).UpdateEntities( allEntities );
+		CollisionManager::Get( ).ProcessCollisions( );
 
 		levelManager.updateLevel( );
 

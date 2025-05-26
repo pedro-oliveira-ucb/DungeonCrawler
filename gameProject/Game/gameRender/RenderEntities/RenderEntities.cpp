@@ -41,10 +41,14 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
     }
 
     if ( entityAnimation->getCurrentTexture( ) == nullptr ) {
+        Log::Print( "Texure of %s is null!" , entity->GetEntityName( ).c_str( ) );
         return;
     }
 
     Texture2D * texture = static_cast< Texture2D * >( entityAnimation->getCurrentTexture( ) );
+
+  
+
     GVector2D size = entityAnimation->getCurrentTextureSize( ) * sizeFactor;
     GVector2D pos = entity->getEntityPosition( );
 
@@ -82,16 +86,16 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 
 		DrawText( entity->GetEntityName( ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
-		offset += 12.0f;
+		offset -= 12.0f;
 
         DrawText( CBaseEntityAnimation::getAnimationTypeName(entity->getEntityAnimations( )->getCurrentAnimationType(  )).c_str() , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
 
-        offset += 12.0f;
+        offset -= 12.0f;
 
         DrawText( std::to_string( entity->getEntityAnimations( )->getCurrentAnimationStep( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
-        offset += 12.0f;
+        offset -= 12.0f;
 
         DrawText( entity->getEntityStateAsString( ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
@@ -174,7 +178,6 @@ void renderEnemies( ) {
 
         renderEntity( CEnemyPtr , true );
     }
-
 }
 
 void RenderEntities::render( ) {

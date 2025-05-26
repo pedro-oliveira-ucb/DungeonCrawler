@@ -2,7 +2,9 @@
 
 #include "../../../SDK/Events/EventManager.h"
 #include "../../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../../gameObjects/attackHandler/attackHandler.h"
 #include "../../../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
+
 
 #include <optional>
 
@@ -80,7 +82,9 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 	builder.movementSpeed = 100;
 	builder.Name = animationName;
 
-	return new CPlayerEntity( builder );
+	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks = attackHandler::Get( ).getAvailableLocalPlayerAttack( );
+
+	return new CPlayerEntity( builder, attacks );
 }
 
 bool LocalPlayerInitializer::initializeEvents( ) {

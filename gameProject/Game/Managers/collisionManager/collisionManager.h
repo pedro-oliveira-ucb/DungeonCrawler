@@ -18,6 +18,8 @@ public:
     std::vector<CBaseEntity *> GetNearbyEntities( const GVector2D & pos );
     std::vector<CBaseEntity *> GetAllEntities( );
     bool checkCollision( CBaseEntity * a , CBaseEntity * b , GVector2D newPosA );
+    bool checkSpacialCollision( CBaseEntity * a , GVector2D pos , GVector2D size );
+    bool isSpaceFree( GVector2D pos , GVector2D size );
 
 private:
     CollisionManager( ) = default;

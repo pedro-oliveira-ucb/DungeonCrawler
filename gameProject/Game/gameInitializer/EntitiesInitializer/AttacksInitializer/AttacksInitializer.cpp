@@ -26,7 +26,7 @@ T * AttacksInitializer::generateAttack( std::string animationName , CBaseAttackC
 	};
 
 	std::optional<CBaseEntityAnimationConstructor> animation = createEntityAnimationConstructor( animationName , requiredAnimations );
-	if ( !animation.has_value() ) {
+	if ( !animation.has_value( ) ) {
 		return nullptr;
 	}
 
@@ -46,6 +46,57 @@ T * AttacksInitializer::generateAttack( std::string animationName , CBaseAttackC
 	return result;
 }
 
+template <typename T>
+bool AttacksInitializer::generateMobAttack( CBaseAttackConstructor attackBuilder , std::string mobName ) {
+	std::string attackName = mobName + "_" + attackBuilder.Name;
+	attackBuilder.Name = attackName;
+
+	T * raw = generateAttack<T>( attackName , attackBuilder );
+	if ( raw == nullptr ) {
+		Log::Print( "[generateMobAttack] Failed to generate %s" , attackName.c_str( ) );
+		return false;
+	}
+	std::shared_ptr<T> newAttack( raw );
+
+	attackHandler::Get( ).addAvailableEnemyAttack( mobName, newAttack );
+	Log::Print( "[generateMobAttack] Generated $s" , attackName.c_str( ) );
+
+	std::string eventName = attackName + "_attackThrow";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ eventName ] ( ) {
+			gameSoundsQueue.addEventToQueue( eventName );
+		}
+	) );
+
+	return true;
+}
+
+template <typename T>
+bool AttacksInitializer::generateLocalPlayerAttack( CBaseAttackConstructor attackBuilder ) {
+	std::string attackName = "localPlayer_" + attackBuilder.Name;
+	attackBuilder.Name = attackName;
+
+	T * raw = generateAttack<T>( attackName , attackBuilder );
+	if ( raw == nullptr ) {
+		Log::Print( "[generateMobAttack] Failed to generate %s" , attackName.c_str( ) );
+		return false;
+	}
+	std::shared_ptr<T> newAttack( raw );
+
+	attackHandler::Get( ).addAvailableLocalPlayerAttack( newAttack );
+	Log::Print( "[generateMobAttack] Generated $s" , attackName.c_str( ) );
+
+	std::string eventName = attackName + "_attackThrow";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ eventName ] ( ) {
+			gameSoundsQueue.addEventToQueue( eventName );
+		}
+	) );
+
+	return true;
+}
 
 
 bool AttacksInitializer::generateLocalPlayerAttacks( ) {
@@ -62,60 +113,70 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 		//attack damage area
 		attackBuilder.area = GVector2D( 5 , 5 );
 
-
-		CMeleeAttack * raw = generateAttack<CMeleeAttack>( "localPlayerSimpleAttack" , attackBuilder );
-		if ( raw == nullptr ) {
-			Log::Print( "[generateLocalPlayerAttacks] Failed to generate meleeAttack" );
+		if ( !generateLocalPlayerAttack<CMeleeAttack>( attackBuilder ) )
+		{
+			Log::Print( "[generateLocalPlayerAttacks] Failed to generate MeleeAttack" );
 			return false;
 		}
-		std::shared_ptr<CMeleeAttack> newAttack( raw );
-
-		attackHandler::Get( ).addAvailableLocalPlayerAttack( newAttack );
-		Log::Print( "[EntitiesInitializer] Generated localPlayerSimpleAttack" );
-
-		std::string eventName = "localPlayerSimpleAttack_attackThrow";
-		EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-			eventName ,
-			[ ] ( ) {
-
-				gameSoundsQueue.addEventToQueue( "localPlayerSimpleAttack_attackThrow" );
-			}
-		) );
 	}
-	 
+
 	{
 		attackBuilder.damage = 50;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 5.0f;
 		attackBuilder.range = 1000.f;
-		attackBuilder.speed = 50;
+		attackBuilder.speed = 200;
 		attackBuilder.type = CBaseAttackType_Ranged;
 		attackBuilder.Name = "MagicAttack";
 		//attack damage area
 		attackBuilder.area = GVector2D( 10 , 10 );
 
-		CRangedAttack * raw = generateAttack<CRangedAttack>( "localPlayerHeavyAttack" , attackBuilder );
-		if ( raw == nullptr ) {
-			Log::Print( "[generateLocalPlayerAttacks] Failed to generate rangedAttack" );
+		if ( !generateLocalPlayerAttack<CRangedAttack>( attackBuilder ) ) {
+			Log::Print( "[generateLocalPlayerAttacks] Failed to generate RangedAttack" );
 			return false;
 		}
-		std::shared_ptr<CRangedAttack> newAttack( raw );
-
-		attackHandler::Get( ).addAvailableLocalPlayerAttack( newAttack );
-
-		Log::Print( "[EntitiesInitializer] Generated localPlayerHeavyAttack" );
 	}
 
 	return true;
 }
 
+bool AttacksInitializer::generateEnemiesAttacks( ) {
+
+	CBaseAttackConstructor attackBuilder;
+	{
+		attackBuilder.damage = 10;
+		attackBuilder.delay = .5f;
+		attackBuilder.cooldown = 1.0f;
+		attackBuilder.range = 5.f;
+		attackBuilder.speed = 5;
+		attackBuilder.type = CBaseAttackType_Melee;
+		attackBuilder.Name = "MeleeAttack";
+		//attack damage area
+		attackBuilder.area = GVector2D( 5 , 5 );
+
+		if ( !generateMobAttack<CMeleeAttack>(  attackBuilder, "BasicEnemy" ) )
+		{
+			Log::Print( "[generateEnemiesAttacks] Failed to generate MeleeAttack" );
+			return false;
+		}
+	}
+
+	
+	return true;
+}
+
+
 bool AttacksInitializer::initializeAttacks( ) {
 
-	if ( !generateLocalPlayerAttacks( ) ) { 
+	if ( !generateLocalPlayerAttacks( ) ) {
 		Log::Print( "[initializeAttacks] Failed to generate localPlayerAttacks" );
 		return false;
-	} 
+	}
 
+	if ( !generateEnemiesAttacks( ) ) {
+		Log::Print( "[initializeAttacks] Failed to generate EnemiesAttacks" );
+		return false;
+	}
 
 	return true;
 }

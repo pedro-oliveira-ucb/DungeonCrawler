@@ -70,8 +70,8 @@ void CRangedAttack::otherActiveLogic( CBaseEntity * sender ) {
 	GVector2D senderSize = sender->getEntityAnimations( )->getCurrentTextureSize( );
 
 	GVector2D newDirection(
-		cosf( angleRad ) * speed ,
-		sinf( angleRad ) * speed
+		cosf( angleRad ) * senderSize.x ,
+		sinf( angleRad ) * senderSize.y
 	);
 
 	GVector2D nextPosition = this->getEntityPosition( ) + newDirection;

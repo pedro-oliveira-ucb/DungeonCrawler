@@ -7,7 +7,6 @@ class CEnemyEntity;
 class EnemiesInitializer : public CSingleton<EnemiesInitializer>
 {
 private:
-    CEnemyEntity* generateEnemy(const std::string& animationName);
     bool initializeEvents(std::string enemyName);
 
 public:
