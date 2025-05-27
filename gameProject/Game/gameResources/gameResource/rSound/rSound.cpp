@@ -13,8 +13,8 @@
 
 namespace fs = std::filesystem;
 
-rSound::rSound( std::string model )
-	: soundPath( model ) {
+rSound::rSound( std::string model, SoundConfig config )
+	: soundPath( model ), config(config){
 	// Lazy loading opcional: 
 	initializeSound( );
 }
@@ -45,17 +45,23 @@ void rSound::initializeSound( ) {
 			return;
 		}
 
-		this->sounds.emplace_back( std::make_unique<Sound>( LoadSound( soundPath.c_str() ) ));
 
-		for( int i =0; i < MAX_SOUNDS ; i++ ) {
-			this->sounds.emplace_back( std::make_unique<Sound>( LoadSoundAlias( *this->sounds.front().get() ) ));
+		auto mainSound = std::make_unique<Sound>( LoadSound( soundPath.c_str( ) ) );
+		SetSoundVolume( *mainSound , config.volume );
+		SetSoundPitch( *mainSound , config.pitch );
+
+		this->sounds.emplace_back( std::move( mainSound ) );
+
+		for ( int i = 0; i < config.maxInstances; i++ ) {
+			auto aliasSound = std::make_unique<Sound>( LoadSoundAlias( *this->sounds.front( ).get( ) ) );
+			SetSoundVolume( *aliasSound , config.volume );
+			SetSoundPitch( *aliasSound , config.pitch );
+			this->sounds.emplace_back( std::move( aliasSound ) );
 		}
 
 		this->initialized = true;
 	}
 }
-
-
 
 void rSound::playSound( ) {
 	std::lock_guard<std::mutex> lock( soundMutex );

@@ -9,7 +9,7 @@
 #include "../../../gameResources/rBaseResource/rBaseResource.h"
 
 
-class rSoundsManager : public rBaseResource
+class rMusicManager : public rBaseResource
 {
 	std::mutex mtx;
 

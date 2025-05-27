@@ -169,6 +169,7 @@
     <ClCompile Include="Game\gameThreads\updateEntities\updateEntities.cpp" />
     <ClCompile Include="Game\SDK\math\math.cpp" />
     <ClCompile Include="Game\Managers\gameResourceManager\rSoundsManager\rSoundsManager.cpp" />
+    <ClCompile Include="Game\Managers\gameResourceManager\rMusicManager\rMusicManager.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
     <ClCompile Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="Game\gameThreads\updateEntities\updateEntities.h" />
     <ClInclude Include="Game\SDK\math\math.h" />
     <ClInclude Include="Game\Managers\gameResourceManager\rSoundsManager\rSoundsManager.h" />
+    <ClInclude Include="Game\Managers\gameResourceManager\rMusicManager\rMusicManager.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />
     <ClInclude Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.h" />

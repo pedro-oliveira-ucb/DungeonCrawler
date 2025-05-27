@@ -178,12 +178,12 @@ std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & s
 	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::ATTACKING_FORWARD ) ) {
 		state |= CBaseEntityState::ATTACKING;
 		this->loopAnimation = false;
+		EventManager::Get( ).Trigger( this->attacks.at( this->currentLoadingAttack )->GetEntityName( ) + "_attackLoad" );
 		this->getEntityAnimations( )->resetAnimation( );
 		return nullptr;
 	}
 
 	bool attackAnimationEnded = this->getEntityAnimations( )->isAnimationFinished( );
-
 
 	std::shared_ptr<CBaseAttack> newAttack = nullptr;
 

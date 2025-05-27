@@ -95,6 +95,14 @@ bool AttacksInitializer::generateLocalPlayerAttack( CBaseAttackConstructor attac
 		}
 	) );
 
+	eventName = attackName + "_attackLoad";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ eventName ] ( ) {
+			gameSoundsQueue.addEventToQueue( eventName );
+		}
+	) );
+
 	return true;
 }
 
