@@ -17,9 +17,21 @@ bool gameResourceManager::initialize( std::string path ) {
         Log::Print( "[gameResourceManager] rSoundsManager initialization failed!" );
         return false;
     }
+    this->musicMananger = std::make_unique<rMusicManager>( path + "\\musics" );
 
- 
+    if ( !this->musicMananger->initialize( ) ) {
+        Log::Print( "[gameResourceManager] rMusicManager initialization failed!" );
+        return false;
+    }
+
+    this->musicMananger->playMusic( musicType::DungeonMusic );
+
+
     return true;
+}
+
+rMusicManager * gameResourceManager::getMusicManager( ) {
+	return this->musicMananger.get( );
 }
 
 rSpritesManager *gameResourceManager::getSpritesManager( ) {

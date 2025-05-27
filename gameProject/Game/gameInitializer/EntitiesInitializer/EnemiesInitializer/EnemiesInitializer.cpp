@@ -18,7 +18,7 @@ std::optional<CBaseEntityAnimationConstructor> createEntityAnimationConstructor(
 	std::vector<CBaseEntityAnimationType> requiredAnimations
 );
 
-CEnemyEntity * generateEnemy( CBaseEntityConstructor & builder , const std::string & animationName , CEnemyType enemyType )
+std::unique_ptr<CEnemyEntity> generateEnemy( CBaseEntityConstructor & builder , const std::string & animationName , CEnemyType enemyType )
 {
 	// Exemplo de lista de animações para o inimigo
 	std::vector<CBaseEntityAnimationType> requiredAnimations = {
@@ -65,14 +65,14 @@ CEnemyEntity * generateEnemy( CBaseEntityConstructor & builder , const std::stri
 	}
 
 	// Cria a instância do inimigo
-	return new CEnemyEntity( builder , attacks , enemyType );
+	return std::make_unique<CEnemyEntity>( builder , attacks , enemyType );
 }
 
 bool EnemiesInitializer::initializeEvents( std::string enemyName )
 {
 	std::vector<std::string> eventsNames {
 		"hurt",
-		"dead"
+		"dead",
 	};
 
 	for ( std::string event : eventsNames ) {
@@ -93,26 +93,23 @@ bool EnemiesInitializer::initialize( )
 	// Crie e registre um inimigo de exemplo (pode criar vários se quiser)
 	std::vector<std::string> enemyNames = { "BasicEnemy", "AdvancedEnemy" };
 
-
 	CBaseEntityConstructor builder;
 	builder.entityPosition = GVector2D( 0 , 0 );
 	builder.entityType = CBaseEntityType::MOB;
 	builder.health = 100;
 	builder.movementSpeed = 5;
 	builder.Name = "BasicEnemy";
-	auto * enemy = generateEnemy( builder , "BasicEnemy" , CEnemyType::MELEE_ENEMY );
+	auto enemy = generateEnemy( builder , "BasicEnemy" , CEnemyType::MELEE_ENEMY );
 	if ( !enemy ) {
 		Log::Print( "[Enemies Initializer] Failed to create enemy BasicEnemy!" );
 		return false;
 	}
-	if ( !initializeEvents( "BasicEnemy" ) ){
+
+	if ( !initializeEvents( "BasicEnemy" ) ) {
 		Log::Print( "[Enemies Initializer] Failed to initialize enemy BasicEnemy events!" );
 		return false;
 	}
-	
-	entitiesHandler::Get( ).addEnemy( enemy );
 
-
-
+	entitiesHandler::Get( ).addEnemy( CEnemyType::MELEE_ENEMY , std::move( enemy ) );
 	return true;
 }

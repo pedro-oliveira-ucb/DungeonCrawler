@@ -5,22 +5,23 @@ CollisionManager & CollisionManager::Get( ) {
 	return instance;
 }
 
-void CollisionManager::UpdateEntities( std::vector<CBaseEntity *> & entities ) {
+void CollisionManager::UpdateEntities( std::vector<CBaseEntity *> entities ) {
 	std::lock_guard<std::mutex> lock( mutex );
 
 	spatialGrid.clear( );
 	allEntities = entities;
 
-	for ( auto * entity : entities ) {
+	for ( auto * entity : allEntities ) {
 		if ( !entity ) continue;
+
 		GridCell cell = {
 			static_cast< int >( std::floor( entity->getEntityPosition( ).x / GRID_CELL_SIZE ) ),
 			static_cast< int >( std::floor( entity->getEntityPosition( ).y / GRID_CELL_SIZE ) )
 		};
+
 		spatialGrid[ cell ].insert( entity );
 	}
 }
-
 std::vector<CBaseEntity *> CollisionManager::GetNearbyEntities( const GVector2D & pos ) {
 	std::vector<CBaseEntity *> result;
 	std::lock_guard<std::mutex> lock( mutex );
@@ -96,14 +97,12 @@ void CollisionManager::ProcessCollisions( ) {
 	std::lock_guard<std::mutex> lock( mutex );
 
 	for ( size_t i = 0; i < allEntities.size( ); ++i ) {
-	
-		
 		for ( size_t j = i + 1; j < allEntities.size( ); ++j ) {
 
 			CBaseEntity * b = allEntities[ j ];
 			CBaseEntity * a = allEntities[ i ];
 
-			if ( !a || !b || !a->isAlive( ) || !b->isAlive( ) ) 
+			if ( !a || !b || !a->isAlive( ) || !b->isAlive( ) )
 				continue;
 			if ( checkCollision( a , b , a->getEntityPosition( ) ) ) {
 				//a->setEntityPosition( GVector2D(0 , 0) );

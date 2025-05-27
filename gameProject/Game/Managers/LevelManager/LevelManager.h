@@ -5,11 +5,11 @@
 #include "../../SDK/Entities/CEnemyEntity/CEnemyEntity.h"
 
 struct LevelData {
-    int levelNumber;
-    std::string mapName;
-    int enemyCount;
-    int RespawnCount;
-    int RespawnTimer = 10;
+	int levelNumber; // Número do nível
+	std::string mapName; // Nome do mapa associado ao nível
+	int enemyCount; // Número de inimigos no nível
+	int RespawnCount; // Número de ressucitações permitidas
+	int RespawnTimer = 10; // Tempo de respawn em segundos
     // Outras propriedades como spawn points, boss, etc.
 };
 
@@ -18,7 +18,7 @@ private:
     // Variáveis que precisam ser protegidas para evitar condições de corrida
     std::vector<LevelData> levels;
     int currentLevelIndex = 0;
-    std::vector<std::shared_ptr<CEnemyEntity>> enemies;
+    std::vector<CEnemyEntity* > enemies;
 
     bool started = false;
     int respawnCount = 0;
@@ -41,7 +41,6 @@ public:
     LevelManager();
     void loadLevels();
     void updateLevel( );
-	std::vector<std::shared_ptr< CEnemyEntity>> getEnemies( );
 };
 
 extern LevelManager levelManager;

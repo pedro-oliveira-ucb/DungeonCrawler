@@ -19,9 +19,6 @@ bool Game::start( ) {
 	}
 	this->threadsStarted = true;
 
-
-
-
 	this->resourcesLoaded = true;	
 	return true;
 }

@@ -1,9 +1,8 @@
 #include "LevelManager.h"
 #include <cstdlib>
 #include <ctime>
-#include <random>
 
-
+#include "../../../Utils/utils.h"
 #include "../../../Globals/Globals.h"
 
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
@@ -27,14 +26,6 @@ void LevelManager::loadLevels( ) {
 
 LevelData LevelManager::getCurrentLevel( ) {
 	return levels[ currentLevelIndex ];
-}
-
-int RandomNumber( int min , int max )
-{
-	std::random_device rd;
-	std::mt19937 rng( rd( ) );
-	std::uniform_int_distribution<int> uni( min , max );
-	return uni( rng );
 }
 
 void LevelManager::moveToNextLevel( ) {
@@ -66,7 +57,6 @@ void LevelManager::updateEnemies( ) {
 	bool canRespawn = delta.count( ) >= levels[ currentLevelIndex ].RespawnTimer;
 
 	for ( auto & enemy : enemies ) {
-		enemy->updateEntity( );
 		if ( !enemy->isAlive( ) && this->respawnCount < levels[ currentLevelIndex ].RespawnCount ) {
 			if ( canRespawn ) {
 				enemy->Respawn( );
@@ -106,10 +96,10 @@ GVector2D getRandomAreaAroundLocalPlayer( CBaseEntity * ent ) {
 	GVector2D deriserdSpawnPlace;
 
 	while ( !okayPlace ) {
-		int RandomX = RandomNumber( -850 , 850 );
-		int RandomY = RandomNumber( -850 , 850 );
+		int RandomX = utils::Get( ).randomNumber( -850 , 850 );
+		int RandomY = utils::Get( ).randomNumber( -850 , 850 );
 		deriserdSpawnPlace = GVector2D( localPos.x + RandomX , localPos.y + RandomY );
-		if ( CollisionManager::Get( ).isSpaceFree( deriserdSpawnPlace , GVector2D(150, 150) ) ) {
+		if ( CollisionManager::Get( ).isSpaceFree( deriserdSpawnPlace , GVector2D( 150 , 150 ) ) ) {
 			okayPlace = true;
 		}
 	}
@@ -119,25 +109,20 @@ GVector2D getRandomAreaAroundLocalPlayer( CBaseEntity * ent ) {
 
 void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
 	auto enemyList = entitiesHandler::Get( ).getEnemies( );
+
 	for ( int i = 0; i < data.enemyCount; i++ ) {
-		CEnemyEntity * rawEnemyPtr = enemyList.at( 0 );
-		std::shared_ptr<CEnemyEntity> enemy( rawEnemyPtr->Clone( ) );
-		entitiesHandler::Get( ).addSpawnedEntity( enemy.get( ) );
-		entitiesHandler::Get( ).addEnemy( enemy.get( ) );
-		enemies.push_back( enemy );
+		// Cria o clone como unique_ptr
+		std::unique_ptr<CEnemyEntity> enemy = enemyList->at( CEnemyType::MELEE_ENEMY )->uniqueClone();
+
+		enemies.push_back( enemy.get() );
+
+		// Adiciona aos handlers (precisa passar ponteiro do unique_ptr para addSpawnedEnemy)
+		entitiesHandler::Get( ).addSpawnedEnemy( &enemy ); // passa ponteiro para o unique_ptr
 	}
 
-	std::vector<CBaseEntity *> entities = entitiesHandler::Get( ).getSpawnedEntities( );
-
-	int i = 0;
-	for ( int i = 0; i < enemies.size( ); i++ ) {
-		enemies.at( i )->setEntityPosition( getRandomAreaAroundLocalPlayer( enemies.at( i ).get( ) ) );
-		enemies.at( i )->Respawn( );
-		i++;
+	// Inicialização das posições
+	for ( auto & e : enemies ) {
+		e->setEntityPosition( getRandomAreaAroundLocalPlayer( e ) );
+		e->Respawn( );
 	}
-}
-
-std::vector<std::shared_ptr<CEnemyEntity>> LevelManager::getEnemies( ) {
-	std::lock_guard<std::mutex> lock( managerMutex );
-	return enemies;
 }

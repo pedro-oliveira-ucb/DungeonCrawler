@@ -1,26 +1,52 @@
 #pragma once
 #include <string>
-#include <vector>
 #include <unordered_map>
 #include <memory>
 #include <mutex>
+#include <vector>
 
-#include "../../../gameResources/gameResource/rSound/rSound.h"
+#include "../../../gameResources/gameResource/rMusic/rMusic.h"
 #include "../../../gameResources/rBaseResource/rBaseResource.h"
 
+enum musicType
+{
+	NoMusic = -1 ,
+	MainMenuMusic = 0 ,
+	DungeonMusic = 1 ,
+	BossMusic = 2 ,
+};
 
 class rMusicManager : public rBaseResource
 {
-	std::mutex mtx;
+	std::mutex musicMutex;
 
 	bool loadSound( std::string name );
 
-	std::unordered_map<std::string , std::unique_ptr<rSound>> sounds;
+	std::unordered_map<musicType , std::vector<std::pair<std::string, std::unique_ptr<rMusic>>>> musics;
+	int currentPlayingSound = -1;
+	musicType currentMusicType = MainMenuMusic;
+	musicType oldMusicType = NoMusic;
+
+	float volume = 1.0f;
+	float fadeSpeed = 1.0f; // Volume por segundo
+	bool onMusicTransition = false;
+	bool isFadingOut = false;
+	bool isFadingIn = false;
+
+	rMusic * currentSound = nullptr;
+	rMusic * nextSound = nullptr;
 
 public:
-	rSoundsManager( std::string path ) :rBaseResource( path ) { }
+	rMusicManager( std::string path ) :rBaseResource( path ) { }
+	rMusicManager( const rMusicManager & ) = delete;
+	rMusicManager & operator=( const rMusicManager & ) = delete;
+
+	// Optionally delete move operations
+	rMusicManager( rMusicManager && ) = delete;
+	rMusicManager & operator=( rMusicManager && ) = delete;
 
 	bool initialize( ) override;
-	bool playSound( std::string soundName );
+	bool playMusic( musicType musicType );
+	void updateMusic( );
 };
 

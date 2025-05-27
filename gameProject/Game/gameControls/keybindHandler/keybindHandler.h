@@ -16,6 +16,7 @@ enum keybind_identifier {
 	MOVE_RIGHT ,
 	ATTACK_SIMPLE ,
 	ATTACK_HEAVY ,
+	SPRINT,
 	UPDATE_MENU
 };
 

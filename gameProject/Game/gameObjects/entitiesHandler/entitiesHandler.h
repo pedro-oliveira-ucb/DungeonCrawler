@@ -1,53 +1,35 @@
 #pragma once
+
 #include "../../../Utils/singleton.h"
 #include "../../SDK/Entities/CPlayerEntity/CPlayerEntity.h"
 #include "../../SDK/Entities/CEnemyEntity/CEnemyEntity.h"
 #include <vector>
+#include <unordered_map>
 #include <mutex>
+#include <memory>
 
 class entitiesHandler : public CSingleton<entitiesHandler> {
 private:
     CPlayerEntity * localPlayer = nullptr;
-    std::vector<CEnemyEntity *> enemies;
-    std::vector<CBaseEntity *> spawnedEntities;
+    std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> enemies;
+    std::vector<std::unique_ptr<CBaseEntity>> spawnedEntities;
+    std::vector<std::unique_ptr<CEnemyEntity>> spawnedEnemies;
     mutable std::mutex handlerMutex;
 
 public:
-    void setLocalPlayer( CPlayerEntity * player ) {
-        std::lock_guard<std::mutex> lock( handlerMutex );
-        localPlayer = player;
-    }
-    CPlayerEntity * getLocalPlayer( ) {
-        std::lock_guard<std::mutex> lock( handlerMutex );
-        return localPlayer;
-    }
+    void setLocalPlayer( CPlayerEntity * player );
+    CPlayerEntity * getLocalPlayer( );
 
-    void addEnemy( CEnemyEntity * enemy ) {
-        std::lock_guard<std::mutex> lock( handlerMutex );
-        enemies.push_back( enemy );
-    }
-    std::vector<CEnemyEntity *> getEnemies( ) {
-        std::lock_guard<std::mutex> lock( handlerMutex );
-        return enemies;
-    }
+    void addEnemy( CEnemyType type , std::unique_ptr<CEnemyEntity> enemy );
+    std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> * getEnemies( );
 
-    void addSpawnedEntity( CBaseEntity * entity ) {
-        std::lock_guard<std::mutex> lock( handlerMutex );
-        spawnedEntities.push_back( entity );
-    }
-    std::vector<CBaseEntity *> getSpawnedEntities( ) {
-        std::lock_guard<std::mutex> lock( handlerMutex );
+    void addSpawnedEnemy( std::unique_ptr<CEnemyEntity> * enemy );
+    std::vector<std::unique_ptr<CEnemyEntity>> * getSpawnedEnemies( );
 
-        // Remove ponteiros nulos do vetor
-        spawnedEntities.erase(
-            std::remove_if(
-                spawnedEntities.begin( ) ,
-                spawnedEntities.end( ) ,
-                [ ] ( const CBaseEntity * enemy ) { return enemy == nullptr; }
-            ) ,
-            spawnedEntities.end( )
-        );
+    void addSpawnedEntity( std::unique_ptr<CBaseEntity> entity );
+    std::vector<std::unique_ptr<CBaseEntity>> * getSpawnedEntities( );
 
-        return spawnedEntities;
-    }
+    void updateSpawnedEnemies( CPlayerEntity* localPlayer  );
+    void updateEnemiesCollision( );
+	void updateLocalPlayer( );
 };

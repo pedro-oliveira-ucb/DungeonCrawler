@@ -158,25 +158,20 @@ void renderAttacks( ) {
 }
 
 void renderEnemies( ) {
-    std::vector<std::shared_ptr<CEnemyEntity>> enemies = levelManager.getEnemies( );
-    for ( int i = 0; i < enemies.size( ); i++ ) {
-        std::shared_ptr<CEnemyEntity> enemy = enemies.at( i );
+    std::vector<std::unique_ptr<CEnemyEntity>> * enemies = entitiesHandler::Get().getSpawnedEnemies();
+    for ( int i = 0; i < enemies->size( ); i++ ) {
+        CEnemyEntity * enemy = enemies->at( i ).get();
 
-        if ( enemy.get( ) == nullptr )
+        if ( enemy == nullptr )
             continue;
 
-        CEnemyEntity * CEnemyPtr = enemy.get( );
-
-        if ( CEnemyPtr == nullptr )
+        if ( enemy->getEntityAnimations( ) == nullptr )
             continue;
 
-        if ( CEnemyPtr->getEntityAnimations( ) == nullptr )
+        if ( !enemy->isAlive( ) && enemy->deathAnimationFinished( ) )
             continue;
 
-        if ( !CEnemyPtr->isAlive( ) && CEnemyPtr->deathAnimationFinished( ) )
-            continue;
-
-        renderEntity( CEnemyPtr , true );
+        renderEntity( enemy , true );
     }
 }
 

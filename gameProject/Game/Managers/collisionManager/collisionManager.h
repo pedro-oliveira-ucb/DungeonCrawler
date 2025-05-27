@@ -10,7 +10,7 @@ class CollisionManager {
 public:
     static CollisionManager & Get( );
 
-    void UpdateEntities( std::vector<CBaseEntity *> & entities );
+    void UpdateEntities( std::vector<CBaseEntity *> entities );
     bool CanMoveTo( CBaseEntity * entity , GVector2D & newPos );
     void ProcessCollisions( );
 
@@ -23,6 +23,8 @@ public:
 
 private:
     CollisionManager( ) = default;
+
+
 
     struct GridCell {
         int x , y;

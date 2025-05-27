@@ -28,10 +28,16 @@ CEnemyType CEnemyEntity::getEnemyType( ) {
 	return this->enemyType;
 }
 
-std::shared_ptr<CEnemyEntity> CEnemyEntity::Clone( ) {
+std::shared_ptr<CEnemyEntity> CEnemyEntity::sharedClone( ) {
 	std::shared_ptr<CEnemyEntity> clone = std::make_shared<CEnemyEntity>( *this ); // Usa cópia
 	return clone;
 }
+
+std::unique_ptr<CEnemyEntity> CEnemyEntity::uniqueClone( ) {
+	std::unique_ptr<CEnemyEntity> clone = std::make_unique<CEnemyEntity>( *this ); // Usa cópia
+	return clone;
+}
+
 
 int sign( float x ) {
 	return ( x > 0 ) - ( x < 0 );

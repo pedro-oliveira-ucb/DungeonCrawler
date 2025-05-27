@@ -1,26 +1,28 @@
 #include "gameRender.h"
 
-#include "../../Utils/Log/Log.h"
-
-#include "../../Globals/Globals.h"
-
 #include "RenderEntities/RenderEntities.h"
 
 #include "../gameObjects/entitiesHandler/entitiesHandler.h"
 #include "../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
 #include "../Managers/gameResourceManager/gameResourceManager.h"
 
-RenderEntities entititiesRender;
+#include "../../Utils/Log/Log.h"
+#include "../../Globals/Globals.h"
 
 #include <raylib/raylib.h>
 #include <raylib/raymath.h>
 
-
 Camera2D camera = { 0 };
+
+RenderEntities entititiesRender;
 
 bool check = false;
 
 void gameRender::soundEvents( ) {
+
+	if ( IsKeyPressed( KEY_SPACE ) ) {
+		_gameResourceManager.getMusicManager( )->playMusic( musicType::BossMusic );
+	}
 
 	std::string soundEvent = gameSoundsQueue.getLatestOnQueue( );
 	while ( !soundEvent.empty( ) ) {
@@ -31,6 +33,7 @@ void gameRender::soundEvents( ) {
 
 		soundEvent = gameSoundsQueue.getLatestOnQueue( );
 	}
+	_gameResourceManager.getMusicManager( )->updateMusic( );
 }
 
 void gameRender::renderCustomCursor( ) {
@@ -38,16 +41,12 @@ void gameRender::renderCustomCursor( ) {
 }
 
 void gameRender::render( ) {
-
-
-
 	static float zoomLevel = 1.0f;
 
 	// Zoom com scroll do mouse
 	zoomLevel += GetMouseWheelMove( ) * 0.1f;
 	zoomLevel = Clamp( zoomLevel , 1.f , 2.0f );
 	camera.zoom = zoomLevel;
-
 
 	CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
 	GVector2D localPos = local->getEntityPosition( );
@@ -82,8 +81,6 @@ void gameRender::render( ) {
 		// Centraliza a câmera no meio da tela
 		camera.offset = { GetScreenWidth( ) / 2.0f, GetScreenHeight( ) / 2.0f };
 
-
-
 	}
 	camera.rotation = 0.0f;
 
@@ -94,5 +91,4 @@ void gameRender::render( ) {
 	renderCustomCursor( );
 
 	EndMode2D( );
-
 }

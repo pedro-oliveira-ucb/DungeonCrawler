@@ -37,5 +37,6 @@ public:
     CEnemyEntity( CBaseEntityConstructor builder , std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks, CEnemyType type);
 	CEnemyEntity( const CEnemyEntity & other );
 
-    std::shared_ptr<CEnemyEntity> Clone( );
+    std::shared_ptr<CEnemyEntity> sharedClone( );
+    std::unique_ptr<CEnemyEntity> uniqueClone( );
 };

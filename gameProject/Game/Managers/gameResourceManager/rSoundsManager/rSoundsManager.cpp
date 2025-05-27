@@ -6,13 +6,79 @@
 #include <sstream>
 #include <string>
 
+#include "../../../../Utils/utils.h"
+
 #include "../../../Utils/Log/Log.h"
 #include <nlohmann/json.hpp>
+
 
 
 namespace fs = std::filesystem;
 
 using nlohmann::json;
+
+
+bool createBaseSoundConfig( std::string filename ) {
+
+	json config;
+
+	config[ "volume" ] = 1.0f;
+	config[ "pitch" ] = 1.0f;
+	config[ "maxInstances" ] = 255;
+
+	std::ofstream file( filename );
+	if ( !file.is_open( ) ) {
+		Log::Print( "[rSpritesManager] Failed to create config file: %s" , filename.c_str( ) );
+		return false;
+	}
+
+	file << config.dump( 4 );
+
+	file.close( );
+	Log::Print( "[rSpritesManager] Created base sound config file: %s" , filename.c_str( ) );
+}
+
+bool generateSoundConfig( std::string filename , SoundConfig * buffer ) {
+
+	if ( !fs::exists( filename ) ) {
+		Log::Print( "[rSpritesManager] Config file not found: %s" , filename.c_str( ) );
+		if ( !createBaseSoundConfig( filename ) ) {
+			Log::Print( "[rSpritesManager] Failed to create base sound config file: %s" , filename.c_str( ) );
+			return false;
+		}
+	}
+
+	std::string configString = utils::Get().readFileAsString( filename );
+	if ( configString.empty( ) ) {
+		Log::Print( "[rSpritesManager] Config file is empty: %s" , filename.c_str( ) );
+		return false;
+	}
+
+	json configJson;
+	try {
+		configJson = json::parse( configString );
+	}
+	catch ( const json::parse_error & e ) {
+		Log::Print( "[rSpritesManager] Failed to parse config file %s: %s" , filename.c_str( ) , e.what( ) );
+		return false;
+	}
+
+	std::vector<std::string> requiredKeys = { "volume", "pitch", "maxInstances" };
+
+	for ( const auto & key : requiredKeys ) {
+		if ( configJson.find( key ) == configJson.end( ) ) {
+			Log::Print( "[rSpritesManager] Config file %s does not contain '%s' key!" , filename.c_str( ) , key.c_str( ) );
+			return false;
+		}
+	}
+
+	buffer->maxInstances = configJson[ "maxInstances" ].get<int>( );
+	buffer->pitch = configJson[ "pitch" ].get<float>( );
+	buffer->volume = configJson[ "volume" ].get<float>( );
+
+	return true;
+}
+
 
 bool rSoundsManager::initialize( )
 {
@@ -72,76 +138,6 @@ bool rSoundsManager::initialize( )
 	return true;
 }
 
-std::string readFileAsString( const std::string & filename ) {
-	std::ifstream file( filename );
-	if ( !file.is_open( ) ) {
-		return ""; // Or throw an exception
-	}
-	std::stringstream buffer;
-	buffer << file.rdbuf( );
-	return buffer.str( );
-}
-
-bool createBaseSoundConfig( std::string filename ) {
-
-	json config;
-
-	config[ "volume" ] = 1.0f;
-	config[ "pitch" ] = 1.0f;
-	config[ "maxInstances" ] = 255;
-
-	std::ofstream file( filename );
-	if ( !file.is_open( ) ) {
-		Log::Print( "[rSpritesManager] Failed to create config file: %s" , filename.c_str( ) );
-		return false;
-	}
-
-	file << config.dump( 4 );
-			
-	file.close( );
-	Log::Print( "[rSpritesManager] Created base sound config file: %s" , filename.c_str( ) );
-}
-
-bool generateSoundConfig( std::string filename , SoundConfig * buffer ) {
-
-	if ( !fs::exists( filename ) ) {
-		Log::Print( "[rSpritesManager] Config file not found: %s" , filename.c_str( ) );
-		if ( !createBaseSoundConfig( filename ) ) {
-			Log::Print( "[rSpritesManager] Failed to create base sound config file: %s" , filename.c_str( ) );
-			return false;
-		}
-	}
-
-	std::string configString = readFileAsString( filename );
-	if ( configString.empty( ) ) {
-		Log::Print( "[rSpritesManager] Config file is empty: %s" , filename.c_str( ) );
-		return false;
-	}
-
-	json configJson;
-	try {
-		configJson = json::parse( configString );
-	}
-	catch ( const json::parse_error & e ) {
-		Log::Print( "[rSpritesManager] Failed to parse config file %s: %s" , filename.c_str( ) , e.what( ) );
-		return false;
-	}
-
-	std::vector<std::string> requiredKeys = { "volume", "pitch", "maxInstances" };
-
-	for ( const auto & key : requiredKeys ) {
-		if ( configJson.find( key ) == configJson.end( ) ) {
-			Log::Print( "[rSpritesManager] Config file %s does not contain '%s' key!" , filename.c_str( ) , key.c_str( ) );
-			return false;
-		}
-	}
-
-	buffer->maxInstances = configJson[ "maxInstances" ].get<int>( );
-	buffer->pitch = configJson[ "pitch" ].get<float>( );
-	buffer->volume = configJson[ "volume" ].get<float>( );
-
-	return true;
-}
 
 bool rSoundsManager::loadSound( std::string name ) {
 	fs::path clipPath = name;

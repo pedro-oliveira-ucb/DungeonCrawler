@@ -43,6 +43,7 @@ bool keybindHandler::initializeKeybinds( ) {
 		{ MOVE_BACKWARD, keybind( 'S', keybind_mode::HOLD ) },
 		{ MOVE_LEFT,     keybind( 'A', keybind_mode::HOLD ) },
 		{ MOVE_RIGHT,    keybind( 'D', keybind_mode::HOLD ) },
+		{ SPRINT,    keybind( KEY_LEFT_SHIFT, keybind_mode::HOLD ) },
 		{ ATTACK_SIMPLE, keybind( MOUSE_LEFT_BUTTON, keybind_mode::HOLD ) },
 		{ ATTACK_HEAVY,  keybind( MOUSE_RIGHT_BUTTON, keybind_mode::HOLD ) },
 		{ UPDATE_MENU,   keybind( KEY_DELETE, keybind_mode::TOGGLE ) }
