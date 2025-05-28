@@ -8,6 +8,7 @@
 
 #include "EntitiesInitializer/EntitiesInitializer.h"
 
+
 gameResourceManager _gameResourceManager;
 gameWindow _gameWindow;
 gameThreads _gameThreads;

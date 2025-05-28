@@ -38,6 +38,11 @@ std::unique_ptr<CEnemyEntity> CEnemyEntity::uniqueClone( ) {
 	return clone;
 }
 
+void CEnemyEntity::initialize( ) {
+	this->initializePlayerAttacks( );
+	this->initialized = true;
+}
+
 
 int sign( float x ) {
 	return ( x > 0 ) - ( x < 0 );

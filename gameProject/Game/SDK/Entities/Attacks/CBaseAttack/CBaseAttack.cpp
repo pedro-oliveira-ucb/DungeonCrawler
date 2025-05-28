@@ -36,11 +36,26 @@ CBaseAttack::CBaseAttack( const CBaseAttack & other )
 	Log::Print( "[%s] Copy constructor called" , this->GetEntityName( ).c_str( ) );
 }
 
+bool CBaseAttack::hasAlreadyHit( CBaseEntity * entity )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	return hitEntities.find( entity ) != hitEntities.end( );
+}
 
+void CBaseAttack::registerHit( CBaseEntity * entity ) {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	hitEntities.insert( entity );
+	EventManager::Get( ).Trigger( this->getName( ) + "_attackHit" );
+}
 
-std::shared_ptr<CBaseAttack> CBaseAttack::Clone() {
-		std::shared_ptr<CBaseAttack> clone = std::make_shared<CBaseAttack>( *this ); // Usa cópia
-		return clone;
+void CBaseAttack::resetHits( ) {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	hitEntities.clear( );
+}
+
+std::shared_ptr<CBaseAttack> CBaseAttack::Clone( ) {
+	std::shared_ptr<CBaseAttack> clone = std::make_shared<CBaseAttack>( *this ); // Usa cópia
+	return clone;
 }
 
 void CBaseAttack::otherActiveLogic( CBaseEntity * sender ) {
@@ -52,13 +67,13 @@ void CBaseAttack::otherDeactiveLogic( ) {
 }
 
 void CBaseAttack::Active( CBaseEntity * sender ) {
-	EventManager::Get( ).Trigger( this->GetEntityName() + "_attackThrow" );
+	EventManager::Get( ).Trigger( this->GetEntityName( ) + "_attackThrow" );
 
 	this->active = true;
-	this->setLookingAngle( sender->getLookingAngle( ).getDegrees() );
+	this->setLookingAngle( sender->getLookingAngle( ).getDegrees( ) );
 	this->setEntityLookingDirection( sender->getEntityLookingDirection( ) );
 	this->setEntityMovementDirection( sender->getEntityMovementDirection( ) );
-	this->setEntityPosition( sender->getEntityPosition() );
+	this->setEntityPosition( sender->getEntityPosition( ) );
 
 	otherActiveLogic( sender );
 }

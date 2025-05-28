@@ -5,6 +5,7 @@
 #include "rSpritesManager/rSpritesManager.h"
 #include "rSoundsManager/rSoundsManager.h"
 #include "rMusicManager/rMusicManager.h"
+#include "rShadersManager/rShadersManager.h"
 
 class gameResourceManager
 {
@@ -13,6 +14,7 @@ class gameResourceManager
 	std::unique_ptr<rSpritesManager> spritesMananger;
 	std::unique_ptr<rSoundsManager> soundsMananger;
 	std::unique_ptr <rMusicManager> musicMananger;
+	std::unique_ptr <rShadersManager> shadersManager;
 
 public:
 
@@ -20,7 +22,7 @@ public:
 	rSpritesManager * getSpritesManager( );
 	rSoundsManager * getSoundManager( );;
 	rMusicManager * getMusicManager( );
-
+	rShadersManager * getShadersManager( );
 };
 
 extern gameResourceManager _gameResourceManager;

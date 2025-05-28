@@ -24,6 +24,13 @@ bool gameResourceManager::initialize( std::string path ) {
         return false;
     }
 
+    this->shadersManager = std::make_unique<rShadersManager>( path + "\\shaders" );
+
+    if ( !this->shadersManager->initialize( ) ) {
+        Log::Print( "[gameResourceManager] rShadersManager initialization failed!" );
+        return false;
+    }
+
     this->musicMananger->playMusic( musicType::DungeonMusic );
 
 
@@ -32,6 +39,10 @@ bool gameResourceManager::initialize( std::string path ) {
 
 rMusicManager * gameResourceManager::getMusicManager( ) {
 	return this->musicMananger.get( );
+}
+
+rShadersManager * gameResourceManager::getShadersManager( ) {
+    return this->shadersManager.get( );
 }
 
 rSpritesManager *gameResourceManager::getSpritesManager( ) {

@@ -7,10 +7,6 @@
 #include "../../../math/gAngle/GAngle.h"
 #include "../../CBaseEntity/CBaseEntity.h"
 
-
-
-
-
 enum CBaseAttackType {
 	CBaseAttackType_None,
 	CBaseAttackType_Melee ,
@@ -32,7 +28,7 @@ struct CBaseAttackConstructor {
 
 class CBaseAttack : public CBaseEntity {
 
-	std::mutex cBaseAttackMutex;
+	mutable std::mutex cBaseAttackMutex;
 
 	std::string Name;
 	float damage;
@@ -66,25 +62,15 @@ public:
 
 	CBaseAttackType getAttackType( );
 
-	bool hasAlreadyHit( CBaseEntity * entity ) {
-		std::lock_guard<std::mutex>( this->cBaseAttackMutex );
-		return hitEntities.find( entity ) != hitEntities.end( );
-	}
-
-	void registerHit( CBaseEntity * entity ) {
-		std::lock_guard<std::mutex>( this->cBaseAttackMutex );
-		hitEntities.insert( entity );
-	}
-
-	void resetHits( ) {
-		std::lock_guard<std::mutex>( this->cBaseAttackMutex );
-		hitEntities.clear( );
-	}
+	bool hasAlreadyHit( CBaseEntity * entity );
+	void registerHit( CBaseEntity * entity );
+	void resetHits( );
 
 	void Deactive( );
-	virtual std::shared_ptr<CBaseAttack> Clone( );
+	
 	void Active( CBaseEntity * sender );
-
 	void setInitialPosition( GVector2D position );
+
+	virtual std::shared_ptr<CBaseAttack> Clone( );
 };
 

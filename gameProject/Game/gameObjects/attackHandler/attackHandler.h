@@ -35,5 +35,5 @@ public:
     void addAvailableEnemyAttack( std::string enemyName, std::shared_ptr<CBaseAttack> attack );
 
     void updateAttacks( );
-    std::shared_ptr<CBaseAttack> throwNewAttack( CBaseEntity * sender , CBaseAttack * attack );
+    void throwNewAttack( CBaseEntity * sender , CBaseAttack * attack );
 };

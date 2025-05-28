@@ -46,6 +46,32 @@ T * AttacksInitializer::generateAttack( std::string animationName , CBaseAttackC
 	return result;
 }
 
+bool generateAttackEvents( std::string attackName ) {
+	std::string eventName = attackName + "_attackThrow";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ eventName ] ( ) {
+			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+		}
+	) );
+	eventName = attackName + "_attackLoad";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ eventName ] ( ) {
+			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+		}
+	) );
+	eventName = attackName + "_attackHit";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ eventName ] ( ) {
+			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+		}
+	) );
+
+	return true;
+}
+
 template <typename T>
 bool AttacksInitializer::generateMobAttack( CBaseAttackConstructor attackBuilder , std::string mobName ) {
 	std::string attackName = mobName + "_" + attackBuilder.Name;
@@ -61,13 +87,10 @@ bool AttacksInitializer::generateMobAttack( CBaseAttackConstructor attackBuilder
 	attackHandler::Get( ).addAvailableEnemyAttack( mobName, newAttack );
 	Log::Print( "[generateMobAttack] Generated $s" , attackName.c_str( ) );
 
-	std::string eventName = attackName + "_attackThrow";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ eventName ] ( ) {
-			gameSoundsQueue.addEventToQueue( eventName );
-		}
-	) );
+	if(!generateAttackEvents( attackName )) {
+		Log::Print( "[generateMobAttack] Failed to generate attack events for %s" , attackName.c_str( ) );
+		return false;
+	}
 
 	return true;
 }
@@ -79,29 +102,18 @@ bool AttacksInitializer::generateLocalPlayerAttack( CBaseAttackConstructor attac
 
 	T * raw = generateAttack<T>( attackName , attackBuilder );
 	if ( raw == nullptr ) {
-		Log::Print( "[generateMobAttack] Failed to generate %s" , attackName.c_str( ) );
+		Log::Print( "[generateLocalPlayerAttack] Failed to generate %s" , attackName.c_str( ) );
 		return false;
 	}
 	std::shared_ptr<T> newAttack( raw );
 
 	attackHandler::Get( ).addAvailableLocalPlayerAttack( newAttack );
-	Log::Print( "[generateMobAttack] Generated $s" , attackName.c_str( ) );
+	Log::Print( "[generateLocalPlayerAttack] Generated $s" , attackName.c_str( ) );
 
-	std::string eventName = attackName + "_attackThrow";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ eventName ] ( ) {
-			gameSoundsQueue.addEventToQueue( eventName );
-		}
-	) );
-
-	eventName = attackName + "_attackLoad";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ eventName ] ( ) {
-			gameSoundsQueue.addEventToQueue( eventName );
-		}
-	) );
+	if ( !generateAttackEvents( attackName ) ) {
+		Log::Print( "[generateLocalPlayerAttack] Failed to generate attack events for %s" , attackName.c_str( ) );
+		return false;
+	}
 
 	return true;
 }
@@ -111,11 +123,11 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 
 	CBaseAttackConstructor attackBuilder;
 	{
-		attackBuilder.damage = 10;
+		attackBuilder.damage = 20;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 1.0f;
-		attackBuilder.range = 5.f;
-		attackBuilder.speed = 5;
+		attackBuilder.range = 30.f;
+		attackBuilder.speed = 30;
 		attackBuilder.type = CBaseAttackType_Melee;
 		attackBuilder.Name = "MeleeAttack";
 		//attack damage area
@@ -129,7 +141,7 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 	}
 
 	{
-		attackBuilder.damage = 50;
+		attackBuilder.damage = 100;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 5.0f;
 		attackBuilder.range = 1000.f;
@@ -155,8 +167,8 @@ bool AttacksInitializer::generateEnemiesAttacks( ) {
 		attackBuilder.damage = 10;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 1.0f;
-		attackBuilder.range = 5.f;
-		attackBuilder.speed = 5;
+		attackBuilder.range = 30.f;
+		attackBuilder.speed = 10;
 		attackBuilder.type = CBaseAttackType_Melee;
 		attackBuilder.Name = "MeleeAttack";
 		//attack damage area

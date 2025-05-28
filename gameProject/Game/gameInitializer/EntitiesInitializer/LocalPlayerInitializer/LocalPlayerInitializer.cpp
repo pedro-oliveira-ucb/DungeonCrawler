@@ -5,10 +5,7 @@
 #include "../../../gameObjects/attackHandler/attackHandler.h"
 #include "../../../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
 
-
 #include <optional>
-
-
 
 std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>>
 generateAnimationPair( CBaseEntityAnimationType type , std::string Name );
@@ -95,7 +92,7 @@ bool LocalPlayerInitializer::initializeEvents( ) {
 		eventName ,
 		[ ] ( ) {
 
-			gameSoundsQueue.addEventToQueue( "localPlayer_hurt" );
+			gameSoundsEventHandler::Get( ).addEventToQueue( "localPlayer_hurt" );
 		}
 	) );
 
@@ -104,7 +101,7 @@ bool LocalPlayerInitializer::initializeEvents( ) {
 		eventName ,
 		[ ] ( ) {
 
-			gameSoundsQueue.addEventToQueue( "localPlayer_dead" );
+			gameSoundsEventHandler::Get( ).addEventToQueue( "localPlayer_dead" );
 		}
 	) );
 
@@ -113,7 +110,7 @@ bool LocalPlayerInitializer::initializeEvents( ) {
 		eventName ,
 		[ ] ( ) {
 
-			gameSoundsQueue.addEventToQueue( "localPlayer_attack_miss" );
+			gameSoundsEventHandler::Get( ).addEventToQueue( "localPlayer_attack_miss" );
 		}
 	) );
 
@@ -122,7 +119,7 @@ bool LocalPlayerInitializer::initializeEvents( ) {
 		eventName ,
 		[ ] ( ) {
 
-			gameSoundsQueue.addEventToQueue( "localPlayer_walking" );
+			gameSoundsEventHandler::Get( ).addEventToQueue( "localPlayer_walking" );
 		}
 	) );
 

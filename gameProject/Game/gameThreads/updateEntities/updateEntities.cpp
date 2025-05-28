@@ -8,6 +8,7 @@
 
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
 #include "../../gameObjects/attackHandler/attackHandler.h"
+#include "../../gameObjects/itemsHandler/itemsHandler.h"
 
 #include "../../../Globals/Globals.h"
 #include "../../../Utils/Log/Log.h"
@@ -18,6 +19,7 @@ void updateEntities::threadFunction( ) {
 
 	while ( true ) {
 		attackHandler::Get( ).updateAttacks( );
+		itemsHandler::Get( ).updateItems( );
 
 		entitiesHandler::Get( ).updateEnemiesCollision( );
 

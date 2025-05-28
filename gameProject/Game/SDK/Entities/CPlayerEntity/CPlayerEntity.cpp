@@ -17,10 +17,10 @@ CPlayerEntity::CPlayerEntity( const CPlayerEntity & other )
 	this->availableAttacksInternal = other.availableAttacksInternal;
 }
 
-CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder , std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks )
+CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder , std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> _attacks )
 	: CBaseEntity( builder ) // Chama explicitamente o construtor de CBaseEntity
 {
-	this->attacks = attacks;
+	this->attacks = _attacks;
 	if ( this->attacks.empty( ) )
 		return;
 
@@ -38,12 +38,29 @@ CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder , std::unordered_ma
 	this->minimumAttackDistance = minAttackDis;
 }
 
-float CPlayerEntity::getMinimumDistanceToAttack( ) {
-	return this->minimumAttackDistance;
+void CPlayerEntity::getMinimumDistanceToAttack( float * buffer ) {
+	std::lock_guard<std::mutex> lock( localPlayerMutex );
+	*buffer = minimumAttackDistance;
 }
 
 std::vector<CBaseAttackType> CPlayerEntity::getAvailableAttacks( ) {
 	return this->availableAttacksInternal;
+}
+
+void CPlayerEntity::initializePlayerAttacks( ) {
+	std::lock_guard<std::mutex> lock( localPlayerMutex );
+	float minAttackDis = 999999;
+
+	for ( auto it = this->attacks.begin( ); it != this->attacks.end( ); ++it ) {
+		if ( it->second->getRange( ) < minAttackDis ) {
+			minAttackDis = it->second->getRange( );
+		}
+		this->availableAttacksInternal.emplace_back( it->second->getAttackType( ) );
+
+		this->attackUseTime.emplace( it->first , now );
+	}
+
+	this->minimumAttackDistance = minAttackDis;
 }
 
 void CPlayerEntity::UseAttack( CBaseAttackType attack ) {
@@ -121,16 +138,6 @@ void CPlayerEntity::updateMovementSounds( ) {
 	}
 }
 
-void CPlayerEntity::updateCurrentAttackState( ) {
-	// Verifica e atualiza o estado de ataque atual
-	if ( this->currentAttack != nullptr ) {
-		this->attacking = true;
-		if ( this->currentAttack->getEntityAnimations( )->isAnimationFinished( ) ) {
-			this->currentAttack = nullptr;
-			this->attacking = false;
-		}
-	}
-}
 
 void CPlayerEntity::handleDeadState( std::uint32_t & state ) {
 	state = CBaseEntityState::DEAD;
@@ -171,7 +178,9 @@ void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
 	this->loopAnimation = false;
 }
 
-std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & state ) {
+bool CPlayerEntity::handleAttackState( std::uint32_t & state ) {
+
+	bool sentAttack = false;
 
 	reverseAnimation = false;
 
@@ -180,26 +189,28 @@ std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & s
 		this->loopAnimation = false;
 		EventManager::Get( ).Trigger( this->attacks.at( this->currentLoadingAttack )->GetEntityName( ) + "_attackLoad" );
 		this->getEntityAnimations( )->resetAnimation( );
-		return nullptr;
+		return sentAttack;
 	}
 
 	bool attackAnimationEnded = this->getEntityAnimations( )->isAnimationFinished( );
 
-	std::shared_ptr<CBaseAttack> newAttack = nullptr;
 
 	switch ( this->attacks.at( this->currentLoadingAttack )->getAttackType( ) ) {
 	case CBaseAttackType_Melee:
 		// Para ataques corpo-a-corpo, lança o ataque imediatamente
 		if ( !this->alreadyThrowedAttack ) {
-			newAttack = attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
+			attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
+			sentAttack = true;
 			this->alreadyThrowedAttack = true;
 		}
 		break;
 
 	case CBaseAttackType_Ranged:
 		// Para ataques à distância, lança o ataque quando a animação termina
-		if ( attackAnimationEnded ) {
-			newAttack = attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
+		if ( attackAnimationEnded && !this->alreadyThrowedAttack ) {
+			attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
+			sentAttack = true;
+			this->alreadyThrowedAttack = true;
 		}
 		break;
 	}
@@ -216,7 +227,7 @@ std::shared_ptr<CBaseAttack> CPlayerEntity::handleAttackState( std::uint32_t & s
 	}
 
 
-	return newAttack;
+	return sentAttack;
 }
 
 std::uint32_t CPlayerEntity::determineEntityState( float lookingAngle , DIRECTION localDirection ) {
@@ -233,12 +244,7 @@ std::uint32_t CPlayerEntity::determineEntityState( float lookingAngle , DIRECTIO
 
 		}
 		else if ( this->inAttackLoadingAnimation ) {
-			std::shared_ptr<CBaseAttack> newAttack = handleAttackState( newEntityState );
-
-			if ( newAttack.get( ) != nullptr ) {
-				this->currentAttack = newAttack.get( );
-				this->attacking = true;
-			}
+			handleAttackState( newEntityState );
 		}
 
 		// Gerencia o movimento do jogador
@@ -282,23 +288,36 @@ void CPlayerEntity::updateEntity( ) {
 	previousEntityState = this->getEntityStates( );
 	previousAnimationType = this->getEntityAnimations( )->getCurrentAnimationType( );
 
-	// Atualiza os ciclos de animação e estados iniciais
-	updateAnimationCycles( );
+	if ( this->isAlive( ) ) {
 
-	// Gerencia eventos de som de movimento
-	updateMovementSounds( );
+		// Atualiza os ciclos de animação e estados iniciais
+		updateAnimationCycles( );
 
-	// Atualiza o estado do ataque atual
-	updateCurrentAttackState( );
+		// Gerencia eventos de som de movimento
+		updateMovementSounds( );
 
-	// Variáveis para controle do comportamento da entidade
-	this->blockMovement = false;
-	this->loopAnimation = true;
-	this->updateAnimation = true;
-	this->reverseAnimation = false;
+		// Variáveis para controle do comportamento da entidade
+		this->blockMovement = false;
+		this->loopAnimation = true;
+		this->updateAnimation = true;
+		this->reverseAnimation = false;
 
-	// Determina o novo estado da entidade
-	this->newEntityState = determineEntityState( lookingAngle , localDirection );
+		// Determina o novo estado da entidade
+		this->newEntityState = determineEntityState( lookingAngle , localDirection );
+	}
+	else {
+		if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::DEAD_BACKWARD ) ) {
+			this->newEntityState = CBaseEntityState::DEAD;
+			this->loopAnimation = false;
+			this->getEntityAnimations( )->resetAnimation( );
+		}
+		else {
+
+			this->setDeathAnimationFinished( this->getEntityAnimations( )->isAnimationFinished( ) );
+			this->loopAnimation = false;
+			this->newEntityState = CBaseEntityState::DEAD;
+		}
+	}
 
 	// Atualiza a animação e o estado da entidade
 	updateEntityAnimationAndState( );

@@ -67,114 +67,91 @@ enum DIRECTION {
 	BACKWARD
 };
 
-class CBaseEntity
-{
-	std::mutex cBaseMutex;
-	std::string Name;
+class CBaseEntity {
 
-	GVector2D entityPosition;
-	int health;
-	int movementSpeed;
+    std::mutex cBaseMutex;
+    std::string Name;
+    GVector2D entityPosition;
+    int health;
+    int movementSpeed;
+    CBaseEntityType entityType;
+    CBaseEntityMovementDirection entityMovementDirection = MOVEMENT_FORWARD;
+    DIRECTION entityLookingDirection;
+    std::uint32_t entityState = STOPPED;
+    CBaseEntityAnimation entityAnimations;
+    std::vector<CBaseEntityMovementDirection> movementsRequest;
+    GAngle lookingAngle;
+    float movementAngle;
+    CBaseEntityHitbox entityHitbox;
+    float maxHealth = 100;
+    bool beingHit = false;
+    bool finishedDeathAnimation = false;
+    bool sprinting = false;
+    std::chrono::steady_clock::time_point lastMoveTime;
 
-	CBaseEntityType entityType;
-	CBaseEntityMovementDirection entityMovementDirection = MOVEMENT_FORWARD;
-	DIRECTION entityLookingDirection;
-	std::uint32_t entityState = STOPPED;
-	CBaseEntityAnimation entityAnimations;
-	std::vector<CBaseEntityMovementDirection> movementsRequest;
-	GAngle lookingAngle;
-	float movementAngle;
-	CBaseEntityHitbox entityHitbox;
-	float maxHealth = 100;
-	bool beingHit = false;
-	bool finishedDeathAnimation = false;
-	bool sprinting = false;
-
-	std::chrono::steady_clock::time_point lastMoveTime;
 public:
 
-	virtual void updateEntity( );
+    // Construtores e operadores
+    CBaseEntity( const CBaseEntity & other );
+    CBaseEntity( CBaseEntityConstructor builder );
 
-	static CBaseEntityAnimationType getAnimationTypeBasedOnStateAndDirection( std::uint32_t states , DIRECTION entityDirection );
+    // Atualização e animação
+    virtual void updateEntity( );
+    static CBaseEntityAnimationType getAnimationTypeBasedOnStateAndDirection( std::uint32_t states , DIRECTION entityDirection );
 
-	CBaseEntity( const CBaseEntity & other );
-	CBaseEntity( CBaseEntityConstructor builder );
+    // Direção e movimento
+    float getEntityLookingDirectionBaseAngle( );
+    bool hasMovementRequest( );
+    void addMoveRequest( CBaseEntityMovementDirection movement );
+    void clearMovementRequest( );
+    void move( );
 
-	float getEntityLookingDirectionBaseAngle( );
+    // Estado de vida e animação de morte
+    bool isAlive( );
+    bool deathAnimationFinished( );
+    void setDeathAnimationFinished( bool finished );
 
-	bool hasMovementRequest( );
+    // Ângulos e velocidade
+    float getMovementAngle( );
+    GAngle getLookingAngle( );
+    float getMovementSpeed( ) { return movementSpeed; }
 
-	void addMoveRequest( CBaseEntityMovementDirection movement );
-	void clearMovementRequest( );
-	void move( );
 
-	bool isAlive( );
+    // Getters
+    std::string GetEntityName( );
+    GVector2D getEntityPosition( );
+    CBaseEntityType getEntityType( );
+    CBaseEntityMovementDirection getEntityMovementDirection( );
+    CBaseEntityAnimation * getEntityAnimations( );
+    int getHealth( );
+    CBaseEntityHitbox getHitbox( );
+    float getMaxHealth( );
+    DIRECTION getEntityLookingDirection( );
 
-	bool deathAnimationFinished( );
-	void setDeathAnimationFinished( bool finished );
+    // Setters
+    void setEntityLookingDirection( DIRECTION direction );
+    void setLookingAngle( float degrees );
+    void setEntityMovementDirection( CBaseEntityMovementDirection move );
+    void setHealth( int health );
+    void setEntityPosition( GVector2D pos );
 
-	float getMovementAngle( );
+    // Sprint
+    bool isSprinting( );
+    void setSprinting( bool sprinting );
 
-	std::string GetEntityName( );
-	GVector2D getEntityPosition( );
-	CBaseEntityType getEntityType( );
-	CBaseEntityMovementDirection getEntityMovementDirection();
-	CBaseEntityAnimation * getEntityAnimations( );
+    // Estados da entidade
+    void addEntityState( CBaseEntityState state );
+    void removeEntityState( CBaseEntityState state );
+    bool hasEntityState( CBaseEntityState state ) const;
+    void clearEntityStates( );
+    std::uint32_t getEntityStates( );
+    void setEntityStates( std::uint32_t states );
 
-	bool isSprinting( ) {
-		std::scoped_lock lock( cBaseMutex );
-		return this->sprinting;
-	}
+    // Hit e dano
+    void Hit( int damage );
+    bool isBeingHit( );
+    void stopBeingHit( );
 
-	void setSprinting( bool sprinting ) {
-		std::scoped_lock lock( cBaseMutex );
-		this->sprinting = sprinting;
-	}
-
-	void addEntityState( CBaseEntityState state ) {
-		std::scoped_lock lock( cBaseMutex );
-		entityState |= state;
-	}
-
-	void removeEntityState( CBaseEntityState state ) {
-		std::scoped_lock lock( cBaseMutex );
-		entityState &= ~state;
-	}
-
-	bool hasEntityState( CBaseEntityState state ) const {
-		return ( entityState & state ) != 0;
-	}
-
-	void clearEntityStates( ) {
-		std::scoped_lock lock( cBaseMutex );
-		entityState = 0;
-	}
-
-	std::uint32_t getEntityStates( ) const {
-		return entityState;
-	}
-
-	void setEntityStates( std::uint32_t states ) {
-		std::scoped_lock lock( cBaseMutex );
-		entityState = states;
-	}
-
-	DIRECTION getEntityLookingDirection( );
-	GAngle getLookingAngle( );
-	float getMovementSpeed( ) { return this->movementSpeed; }
-	int getHealth( );
-	CBaseEntityHitbox getHitbox( );
-
-	void setEntityLookingDirection( DIRECTION direction );
-	void setLookingAngle( float degrees );
-	
-	void setEntityMovementDirection( CBaseEntityMovementDirection move );
-	void setHealth( int health );
-	void setEntityPosition( GVector2D pos );
-	float getMaxHealth( );
-	void Hit( int damage );
-	bool isBeingHit( );
-	void stopBeingHit( );
-
-	std::string getEntityStateAsString() const;
+    // Utilitários
+    std::string getEntityStateAsString( ) const;
 };

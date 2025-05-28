@@ -11,51 +11,43 @@ CRangedAttack::CRangedAttack( CBaseEntityConstructor entityBuilder ,
 }
 
 void CRangedAttack::updateEntity( ) {
-    if ( this->IsActive( ) ) {
+	if ( this->IsActive( ) ) {
 
-        // Calcular deltaTime em segundos
-        float deltaTime = 0.0f;
-        if ( this->lastUpdateTime.time_since_epoch( ).count( ) > 0 ) {
-            std::chrono::duration<float> delta = now - this->lastUpdateTime;
-            deltaTime = delta.count( );
-        }
+		// Calcular deltaTime em segundos
+		float deltaTime = 0.0f;
+		if ( this->lastUpdateTime.time_since_epoch( ).count( ) > 0 ) {
+			std::chrono::duration<float> delta = now - this->lastUpdateTime;
+			deltaTime = delta.count( );
+		}
 
-        // Atualizar lastUpdateTime
-        this->lastUpdateTime = now;
+		// Atualizar lastUpdateTime
+		this->lastUpdateTime = now;
 
-        float angleRad = this->getLookingAngle( ).getRadians( );
-        float speed = this->getSpeed( ); // unidades por segundo
-        GVector2D initialPos = this->getInitialPosition( );
+		float angleRad = this->getLookingAngle( ).getRadians( );
+		float speed = this->getSpeed( ); // unidades por segundo
+		GVector2D initialPos = this->getInitialPosition( );
 
-        // Aplica deltaTime ao deslocamento
-        GVector2D newDirection(
-            std::cos( angleRad ) * speed * deltaTime ,
-            std::sin( angleRad ) * speed * deltaTime
-        );
+		// Aplica deltaTime ao deslocamento
+		GVector2D newDirection(
+			std::cos( angleRad ) * speed * deltaTime ,
+			std::sin( angleRad ) * speed * deltaTime
+		);
 
-        GVector2D nextPosition = this->getEntityPosition( ) + newDirection;
-        float positionDelta = GVector2D( initialPos - nextPosition ).length( );
+		GVector2D nextPosition = this->getEntityPosition( ) + newDirection;
+		float positionDelta = GVector2D( initialPos - nextPosition ).length( );
+		float range = this->getRange( );
 
-        bool animationFinished = this->getEntityAnimations( )->isAnimationFinished( );
+		this->getEntityAnimations( )->updateAnimation( true );
 
-        if ( positionDelta > this->getRange( ) || animationFinished ) {
-            if ( positionDelta > this->getRange( ) ) {
-                Log::Print( "[%s] Max attack range!" , this->GetEntityName( ).c_str( ) );
-            }
+		if ( positionDelta > range ) {
+			this->Deactive( );
+			return;
+		}
 
-            if ( animationFinished ) {
-                Log::Print( "[%s] Attack animation finished!" , this->GetEntityName( ).c_str( ) );
-                this->Deactive( );
-            }
-            return;
-        }
-
-        this->setEntityPosition( nextPosition );
-        Log::Print( "[%s] Attack addPos: %f,%f, delta: %f, range: %f" ,
-            this->GetEntityName( ).c_str( ) , newDirection.x , newDirection.y , positionDelta , this->getRange( ) );
-
-        this->getEntityAnimations( )->updateAnimation( false );
-    }
+		this->setEntityPosition( nextPosition );
+		// Log::Print( "[%s] Attack addPos: %f,%f, delta: %f, range: %f" ,
+		  //   this->GetEntityName( ).c_str( ) , newDirection.x , newDirection.y , positionDelta , this->getRange( ) );		
+	}
 }
 
 void CRangedAttack::otherDeactiveLogic( ) {

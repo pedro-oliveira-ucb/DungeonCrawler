@@ -41,25 +41,19 @@ void CMeleeAttack::updateEntity( ) {
         GVector2D nextPosition = this->getEntityPosition( ) + newDirection;
         float positionDelta = GVector2D( initialPos - nextPosition ).length( );
 
+        this->getEntityAnimations( )->updateAnimation( false );
+
         bool animationFinished = this->getEntityAnimations( )->isAnimationFinished( );
 
         if ( positionDelta > this->getRange( ) || animationFinished ) {
-            if ( positionDelta > this->getRange( ) ) {
-                Log::Print( "[%s] Max attack range!" , this->GetEntityName( ).c_str( ) );
-            }
-
             if ( animationFinished ) {
-                Log::Print( "[%s] Attack animation finished!" , this->GetEntityName( ).c_str( ) );
+                //Log::Print( "[%s] Attack animation finished!" , this->GetEntityName( ).c_str( ) );
                 this->Deactive( );
             }
             return;
         }
 
         this->setEntityPosition( nextPosition );
-        Log::Print( "[%s] Attack addPos: %f,%f, delta: %f, range: %f" ,
-            this->GetEntityName( ).c_str( ) , newDirection.x , newDirection.y , positionDelta , this->getRange( ) );
-
-        this->getEntityAnimations( )->updateAnimation( false );
     }
 }
 void CMeleeAttack::otherActiveLogic( CBaseEntity * sender) {

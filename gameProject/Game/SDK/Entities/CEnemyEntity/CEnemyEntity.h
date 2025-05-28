@@ -27,9 +27,12 @@ class CEnemyEntity : public CPlayerEntity {
 private:
 
     CEnemyType enemyType;
+    bool initialized = false;
 
 public:
 
+    bool isInitialized( ) { return this->initialized; }
+    void initialize( );
     CEnemyType getEnemyType( );
 
     static GVector2D findBestDirectionToPlayer( CBaseEntity * entity, GVector2D & toPlayer );

@@ -80,17 +80,14 @@ std::shared_ptr<CBaseAttack> attackHandler::getRunningAttack( int index )
 	return nullptr;
 }
 
-std::shared_ptr<CBaseAttack> attackHandler::throwNewAttack( CBaseEntity * sender , CBaseAttack * attack )
+void attackHandler::throwNewAttack( CBaseEntity * sender , CBaseAttack * attack )
 {
-
 	std::shared_ptr<CBaseAttack> newAttack = attack->Clone( );
 	newAttack->Active( sender );
 	{
 		std::lock_guard<std::mutex> lock( attackHandlerMutex );
 		runningAttacks.push_back( std::make_pair( sender , newAttack ) );
 	}
-
-	return newAttack;
 }
 
 void attackHandler::addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> attack ) {

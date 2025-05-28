@@ -150,6 +150,24 @@
     <ClCompile Include="Game\gameResources\gameResource\rMusic\rMusic.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Game\gameResources\gameResource\rShader\rShader.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Managers\gameResourceManager\rShadersManager\rShadersManager.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameObjects\gamdDialogHandler\gameDialogHandler.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameRender\DialogsRender\DialogsRender.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\SDK\Entities\Items\CBaseItem\CBaseItem.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\SDK\Entities\Items\CHealthItem\CHealthItem.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h">
@@ -291,6 +309,24 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameResources\gameResource\rMusic\rMusic.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameResources\gameResource\rShader\rShader.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Managers\gameResourceManager\rShadersManager\rShadersManager.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameObjects\gamdDialogHandler\gameDialogHandler.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameRender\DialogsRender\DialogsRender.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Entities\Items\CBaseItem\CBaseItem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Entities\Items\CHealthItem\CHealthItem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

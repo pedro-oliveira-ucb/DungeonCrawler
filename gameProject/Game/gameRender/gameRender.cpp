@@ -1,9 +1,11 @@
 #include "gameRender.h"
 
 #include "RenderEntities/RenderEntities.h"
+#include "DialogsRender/DialogsRender.h"
 
 #include "../gameObjects/entitiesHandler/entitiesHandler.h"
 #include "../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
+#include "../gameObjects/gamdDialogHandler/gameDialogHandler.h"
 #include "../Managers/gameResourceManager/gameResourceManager.h"
 
 #include "../../Utils/Log/Log.h"
@@ -15,38 +17,37 @@
 Camera2D camera = { 0 };
 
 RenderEntities entititiesRender;
+DialogsRender dialogsRender;
 
 bool check = false;
 
-void gameRender::soundEvents( ) {
+void gameRender::processSoundEvents( ) {
 
 	if ( IsKeyPressed( KEY_SPACE ) ) {
 		_gameResourceManager.getMusicManager( )->playMusic( musicType::BossMusic );
 	}
 
-	std::string soundEvent = gameSoundsQueue.getLatestOnQueue( );
+	std::string soundEvent = gameSoundsEventHandler::Get().getLatestOnQueue( );
 	while ( !soundEvent.empty( ) ) {
 
 		if ( !_gameResourceManager.getSoundManager( )->playSound( soundEvent ) ) {
 			Log::Print( "[soundEvents] cant play %s" , soundEvent.c_str( ) );
 		}
 
-		soundEvent = gameSoundsQueue.getLatestOnQueue( );
+		soundEvent = gameSoundsEventHandler::Get( ).getLatestOnQueue( );
 	}
 	_gameResourceManager.getMusicManager( )->updateMusic( );
 }
 
 void gameRender::renderCustomCursor( ) {
-	DrawCircle( GetMouseX( ) , GetMouseY( ) , 10 , BLUE );
+	DrawCircle( globals.mousePosX , globals.mousePosY , 10 , BLUE );
 }
 
-void gameRender::render( ) {
-	static float zoomLevel = 1.0f;
+void gameRender::renderDialogs( ) {
+	dialogsRender.render( );
+}
 
-	// Zoom com scroll do mouse
-	zoomLevel += GetMouseWheelMove( ) * 0.1f;
-	zoomLevel = Clamp( zoomLevel , 1.f , 2.0f );
-	camera.zoom = zoomLevel;
+void gameRender::correctMousePosition( ) {
 
 	CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
 	GVector2D localPos = local->getEntityPosition( );
@@ -82,13 +83,30 @@ void gameRender::render( ) {
 		camera.offset = { GetScreenWidth( ) / 2.0f, GetScreenHeight( ) / 2.0f };
 
 	}
+}
+
+void gameRender::render( ) {
+	gameDialog newDialog;
+	newDialog.dialogText = "Hello World!";
+	newDialog.dialogStayTime = 2.0f;
+	newDialog.dialogDuration = 10.f;
+	newDialog.triggers.emplace_back( timedTrigger( "localPlayer_hurt" , 2 ) );
+	if ( IsKeyPressed( KEY_SPACE ) ) {
+		gameDialogHandler::Get( ).throwDialog( newDialog );
+	}
+
+	// Zoom com scroll do mouse
+	zoomLevel += GetMouseWheelMove( ) * 0.1f;
+	zoomLevel = Clamp( zoomLevel , 1.f , 2.0f );
+	camera.zoom = zoomLevel;
+	correctMousePosition( );
 	camera.rotation = 0.0f;
 
 	BeginMode2D( camera );
-
-	entititiesRender.render( );
-
-	renderCustomCursor( );
-
+	{
+		entititiesRender.render( );	
+		renderCustomCursor( );
+	}
 	EndMode2D( );
+	renderDialogs( );
 }

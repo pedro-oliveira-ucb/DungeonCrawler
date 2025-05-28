@@ -14,7 +14,6 @@ class CPlayerEntity : public CBaseEntity {
     std::unordered_map<CBaseAttackType, std::shared_ptr<CBaseAttack>> attacks; // Lista de ataques do jogador
 	std::unordered_map<CBaseAttackType , std::chrono::steady_clock::time_point> attackUseTime; // Lista de ciclos de animação dos ataques do jogador
 
-    bool attacking = false;
     bool inAttackLoadingAnimation = false;
     bool alreadyThrowedAttack = false;
 
@@ -27,7 +26,6 @@ class CPlayerEntity : public CBaseEntity {
 
     int AnimationCycleSinceLastStep = 0;
 
-	CBaseAttack * currentAttack = nullptr; // Ataque atual do jogador
 
     DIRECTION localDirection;
     bool blockMovement = false;
@@ -45,14 +43,14 @@ private:
     // Funções auxiliares para modularizar updateEntity
     void updateAnimationCycles();
     void updateMovementSounds();
-    void updateCurrentAttackState();
+  
     
     std::uint32_t determineEntityState(float lookingAngle, DIRECTION localDirection);
     void handleDeadState( std::uint32_t  & state);
     void handleMovementState( std::uint32_t & state);
     void handleHurtState( std::uint32_t  & state);
     
-    std::shared_ptr<CBaseAttack> handleAttackState( std::uint32_t & state );
+    bool handleAttackState( std::uint32_t & state );
     
     void updateEntityAnimationAndState();
     void updateAttackCooldowns();
@@ -61,6 +59,10 @@ private:
 
 public:
     std::mutex localPlayerMutex;
+
+   
+
+    void initializePlayerAttacks( );
 
 	CPlayerEntity( CBaseEntityConstructor builder , std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks );
 	CPlayerEntity( const CPlayerEntity & other );
@@ -75,5 +77,5 @@ public:
 
 	std::vector< CBaseAttackType> getAvailableAttacks( ); // Retorna os ataques disponíveis do jogador
 
-	float getMinimumDistanceToAttack( );
+	void getMinimumDistanceToAttack( float * buffer );
 };

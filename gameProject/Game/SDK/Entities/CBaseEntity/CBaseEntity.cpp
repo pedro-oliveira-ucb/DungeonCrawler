@@ -36,6 +36,48 @@ CBaseEntity::CBaseEntity( CBaseEntityConstructor builder ) :
 	this->entityMovementDirection = builder.entityMovementDirection;
 	this->entityAnimations = builder.entityAnimations;
 	this->movementSpeed = builder.movementSpeed;
+	this->movementAngle = 0.f;
+	this->lookingAngle = 0.0f;
+	this->entityLookingDirection = DIRECTION::LEFT;
+	
+}
+
+bool CBaseEntity::isSprinting( ) {
+	std::scoped_lock lock( cBaseMutex );
+	return this->sprinting;
+}
+
+void  CBaseEntity::setSprinting( bool sprinting ) {
+	std::scoped_lock lock( cBaseMutex );
+	this->sprinting = sprinting;
+}
+
+void  CBaseEntity::addEntityState( CBaseEntityState state ) {
+	std::scoped_lock lock( cBaseMutex );
+	entityState |= state;
+}
+
+void  CBaseEntity::removeEntityState( CBaseEntityState state ) {
+	std::scoped_lock lock( cBaseMutex );
+	entityState &= ~state;
+}
+
+bool  CBaseEntity::hasEntityState( CBaseEntityState state ) const {
+	return ( entityState & state ) != 0;
+}
+
+void  CBaseEntity::clearEntityStates( ) {
+	std::scoped_lock lock( cBaseMutex );
+	entityState = 0;
+}
+
+std::uint32_t CBaseEntity::getEntityStates( ) {
+	return entityState;
+}
+
+void  CBaseEntity::setEntityStates( std::uint32_t states ) {
+	std::scoped_lock lock( cBaseMutex );
+	entityState = states;
 }
 
 std::string CBaseEntity::GetEntityName( ) {

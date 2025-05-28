@@ -4,6 +4,8 @@
 #include "../../gameControls/keybindHandler/keybindHandler.h"
 #include "../../../Globals/Globals.h"
 
+#include "../../../Utils/Log/Log.h"
+
 void entitiesHandler::setLocalPlayer( CPlayerEntity * player ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 	localPlayer = player;
@@ -14,29 +16,31 @@ CPlayerEntity * entitiesHandler::getLocalPlayer( ) {
 	return localPlayer;
 }
 
-void entitiesHandler::addEnemy( CEnemyType type , std::unique_ptr<CEnemyEntity> enemy ) {
+void entitiesHandler::addSpawnableEnemy( CEnemyType type , std::unique_ptr<CEnemyEntity> enemy ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
-	enemies.emplace( type , std::move( enemy ) );
+	spawnableEnemies.emplace( type , std::move( enemy ) );
 }
 
-std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> * entitiesHandler::getEnemies( ) {
-	std::lock_guard<std::mutex> lock( handlerMutex );
-	return &enemies;
-}
+
 
 void entitiesHandler::addSpawnedEnemy( std::unique_ptr<CEnemyEntity> * enemy ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 	spawnedEnemies.push_back( std::move( *enemy ) );
 }
+std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> * entitiesHandler::getSpawnableEnemies( ) {
+	std::lock_guard<std::mutex> lock( handlerMutex );
+	return &spawnableEnemies;
+}
+
 
 std::vector<std::unique_ptr<CEnemyEntity>> * entitiesHandler::getSpawnedEnemies( ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 	return &spawnedEnemies;
 }
 
-void entitiesHandler::addSpawnedEntity( std::unique_ptr<CBaseEntity> entity ) {
+void entitiesHandler::addSpawnedEntity( std::unique_ptr<CBaseEntity> * entity ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
-	spawnedEntities.push_back( std::move( entity ) );
+	spawnedEntities.push_back( std::move( *entity ) );
 }
 
 std::vector<std::unique_ptr<CBaseEntity>> * entitiesHandler::getSpawnedEntities( ) {
@@ -56,6 +60,10 @@ std::vector<std::unique_ptr<CBaseEntity>> * entitiesHandler::getSpawnedEntities(
 	return &spawnedEntities;
 }
 
+float calcularDistancia( GVector2D a , GVector2D b ) {
+	return std::sqrt( ( b.x - a.x ) * ( b.x - a.x ) + ( b.y - a.y ) * ( b.y - a.y ) );
+}
+
 void entitiesHandler::updateSpawnedEnemies( CPlayerEntity * localPlayer ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 
@@ -67,17 +75,19 @@ void entitiesHandler::updateSpawnedEnemies( CPlayerEntity * localPlayer ) {
 		if ( !entity )
 			continue;
 
-		if ( !entity->isAlive( ) )
-			continue;
+		if ( !entity->isInitialized( ) )
+			entity->initialize( );
 
 		GVector2D myPos = entity->getEntityPosition( );
 		GVector2D toPlayer = playerPos - myPos;
+
 		float angle = atan2( toPlayer.y , toPlayer.x ) * 180.0f / 3.14159265f;
+		float distance = calcularDistancia( myPos , playerPos );
 		entity->setLookingAngle( angle );
-		float minimumDistanceToAttack = entity->getMinimumDistanceToAttack( );
+		float minimumDistanceToAttack = 0.0f;
+		entity->getMinimumDistanceToAttack( &minimumDistanceToAttack );
 
-		if ( toPlayer.length( ) > minimumDistanceToAttack ) {
-
+		if ( distance > minimumDistanceToAttack + 10 ) {
 			GVector2D bestDir = CEnemyEntity::findBestDirectionToPlayer( entity , toPlayer );
 			if ( bestDir.x != 0 ) {
 				entity->addMoveRequest( bestDir.x > 0 ? MOVEMENT_RIGHT : MOVEMENT_LEFT );
@@ -91,6 +101,7 @@ void entitiesHandler::updateSpawnedEnemies( CPlayerEntity * localPlayer ) {
 			std::vector<CBaseAttackType> availableAttacks = entity->getAvailableAttacks( );
 			if ( availableAttacks.empty( ) )
 				continue;
+
 			entity->UseAttack( availableAttacks.at( 0 ) );
 		}
 
@@ -164,7 +175,6 @@ void entitiesHandler::updateEnemiesCollision( )
 		CBaseEntity * entity = spawnedEnemies.at( i ).get( );
 		allEnemies.emplace_back( entity );
 	}
-
 
 	CollisionManager::Get( ).UpdateEntities( allEnemies );
 	//CollisionManager::Get( ).ProcessCollisions( );

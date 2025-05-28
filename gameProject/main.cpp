@@ -13,6 +13,7 @@
 Game game;
 
 #include <raylib/raylib.h>
+#include <raylib/raymath.h>
 
 void idle( ) {
 	Log::Print( "[main] Entering idle!" );
@@ -44,28 +45,71 @@ int main( void ) {
 	game.start( );
 	Log::Print( "[main] game started!" );
 
-	waitGameLoad( );
 
+	// Shader loading & generic preparing.
+	Shader shader = LoadShader( 0 , "vignette.fs" );
+
+	int rLoc = GetShaderLocation( shader , "radius" );
+	int blurLoc = GetShaderLocation( shader , "blur" );
+	int colLoc = GetShaderLocation( shader , "color" );
+
+	// Radius and blur.
+	float radius = -0.29;
+
+	float blur = 1.1f;
+
+	Vector3 vColor = { 0.f, 0.f, 0.f }; // Vignette color.
+
+	RenderTexture2D vTexture = LoadRenderTexture( globals.screenWidth , globals.screenHeight ); // Vignette texture.
+
+	waitGameLoad( );
 
 	while ( true )
 	{
-		if ( globals.updateWindow ) {
-			globals.updateWindow = false;
-			break;
-		}
+		// Update values.
+		if ( IsKeyDown( KEY_UP ) ) radius += 0.01f;
+		if ( IsKeyDown( KEY_DOWN ) ) radius -= 0.01f;
+
+		if ( IsKeyDown( KEY_RIGHT ) ) blur += 0.01f;
+		if ( IsKeyDown( KEY_LEFT ) ) blur -= 0.01f;
 
 		Vector2 mousePos = GetMousePosition( );
+
 		globals.mousePosX = mousePos.x;
 		globals.mousePosY = mousePos.y;
 
 		keybindHandler::Get( ).update( );
-		gameRender::Get( ).soundEvents( );
+
+		gameRender::Get( ).processSoundEvents( );
+
+		SetShaderValue( shader , rLoc , &radius , SHADER_UNIFORM_FLOAT );
+		SetShaderValue( shader , blurLoc , &blur , SHADER_UNIFORM_FLOAT );
+		SetShaderValue( shader , colLoc , &vColor , SHADER_UNIFORM_VEC3 );
 
 		BeginDrawing( );
 		//remove old draws?
-		ClearBackground( GRAY );
+		ClearBackground( WHITE );
 
 		gameRender::Get( ).render( );
+
+		// Draw vignette.
+		BeginShaderMode( shader );
+
+		Rectangle sourceRec = { 0.0f, 0.0f, ( float ) vTexture.texture.width, ( float ) vTexture.texture.height };
+		Vector2 destRec = { 0.0f, 0.0f };
+
+		DrawTextureRec(
+		    vTexture.texture, 
+			sourceRec ,
+			destRec ,
+		    BLANK
+		);
+
+		EndShaderMode( );
+		// Some information.
+		DrawText( TextFormat( "Radius: %.2f" , radius ) , 10 , 30 , 20 , WHITE );
+
+		DrawText( TextFormat( "Blur: %.2f" , blur ) , 10 , 60 , 20 , WHITE );
 
 		//DrawText( "Janela em fullscreen!" , 100 , 100 , 20 , BLACK );
 		EndDrawing( );

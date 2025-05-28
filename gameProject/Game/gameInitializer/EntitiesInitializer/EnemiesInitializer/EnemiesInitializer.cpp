@@ -7,8 +7,10 @@
 #include "../../../SDK/Entities/CEnemyEntity/CEnemyEntity.h"
 #include "../../../SDK/Events/EventManager.h"
 #include "../../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../../gameObjects/itemsHandler/itemsHandler.h"
 #include "../../../gameObjects/attackHandler/attackHandler.h"
 #include "../../../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
+#include "../../../../Utils/utils.h"
 
 std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>>
 generateAnimationPair( CBaseEntityAnimationType type , std::string Name );
@@ -53,7 +55,7 @@ std::unique_ptr<CEnemyEntity> generateEnemy( CBaseEntityConstructor & builder , 
 	auto animation = createEntityAnimationConstructor( animationName , requiredAnimations );
 	if ( !animation ) {
 		Log::Print( "[Enemy Initializer] %s animation generation failed!" , animationName.c_str( ) );
-		return nullptr; 
+		return nullptr;
 	}
 
 	builder.entityAnimations = animation.value( );
@@ -71,8 +73,7 @@ std::unique_ptr<CEnemyEntity> generateEnemy( CBaseEntityConstructor & builder , 
 bool EnemiesInitializer::initializeEvents( std::string enemyName )
 {
 	std::vector<std::string> eventsNames {
-		"hurt",
-		"dead",
+		"hurt"
 	};
 
 	for ( std::string event : eventsNames ) {
@@ -80,10 +81,33 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 		EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 			eventName ,
 			[ eventName ] ( ) {
-				gameSoundsQueue.addEventToQueue( eventName );
+				gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
 			}
 		) );
 	}
+
+	std::string eventName = enemyName + "_dead";
+	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
+		eventName ,
+		[ eventName ] ( ) {
+			auto spawnableItems = itemsHandler::Get( ).getSpawnableItems( );
+			auto it = spawnableItems->find( ItemType::HEALTH_ITEM );
+			if ( it != spawnableItems->end( ) ) {
+				auto itemClone = it->second->ItemClone( );
+				int randomX = utils::Get( ).randomNumber( -500 , 500 );
+				int randomY = utils::Get( ).randomNumber( -500 , 500 );
+				CPlayerEntity * localPlayer = entitiesHandler::Get( ).getLocalPlayer( );
+				if ( localPlayer != nullptr ) {
+					GVector2D playerPos = entitiesHandler::Get( ).getLocalPlayer( )->getEntityPosition( );
+					GVector2D randomSpot( randomX , randomY );
+					GVector2D randomSpotAroundPlayer = playerPos + randomSpot;
+					itemsHandler::Get( ).spawnItem( std::move( itemClone ) , randomSpotAroundPlayer );
+				}
+			}
+
+			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+		}
+	) );
 
 	return true;
 }
@@ -97,7 +121,7 @@ bool EnemiesInitializer::initialize( )
 	builder.entityPosition = GVector2D( 0 , 0 );
 	builder.entityType = CBaseEntityType::MOB;
 	builder.health = 100;
-	builder.movementSpeed = 5;
+	builder.movementSpeed = 30;
 	builder.Name = "BasicEnemy";
 	auto enemy = generateEnemy( builder , "BasicEnemy" , CEnemyType::MELEE_ENEMY );
 	if ( !enemy ) {
@@ -110,6 +134,6 @@ bool EnemiesInitializer::initialize( )
 		return false;
 	}
 
-	entitiesHandler::Get( ).addEnemy( CEnemyType::MELEE_ENEMY , std::move( enemy ) );
+	entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::MELEE_ENEMY , std::move( enemy ) );
 	return true;
 }

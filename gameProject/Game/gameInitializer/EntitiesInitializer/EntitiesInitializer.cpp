@@ -4,6 +4,7 @@
 #include "LocalPlayerInitializer/LocalPlayerInitializer.h"
 #include "AttacksInitializer/AttacksInitializer.h"
 #include "EnemiesInitializer/EnemiesInitializer.h"
+#include "ItemsInitializer/ItemsInitializer.h"
 
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
 
@@ -69,6 +70,8 @@ bool EntitiesInitializer::initialize( ) {
 		return false;
 	}
 
+	Log::Print( "[EntitiesInitializer] attacks initialized" );
+
 	if ( !LocalPlayerInitializer::Get( ).initialize( ) ) {
 		Log::Print( "[EntitiesInitializer] Failed to initialize localplayer" );
 		return false;
@@ -83,6 +86,12 @@ bool EntitiesInitializer::initialize( ) {
 
 	Log::Print( "[EntitiesInitializer] enemies initialized" );
 
+	if ( !ItemsInitializer::Get( ).initialize( ) ) {
+		Log::Print( "[EnemiesInitializer] Failed to initialize items" );
+		return false;
+	}
+
+	Log::Print( "[EntitiesInitializer] items initialized" );
 
 	return true;
 }
