@@ -13,13 +13,13 @@ class CBaseItem : public CBaseEntity
 
 	bool active;
 	ItemType type;
-
+	GVector2D generateRandomPosition( );
 public:
 	CBaseItem( CBaseEntityConstructor, ItemType );
 	CBaseItem( const CBaseItem & other );
 
 	virtual void applyEffect( );
-	void Active( GVector2D );
+	void Active( );
 	bool isActive( );
 	void Deactive( );
 	ItemType getItemType( );

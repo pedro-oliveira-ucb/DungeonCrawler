@@ -16,9 +16,9 @@ struct dialogBox {
 
 class DialogsRender 
 {
-	float dialogStartTime;
-	float dialogEndTime;
-	float currentDialogTime;
+	float dialogStartTime = 0;
+	float dialogEndTime = 0;
+	float currentDialogTime = 0;
 	gameDialog currentDialog;
 	gameDialog tempDialog;
 	dialogBox renderDialogBox( std::string, Font);

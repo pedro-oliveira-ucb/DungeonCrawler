@@ -5,6 +5,7 @@
 #include "../../../Globals/Globals.h"
 
 #include "../../../Utils/Log/Log.h"
+#include "../../../Utils/utils.h"
 
 void entitiesHandler::setLocalPlayer( CPlayerEntity * player ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
@@ -21,8 +22,6 @@ void entitiesHandler::addSpawnableEnemy( CEnemyType type , std::unique_ptr<CEnem
 	spawnableEnemies.emplace( type , std::move( enemy ) );
 }
 
-
-
 void entitiesHandler::addSpawnedEnemy( std::unique_ptr<CEnemyEntity> * enemy ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 	spawnedEnemies.push_back( std::move( *enemy ) );
@@ -31,7 +30,6 @@ std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> * entitiesHandler
 	std::lock_guard<std::mutex> lock( handlerMutex );
 	return &spawnableEnemies;
 }
-
 
 std::vector<std::unique_ptr<CEnemyEntity>> * entitiesHandler::getSpawnedEnemies( ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
@@ -163,11 +161,27 @@ void entitiesHandler::updateLocalPlayer( ) {
 	localPlayer->updateEntity( );
 }
 
+GVector2D entitiesHandler::getRandomPlaceAroundPlayer( float radius )
+{
+	Log::Print( "generating random x" );
+	int randomX = utils::Get( ).randomNumber( -500 , 500 );
+	Log::Print( "generated random x, generating random y" );
+	int randomY = utils::Get( ).randomNumber( -500 , 500 );
+	Log::Print( "generated random y, getting player pos" );
+	GVector2D playerPos = localPlayer->getEntityPosition( );
+	Log::Print( "got playerpos, creating random pos" );
+	GVector2D randomSpot( randomX , randomY );
+	Log::Print( "random pos generated, summing vectors" );
+	GVector2D randomSpotAroundPlayer = playerPos + randomSpot;
+	Log::Print( "vectors summed, returning" );
+	return randomSpotAroundPlayer;
+}
+
 void entitiesHandler::updateEnemiesCollision( )
 {
-	CPlayerEntity * localPlayer = getLocalPlayer( );
-
 	std::lock_guard<std::mutex> lock( handlerMutex );
+
+	CPlayerEntity * localPlayer = this->localPlayer;
 
 	std::vector< CBaseEntity *> allEnemies { localPlayer };
 

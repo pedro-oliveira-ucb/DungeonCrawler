@@ -6,8 +6,9 @@
 
 #include "../../../gameObjects/attackHandler/attackHandler.h"
 #include "../../Events/EventManager.h"
-#include "../../../Utils/Log/Log.h"
+#include "../../../../Utils/Log/Log.h"
 
+#include "../../math/math.h"
 
 CPlayerEntity::CPlayerEntity( const CPlayerEntity & other )
 	:CBaseEntity( other )
@@ -96,12 +97,6 @@ void CPlayerEntity::UseAttack( CBaseAttackType attack ) {
 	}
 }
 
-float AngleDiff( float a , float b ) {
-	float diff = fmodf( a - b + 180.0f , 360.0f );
-	if ( diff < 0 ) diff += 360.0f;
-	return diff - 180.0f;
-}
-
 void CPlayerEntity::updateAnimationCycles( ) {
 	// Detecta o início de uma animação de ataque
 	if ( this->inAttackLoadingAnimation && !( previousEntityState & CBaseEntityState::ATTACKING ) ) {
@@ -145,7 +140,7 @@ void CPlayerEntity::handleDeadState( std::uint32_t & state ) {
 }
 
 void CPlayerEntity::handleMovementState( std::uint32_t & state ) {
-	float delta = AngleDiff( lookingAngle , this->getMovementAngle( ) );
+	float delta = math::AngleDiff( lookingAngle , this->getMovementAngle( ) );
 
 	if ( this->hasMovementRequest( ) ) {
 		state |= this->isSprinting( ) ? CBaseEntityState::RUNNING : CBaseEntityState::MOVING;
@@ -241,7 +236,6 @@ std::uint32_t CPlayerEntity::determineEntityState( float lookingAngle , DIRECTIO
 
 		if ( this->isBeingHit( ) ) {
 			handleHurtState( newEntityState );
-
 		}
 		else if ( this->inAttackLoadingAnimation ) {
 			handleAttackState( newEntityState );
@@ -262,7 +256,6 @@ std::uint32_t CPlayerEntity::determineEntityState( float lookingAngle , DIRECTIO
 void CPlayerEntity::updateEntityAnimationAndState( ) {
 	// Determina o tipo de animação baseado no novo estado e direção
 	CBaseEntityAnimationType updatedAnimationType = CBaseEntity::getAnimationTypeBasedOnStateAndDirection( newEntityState , localDirection );
-
 
 	// Atualiza os estados e animações da entidade
 	this->setEntityStates( newEntityState );

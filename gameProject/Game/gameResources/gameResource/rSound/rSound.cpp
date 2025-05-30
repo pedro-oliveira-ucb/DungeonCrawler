@@ -5,8 +5,7 @@
 #include <vector>
 #include <thread>
 
-#include "../../../Utils/Log/Log.h"
-
+#include "../../../../Utils/Log/Log.h"
 #include <raylib/raylib.h>
 
 #include <filesystem>
@@ -44,7 +43,6 @@ void rSound::initializeSound( ) {
 			Log::Print( "Error: Provided path is not a regular file: %s" , path.string( ).c_str( ) );
 			return;
 		}
-
 
 		auto mainSound = std::make_unique<Sound>( LoadSound( soundPath.c_str( ) ) );
 		SetSoundVolume( *mainSound , config.volume );

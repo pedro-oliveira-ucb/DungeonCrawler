@@ -168,6 +168,12 @@
     <ClCompile Include="Game\SDK\Entities\Items\CHealthItem\CHealthItem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Game\gameInitializer\EntitiesInitializer\ItemsInitializer\ItemsInitializer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameObjects\itemsHandler\itemsHandler.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h">
@@ -327,6 +333,12 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\SDK\Entities\Items\CHealthItem\CHealthItem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameInitializer\EntitiesInitializer\ItemsInitializer\ItemsInitializer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameObjects\itemsHandler\itemsHandler.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

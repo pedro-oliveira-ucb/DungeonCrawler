@@ -8,7 +8,7 @@
 
 #include "../../../../Utils/utils.h"
 
-#include "../../../Utils/Log/Log.h"
+#include "../../../../Utils/Log/Log.h"
 #include <nlohmann/json.hpp>
 
 
@@ -18,7 +18,7 @@ namespace fs = std::filesystem;
 using nlohmann::json;
 
 
-bool createBaseSoundConfig( std::string filename ) {
+bool SoundConfig::createBaseSoundConfig( std::string filename ) {
 
 	json config;
 
@@ -38,7 +38,7 @@ bool createBaseSoundConfig( std::string filename ) {
 	Log::Print( "[rSpritesManager] Created base sound config file: %s" , filename.c_str( ) );
 }
 
-bool generateSoundConfig( std::string filename , SoundConfig * buffer ) {
+bool SoundConfig::generateSoundConfig( std::string filename , SoundConfig * buffer ) {
 
 	if ( !fs::exists( filename ) ) {
 		Log::Print( "[rSpritesManager] Config file not found: %s" , filename.c_str( ) );
@@ -118,7 +118,7 @@ bool rSoundsManager::initialize( )
 		}
 	}
 
-	for ( auto animationPath : toLoad ) {
+	for ( auto& animationPath : toLoad ) {
 		Log::Print( "[rSoundsManager] Loading %s!" , animationPath.c_str( ) );
 		if ( !this->loadSound( animationPath ) ) {
 			Log::Print( "[rSoundsManager] Failed to load sound %s!" , animationPath.c_str( ) );
@@ -174,7 +174,7 @@ bool rSoundsManager::loadSound( std::string name ) {
 
 	SoundConfig soundConfig;
 
-	if ( !generateSoundConfig( configPath.string( ) , &soundConfig ) ) {
+	if ( !SoundConfig::generateSoundConfig( configPath.string( ) , &soundConfig ) ) {
 		Log::Print( "[rSpritesManager] Failed to generate sound config for %s!" , name.c_str( ) );
 		return false;
 	}

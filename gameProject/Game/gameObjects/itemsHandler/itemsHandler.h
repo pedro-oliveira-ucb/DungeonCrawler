@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include <memory>
 #include <vector>
 #include <unordered_map>
@@ -16,11 +17,11 @@ class itemsHandler : public CSingleton<itemsHandler>
 public:
 	void updateItems( );
 
-
 	void addSpawnableItem( std::unique_ptr<CBaseItem> item );
-	std::unordered_map<ItemType , std::unique_ptr<CBaseItem>> * getSpawnableItems( );
+	std::unique_ptr<CBaseItem> * getSpawnableItem( ItemType type );
 
-	void spawnItem( std::unique_ptr<CBaseItem> item, GVector2D position);
+	void spawnItem( ItemType type );
+
 	std::vector<std::unique_ptr<CBaseItem>> * getSpawnedItems( );
 };
 

@@ -1,7 +1,7 @@
 #include "CMeleeAttack.h"
 
 #include "../../../../../Globals/Globals.h"
-#include "../../../Utils/Log/Log.h"
+#include "../../../../Utils/Log/Log.h"
 
 CMeleeAttack::CMeleeAttack( CBaseEntityConstructor entityBuilder ,
 	CBaseAttackConstructor attackBuilder

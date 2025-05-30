@@ -1,6 +1,6 @@
 #include "rSprite.h"
 #include <raylib/raylib.h>
-#include "../../../Utils/Log/Log.h"
+#include "../../../../Utils/Log/Log.h"
 
 rSprite::rSprite( std::string model )
     : modelPath( model ) , texture( nullptr ) {

@@ -2,7 +2,7 @@
 
 #include "../../../Managers/collisionManager/collisionManager.h"
 #include "../../Events/EventManager.h"
-#include "../../../Utils/Log/Log.h"
+#include "../../../../Utils/Log/Log.h"
 #include <unordered_map>
 #include <set>
 #include <cmath>
@@ -42,7 +42,7 @@ CBaseEntity::CBaseEntity( CBaseEntityConstructor builder ) :
 	
 }
 
-bool CBaseEntity::isSprinting( ) {
+bool CBaseEntity::isSprinting( ) const {
 	std::scoped_lock lock( cBaseMutex );
 	return this->sprinting;
 }
@@ -71,7 +71,7 @@ void  CBaseEntity::clearEntityStates( ) {
 	entityState = 0;
 }
 
-std::uint32_t CBaseEntity::getEntityStates( ) {
+std::uint32_t CBaseEntity::getEntityStates( ) const{
 	return entityState;
 }
 
@@ -80,16 +80,16 @@ void  CBaseEntity::setEntityStates( std::uint32_t states ) {
 	entityState = states;
 }
 
-std::string CBaseEntity::GetEntityName( ) {
+std::string CBaseEntity::GetEntityName( ) const {
 	return this->Name;
 }
 
-GVector2D CBaseEntity::getEntityPosition( ) {
+GVector2D CBaseEntity::getEntityPosition( ) const {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	return this->entityPosition;
 }
 
-int CBaseEntity::getHealth( ) {
+int CBaseEntity::getHealth( ) const {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	return this->health;
 }
@@ -99,14 +99,14 @@ int CBaseEntity::getHealth( ) {
 //	return this->entityState;
 //}
 
-CBaseEntityType CBaseEntity::getEntityType( ) {
+CBaseEntityType CBaseEntity::getEntityType( ) const {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	return this->entityType;
 }
 
 
 
-float CBaseEntity::getEntityLookingDirectionBaseAngle( ) {
+float CBaseEntity::getEntityLookingDirectionBaseAngle( ) const{
 	switch ( getEntityLookingDirection( ) ) {
 	case DIRECTION::FORWARD:
 		return 270.f;
@@ -121,7 +121,7 @@ float CBaseEntity::getEntityLookingDirectionBaseAngle( ) {
 	return 0.f;
 }
 
-float CBaseEntity::getMaxHealth( ) {
+int CBaseEntity::getMaxHealth( ) const {
 	return this->maxHealth;
 }
 
@@ -150,7 +150,7 @@ void CBaseEntity::Hit( int damage ) {
 		EventManager::Get( ).Trigger( this->Name + "_dead" );
 }
 
-bool CBaseEntity::isBeingHit( ) {
+bool CBaseEntity::isBeingHit( ) const {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	return this->beingHit;
 }
@@ -160,7 +160,7 @@ void CBaseEntity::stopBeingHit( ) {
 	this->beingHit = false;
 }
 
-CBaseEntityMovementDirection CBaseEntity::getEntityMovementDirection( ) {
+CBaseEntityMovementDirection CBaseEntity::getEntityMovementDirection( ) const{
 	return this->entityMovementDirection;
 }
 
@@ -178,7 +178,7 @@ void CBaseEntity::addMoveRequest( CBaseEntityMovementDirection movement ) {
 	this->movementsRequest.emplace_back( movement );
 }
 
-float CBaseEntity::getMovementAngle( ) {
+float CBaseEntity::getMovementAngle( )const  {
 	return this->movementAngle;
 }
 
@@ -243,7 +243,7 @@ void CBaseEntity::move( ) {
 }
 
 
-bool CBaseEntity::hasMovementRequest( ) {
+bool CBaseEntity::hasMovementRequest( ) const {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	return !this->movementsRequest.empty( );
 }
@@ -304,11 +304,11 @@ CBaseEntityAnimationType CBaseEntity::getAnimationTypeBasedOnStateAndDirection( 
 }
 
 
-bool CBaseEntity::isAlive( ) {
+bool CBaseEntity::isAlive( )  const{
 	return this->health > 0;
 }
 
-bool CBaseEntity::deathAnimationFinished( )
+bool CBaseEntity::deathAnimationFinished( ) const
 {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 	return this->finishedDeathAnimation;
@@ -338,18 +338,18 @@ void CBaseEntity::setLookingAngle( float degress )
 	this->lookingAngle.setDegrees( degress );
 }
 
-GAngle CBaseEntity::getLookingAngle( )
+GAngle CBaseEntity::getLookingAngle( ) const
 {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 
 	return this->lookingAngle;
 }
 
-CBaseEntityHitbox CBaseEntity::getHitbox( )
+CBaseEntityHitbox CBaseEntity::getHitbox( ) const
 {
 	return this->entityHitbox;
 }
-DIRECTION CBaseEntity::getEntityLookingDirection( )
+DIRECTION CBaseEntity::getEntityLookingDirection( ) const 
 {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 

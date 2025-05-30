@@ -69,7 +69,7 @@ enum DIRECTION {
 
 class CBaseEntity {
 
-    std::mutex cBaseMutex;
+    mutable std::mutex cBaseMutex;
     std::string Name;
     GVector2D entityPosition;
     int health;
@@ -83,7 +83,7 @@ class CBaseEntity {
     GAngle lookingAngle;
     float movementAngle;
     CBaseEntityHitbox entityHitbox;
-    float maxHealth = 100;
+    int maxHealth = 100;
     bool beingHit = false;
     bool finishedDeathAnimation = false;
     bool sprinting = false;
@@ -100,33 +100,32 @@ public:
     static CBaseEntityAnimationType getAnimationTypeBasedOnStateAndDirection( std::uint32_t states , DIRECTION entityDirection );
 
     // Direção e movimento
-    float getEntityLookingDirectionBaseAngle( );
-    bool hasMovementRequest( );
+    float getEntityLookingDirectionBaseAngle( ) const;
+    bool hasMovementRequest( ) const;
     void addMoveRequest( CBaseEntityMovementDirection movement );
     void clearMovementRequest( );
     void move( );
 
     // Estado de vida e animação de morte
-    bool isAlive( );
-    bool deathAnimationFinished( );
+    bool isAlive( ) const;
+    bool deathAnimationFinished( ) const;
     void setDeathAnimationFinished( bool finished );
 
     // Ângulos e velocidade
-    float getMovementAngle( );
-    GAngle getLookingAngle( );
-    float getMovementSpeed( ) { return movementSpeed; }
-
+    float getMovementAngle( ) const;
+    GAngle getLookingAngle( ) const;
+    int getMovementSpeed( ) const { return movementSpeed; }
 
     // Getters
-    std::string GetEntityName( );
-    GVector2D getEntityPosition( );
-    CBaseEntityType getEntityType( );
-    CBaseEntityMovementDirection getEntityMovementDirection( );
+    std::string GetEntityName( ) const;
+    GVector2D getEntityPosition( ) const;
+    CBaseEntityType getEntityType( ) const;
+    CBaseEntityMovementDirection getEntityMovementDirection( ) const;
     CBaseEntityAnimation * getEntityAnimations( );
-    int getHealth( );
-    CBaseEntityHitbox getHitbox( );
-    float getMaxHealth( );
-    DIRECTION getEntityLookingDirection( );
+    int getHealth( ) const;
+    CBaseEntityHitbox getHitbox( ) const;
+    int getMaxHealth( ) const;
+    DIRECTION getEntityLookingDirection( ) const;
 
     // Setters
     void setEntityLookingDirection( DIRECTION direction );
@@ -136,7 +135,7 @@ public:
     void setEntityPosition( GVector2D pos );
 
     // Sprint
-    bool isSprinting( );
+    bool isSprinting( ) const;
     void setSprinting( bool sprinting );
 
     // Estados da entidade
@@ -144,12 +143,12 @@ public:
     void removeEntityState( CBaseEntityState state );
     bool hasEntityState( CBaseEntityState state ) const;
     void clearEntityStates( );
-    std::uint32_t getEntityStates( );
+    std::uint32_t getEntityStates( ) const;
     void setEntityStates( std::uint32_t states );
 
     // Hit e dano
     void Hit( int damage );
-    bool isBeingHit( );
+    bool isBeingHit( ) const;
     void stopBeingHit( );
 
     // Utilitários

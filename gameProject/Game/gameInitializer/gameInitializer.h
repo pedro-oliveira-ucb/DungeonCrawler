@@ -1,10 +1,11 @@
 #pragma once
-#include "../../../Utils/singleton.h"
+#include "../../../../Utils/singleton.h"
 
 class gameInitializer : public CSingleton<gameInitializer>
 {
 public:
 	bool initializeResources( );
+	bool initializeEvents( );
 	bool initializeThreads( );
 };
 

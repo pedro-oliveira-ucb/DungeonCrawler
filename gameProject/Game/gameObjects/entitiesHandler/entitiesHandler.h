@@ -17,7 +17,7 @@ private:
 
     std::vector<std::unique_ptr<CBaseEntity>> spawnedEntities;
     std::vector<std::unique_ptr<CEnemyEntity>> spawnedEnemies;
-    mutable std::mutex handlerMutex;
+    std::mutex handlerMutex;
 
 public:
     void setLocalPlayer( CPlayerEntity * player );
@@ -36,4 +36,6 @@ public:
     void updateSpawnedEnemies( CPlayerEntity* localPlayer  );
     void updateEnemiesCollision( );
 	void updateLocalPlayer( );
+
+    GVector2D getRandomPlaceAroundPlayer( float radius );
 };

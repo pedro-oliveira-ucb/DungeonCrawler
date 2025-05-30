@@ -2,7 +2,7 @@
 
 #include "../../../Events/EventManager.h"
 
-#include "../../../Utils/Log/Log.h"
+#include "./../../../../Utils/Log/Log.h"
 
 
 CBaseAttack::CBaseAttack( CBaseEntityConstructor builder , CBaseAttackConstructor attackBuilder )
@@ -112,7 +112,7 @@ GVector2D CBaseAttack::getArea( ) const {
 	return this->area;
 }
 
-CBaseAttackType CBaseAttack::getAttackType( ) {
+CBaseAttackType CBaseAttack::getAttackType( ) const{
 	return this->type;
 }
 

@@ -1,34 +1,18 @@
-﻿
-
-#include "RenderEntities.h"
+﻿#include "RenderEntities.h"
 
 #include "../../Managers/LevelManager/LevelManager.h"
 
-#include "../../../Utils/Log/Log.h"
-#include "../../../Globals/Globals.h"
+
 #include "../../gameObjects/attackHandler/attackHandler.h"
 #include "../../gameObjects/entitiesHandler/entitiesHandler.h"
 #include "../../gameObjects/itemsHandler/itemsHandler.h"
+
+#include "./../../SDK/math/math.h"
+
+#include "../../../Utils/Log/Log.h"
+#include "../../../Globals/Globals.h"
+
 #include <raylib/raylib.h>
-#include <cmath>
-
-#define M_PI 3.14159265358979323846f
-
-float angleDiff( const GVector2D & a , const GVector2D & b ) {
-	float dot = a.x * b.x + a.y * b.y;
-	float det = a.x * b.y - a.y * b.x; // Determinant (equivalente ao cross product em 2D)
-	return atan2( det , dot ); // Retorna ângulo em radianos, entre -π e π
-}
-
-float angleDiff360( const GVector2D & a , const GVector2D & b ) {
-	float angle = atan2( a.x * b.y - a.y * b.x , a.x * b.x + a.y * b.y );
-	if ( angle < 0 ) angle += 2 * M_PI;
-	return angle; // radianos
-}
-
-
-
-float AngleDiff( float a , float b );
 
 void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFactor = 1.0f ) {
 	if ( entity == nullptr ) {
@@ -48,8 +32,6 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 
 	Texture2D * texture = static_cast< Texture2D * >( entityAnimation->getCurrentTexture( ) );
 
-
-
 	GVector2D size = entityAnimation->getCurrentTextureSize( ) * sizeFactor;
 	GVector2D pos = entity->getEntityPosition( );
 
@@ -68,7 +50,7 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 		rotationAngle = 0;
 		break;
 	default:
-		rotationAngle = AngleDiff( lookingAngleDeg , baseAngle );
+		rotationAngle = math::AngleDiff( lookingAngleDeg , baseAngle );
 		break;
 	}
 
@@ -86,26 +68,26 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 	);
 
 	if ( DrawInfo ) {
-		float offset = 0.0f;
+		int offset = 0;
 
-		DrawText( entity->GetEntityName( ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
+		DrawText( entity->GetEntityName( ).c_str( ) , pos.x - size.x / 2 , pos.y - size.y / 2 - 20 + offset , 10 , BLACK );
 
-		offset -= 12.0f;
+		offset -= 12;
 
 		DrawText( CBaseEntityAnimation::getAnimationTypeName( entity->getEntityAnimations( )->getCurrentAnimationType( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
 
-		offset -= 12.0f;
+		offset -= 12;
 
 		DrawText( std::to_string( entity->getEntityAnimations( )->getCurrentAnimationStep( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
-		offset -= 12.0f;
+		offset -= 12;
 
 		DrawText( entity->getEntityStateAsString( ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
 		DrawRectangleLines(
-			pos.x - size.x / 2.0f ,
-			pos.y - size.y / 2.0f ,
+			pos.x - size.x / 2 ,
+			pos.y - size.y / 2 ,
 			size.x ,
 			size.y ,
 			BLUE
@@ -135,8 +117,8 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 		int fullH = size.y;
 
 		// posição do canto superior esquerdo da barra (supondo pos no centro da entidade)
-		int barX = pos.x + size.x / 2 + 5;
-		int barY = pos.y - fullH / 2;
+		int barX = (int)pos.x + (int)size.x / 2 + 5;
+		int barY = int(pos.y) - fullH / 2;
 
 		// altura da parte preenchida
 		int lifeH = int( ratio * fullH );
@@ -240,11 +222,4 @@ void RenderEntities::render( ) {
 	renderAttacks( );
 	renderEnemies( );
 	renderItems( );
-	/*for ( int i = 0; i < _gameWorld.entities.size( ); i++ ) {
-		CBaseEntity * entity = _gameWorld.entities.at( i );
-		if ( entity == nullptr ) {
-			continue;
-		}
-		renderEntity( entity );
-	}*/
 }

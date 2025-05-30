@@ -60,7 +60,7 @@ public:
 	GVector2D getInitialPosition( ) const;
 	std::string getName( ) const;
 
-	CBaseAttackType getAttackType( );
+	CBaseAttackType getAttackType( ) const;
 
 	bool hasAlreadyHit( CBaseEntity * entity );
 	void registerHit( CBaseEntity * entity );

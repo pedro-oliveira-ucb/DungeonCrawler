@@ -1,5 +1,5 @@
 #include "rSpritesManager.h"
-#include "../../../Utils/Log/Log.h"
+#include "..\..\..\..\Utils\Log\Log.h"
 #include <filesystem>
 #include <regex>
 
@@ -42,7 +42,7 @@ bool rSpritesManager::initialize( ) {
 		}
 	}
 
-	for ( auto animationPath : toLoad ) {
+	for ( auto & animationPath : toLoad ) {
 		Log::Print( "[rSpritesManager] Loading %s!" , animationPath.c_str( ) );
 		this->loadClip( animationPath , SPRITE_TYPE::SINGULAR );
 	}

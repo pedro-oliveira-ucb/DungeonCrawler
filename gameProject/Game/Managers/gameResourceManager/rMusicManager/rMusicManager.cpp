@@ -6,8 +6,8 @@
 #include <sstream>
 #include <string>
 
-#include "../../../Utils/Log/Log.h"
-#include "../../../Utils/utils.h"
+#include "./../../../../Utils/Log/Log.h"
+#include "./../../../../Utils/utils.h"
 
 #include <nlohmann/json.hpp>
 #include <raylib/raylib.h>

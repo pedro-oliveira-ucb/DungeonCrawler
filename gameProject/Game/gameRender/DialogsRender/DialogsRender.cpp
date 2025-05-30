@@ -56,6 +56,7 @@ void DialogsRender::render( ) {
 			}
 		}
 		float lettersPerSecond = ( this->currentDialog.dialogText.size( ) / this->currentDialog.dialogDuration );
+		static int oldLettersToShow = 0;
 		int lettersToShow = static_cast< int >( this->currentDialogTime * lettersPerSecond );
 
 		if ( lettersToShow > this->currentDialog.dialogText.size( ) ) {
@@ -74,7 +75,12 @@ void DialogsRender::render( ) {
 				return;
 			}
 		}
+		else if( oldLettersToShow != lettersToShow) {
+			EventManager::Get( ).Trigger( "dialog_Update" );
+			oldLettersToShow = lettersToShow;
+		}
 
+		
 		std::string textToRender = this->currentDialog.dialogText.substr( 0 , lettersToShow );
 		dialogBox box = renderDialogBox( textToRender , GetFontDefault( ) );
 		renderDialogText( box );

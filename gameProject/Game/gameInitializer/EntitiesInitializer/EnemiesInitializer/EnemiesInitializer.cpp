@@ -89,22 +89,11 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 	std::string eventName = enemyName + "_dead";
 	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 		eventName ,
-		[ eventName ] ( ) {
-			auto spawnableItems = itemsHandler::Get( ).getSpawnableItems( );
-			auto it = spawnableItems->find( ItemType::HEALTH_ITEM );
-			if ( it != spawnableItems->end( ) ) {
-				auto itemClone = it->second->ItemClone( );
-				int randomX = utils::Get( ).randomNumber( -500 , 500 );
-				int randomY = utils::Get( ).randomNumber( -500 , 500 );
-				CPlayerEntity * localPlayer = entitiesHandler::Get( ).getLocalPlayer( );
-				if ( localPlayer != nullptr ) {
-					GVector2D playerPos = entitiesHandler::Get( ).getLocalPlayer( )->getEntityPosition( );
-					GVector2D randomSpot( randomX , randomY );
-					GVector2D randomSpotAroundPlayer = playerPos + randomSpot;
-					itemsHandler::Get( ).spawnItem( std::move( itemClone ) , randomSpotAroundPlayer );
-				}
+		[ eventName ] ( ) {		
+			if ( utils::Get().onProbability( 20 ) ) {
+				// 20% de chance de spawnar um item de vida
+				itemsHandler::Get( ).spawnItem( ItemType::HEALTH_ITEM );
 			}
-
 			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
 		}
 	) );

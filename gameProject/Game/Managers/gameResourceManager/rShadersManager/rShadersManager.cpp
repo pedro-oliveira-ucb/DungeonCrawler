@@ -1,7 +1,7 @@
 #include "rShadersManager.h"
 #include <filesystem>
 #include <raylib/raylib.h>
-#include "../../../Utils/Log/Log.h"
+#include "../../../../Utils/Log/Log.h"
 
 namespace fs = std::filesystem;
 
@@ -40,7 +40,7 @@ bool rShadersManager::initialize( )
 		}
 	}
 
-	for ( auto animationPath : toLoad ) {
+	for ( auto& animationPath : toLoad ) {
 		Log::Print( "[rShadersManager] Loading %s!" , animationPath.c_str( ) );
 		if ( !this->loadShader( animationPath ) ) {
 			Log::Print( "[rShadersManager] Failed to load shader %s!" , animationPath.c_str( ) );

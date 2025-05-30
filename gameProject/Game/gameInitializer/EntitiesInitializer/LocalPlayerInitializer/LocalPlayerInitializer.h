@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../Utils/singleton.h"
+#include "../../../../Utils/singleton.h"
 #include "../../../SDK/Entities/CPlayerEntity/CPlayerEntity.h"
 
 class LocalPlayerInitializer : public CSingleton<LocalPlayerInitializer>

@@ -1,7 +1,7 @@
 #include "CRangedAttack.h"
 
 #include "../../../../../Globals/Globals.h"
-#include "../../../Utils/Log/Log.h"
+#include "../../../../Utils/Log/Log.h"
 
 CRangedAttack::CRangedAttack( CBaseEntityConstructor entityBuilder ,
 	CBaseAttackConstructor attackBuilder

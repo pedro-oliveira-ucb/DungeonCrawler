@@ -15,6 +15,11 @@ Game game;
 #include <raylib/raylib.h>
 #include <raylib/raymath.h>
 
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
+
+
 void idle( ) {
 	Log::Print( "[main] Entering idle!" );
 	while ( !globals.exitGame ) {
@@ -30,7 +35,7 @@ void waitGameLoad( ) {
 }
 
 int main( void ) {
-
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	Log::Print( "[Render] Initialized window!" );
 
 	SetConfigFlags( FLAG_VSYNC_HINT );

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../../../Utils/singleton.h"
+#include "../../../../Utils/singleton.h"
 
 class CEnemyEntity;
 

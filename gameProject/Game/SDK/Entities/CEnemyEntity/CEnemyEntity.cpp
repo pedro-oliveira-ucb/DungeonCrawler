@@ -1,12 +1,14 @@
 #include "CEnemyEntity.h"
-#include "../../../gameObjects/attackHandler/attackHandler.h"
+
 #include "../../Events/EventManager.h"
-#include "../../../Utils/Log/Log.h"
 #include "../CPlayerEntity/CPlayerEntity.h"
+#include "../../math/math.h"
+
+#include "../../../gameObjects/attackHandler/attackHandler.h"
 #include "../../../gameObjects/entitiesHandler/entitiesHandler.h"
 #include "../../../Managers/collisionManager/collisionManager.h"
-#include "../../Events/EventManager.h"
 
+#include "../../../../Utils/Log/Log.h"
 
 
 CEnemyEntity::CEnemyEntity( CBaseEntityConstructor builder ,
@@ -44,17 +46,14 @@ void CEnemyEntity::initialize( ) {
 }
 
 
-int sign( float x ) {
-	return ( x > 0 ) - ( x < 0 );
-}
 
 GVector2D CEnemyEntity::findBestDirectionToPlayer( CBaseEntity * entity , GVector2D & toPlayer ) {
 	GVector2D dirs[ ] = {
-		{ sign( toPlayer.x ), sign( toPlayer.y ) },                // Diagonal principal
-		{ sign( toPlayer.x ), 0 }, { 0, sign( toPlayer.y ) },      // Eixos principais
-		{ sign( toPlayer.x ), -sign( toPlayer.y ) },               // Diagonal invertida
-		{ -sign( toPlayer.x ), sign( toPlayer.y ) },               // Outra diagonal invertida
-		{ -sign( toPlayer.x ), 0 }, { 0, -sign( toPlayer.y ) }     // Direções opostas
+		{ math::sign( toPlayer.x ),  math::sign( toPlayer.y ) },                // Diagonal principal
+		{  math::sign( toPlayer.x ), 0 }, { 0,  math::sign( toPlayer.y ) },      // Eixos principais
+		{  math::sign( toPlayer.x ),  -math::sign( toPlayer.y ) },               // Diagonal invertida
+		{ -math::sign( toPlayer.x ),  math::sign( toPlayer.y ) },               // Outra diagonal invertida
+		{  -math::sign( toPlayer.x ), 0 }, { 0, -math::sign( toPlayer.y ) }     // Direções opostas
 	};
 
 	for ( const auto & dir : dirs ) {

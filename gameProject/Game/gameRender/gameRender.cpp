@@ -86,12 +86,13 @@ void gameRender::correctMousePosition( ) {
 }
 
 void gameRender::render( ) {
-	gameDialog newDialog;
-	newDialog.dialogText = "Hello World!";
-	newDialog.dialogStayTime = 2.0f;
-	newDialog.dialogDuration = 10.f;
-	newDialog.triggers.emplace_back( timedTrigger( "localPlayer_hurt" , 2 ) );
+	
 	if ( IsKeyPressed( KEY_SPACE ) ) {
+		gameDialog newDialog;
+		newDialog.dialogText = "Hello World!";
+		newDialog.dialogStayTime = 2;
+		newDialog.dialogDuration = 10;
+		newDialog.triggers.emplace_back( timedTrigger( "localPlayer_hurt" , 2 ) );
 		gameDialogHandler::Get( ).throwDialog( newDialog );
 	}
 

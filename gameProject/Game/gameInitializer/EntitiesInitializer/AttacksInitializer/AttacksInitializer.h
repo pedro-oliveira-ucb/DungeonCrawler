@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../Utils/singleton.h"
+#include "../../../../Utils/singleton.h"
 #include "../../../SDK/Entities/Attacks/CMeleeAttack/CMeleeAttack.h"
 #include "../../../SDK/Entities/Attacks/CRangedAttack/CRangedAttack.h"
 
