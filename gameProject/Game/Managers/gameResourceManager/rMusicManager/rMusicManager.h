@@ -20,8 +20,6 @@ class rMusicManager : public rBaseResource
 {
 	std::mutex musicMutex;
 
-	bool loadSound( std::string name );
-
 	std::unordered_map<musicType , std::vector<std::pair<std::string, std::unique_ptr<rMusic>>>> musics;
 	int currentPlayingSound = -1;
 	musicType currentMusicType = MainMenuMusic;

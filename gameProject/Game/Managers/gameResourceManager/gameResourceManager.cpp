@@ -4,6 +4,13 @@
 
 bool gameResourceManager::initialize( std::string path ) {
     this->basePath = path;
+    this->mapManagerManager = std::make_unique<rMapManager>( path + "\\map" );
+
+    if ( !this->mapManagerManager->initialize( ) ) {
+        Log::Print( "[gameResourceManager] rMapManager initialization failed!" );
+        return false;
+    }
+
     this->spritesMananger = std::make_unique<rSpritesManager>( path + "\\sprites" );
 
     if ( !this->spritesMananger->initialize( ) ) {
@@ -31,9 +38,9 @@ bool gameResourceManager::initialize( std::string path ) {
         return false;
     }
 
+  
+
     this->musicMananger->playMusic( musicType::DungeonMusic );
-
-
     return true;
 }
 
@@ -43,6 +50,10 @@ rMusicManager * gameResourceManager::getMusicManager( ) {
 
 rShadersManager * gameResourceManager::getShadersManager( ) {
     return this->shadersManager.get( );
+}
+
+rMapManager * gameResourceManager::getMapManager( ){
+    return this->mapManagerManager.get( );
 }
 
 rSpritesManager *gameResourceManager::getSpritesManager( ) {

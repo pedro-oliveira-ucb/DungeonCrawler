@@ -13,8 +13,6 @@ class rSoundsManager : public rBaseResource
 {
 	std::mutex mtx;
 
-	bool loadSound( std::string name );
-
 	std::unordered_map<std::string , std::unique_ptr<rSound>> sounds;
 
 public:

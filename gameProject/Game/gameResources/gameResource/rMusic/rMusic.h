@@ -13,6 +13,9 @@ enum class MusicTransitionState {
 struct MusicConfig {
 	float volume = 1.0f; // Volume de 0.0f a 1.0f
 	bool loop = true;
+
+	static bool createBaseMusicConfig( std::string filename );
+	static bool generateMusicConfig( std::string filename , MusicConfig * buffer );
 };
 
 class rMusic {

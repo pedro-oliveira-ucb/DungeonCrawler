@@ -16,7 +16,7 @@
 namespace fs = std::filesystem;
 using nlohmann::json;
 
-bool createBaseMusicConfig( std::string filename ) {
+bool MusicConfig::createBaseMusicConfig( std::string filename ) {
 
 	json config;
 
@@ -35,7 +35,7 @@ bool createBaseMusicConfig( std::string filename ) {
 	Log::Print( "[rSpritesManager] Created base sound config file: %s" , filename.c_str( ) );
 }
 
-bool generateMusicConfig( std::string filename , MusicConfig * buffer ) {
+bool MusicConfig::generateMusicConfig( std::string filename , MusicConfig * buffer ) {
 
 	if ( !fs::exists( filename ) ) {
 		Log::Print( "[rSpritesManager] Config file not found: %s" , filename.c_str( ) );
@@ -77,118 +77,56 @@ bool generateMusicConfig( std::string filename , MusicConfig * buffer ) {
 
 bool rMusicManager::initialize( )
 {
-	fs::path basePath = this->getPath( );
+	std::vector<std::vector<fileScanResult>> FilesOnFolder = this->recursiveGetFiles( this->getPath( ) , ".wav" );
 
-	if ( !fs::exists( basePath ) ) {
-		Log::Print( "[rMusicManager] %s doesn't exist!" , basePath.string( ).c_str( ) );
+	if ( FilesOnFolder.empty( ) ) {
+		Log::Print( "[rMusicManager] No files found in %s" , this->getPath( ).c_str( ) );
 		return false;
 	}
 
-	Log::Print( "[rMusicManager] Recursively scanning folders in: %s" , basePath.string( ).c_str( ) );
+	for ( auto & files : FilesOnFolder ) {
+		std::vector<std::pair<int , std::string>> orderedFiles; // Para ordenar os arquivos por nome (0.png, 1.png, ...)
 
-	std::vector<std::string> toLoad;
+		for ( auto & file : files ) {
+			fs::path configPath = file.folderPath + "\\config.json";
 
-	for ( const auto & entry : fs::recursive_directory_iterator( basePath ) ) {
-		if ( !fs::is_directory( entry ) ) continue;
+			MusicConfig musicConfig;
 
-		bool containsSound = false;
-
-		// verifica se a pasta tem arquivos tipo 0.png, 1.png, etc.
-		for ( const auto & file : fs::directory_iterator( entry ) ) {
-			if ( fs::is_regular_file( file ) ) {
-				std::string filename = file.path( ).filename( ).string( );
-				if ( file.path( ).extension( ) != ".wav" )
-					continue; // Only load .wav files
-				containsSound = true;
-				break;
+			if ( !MusicConfig::generateMusicConfig( configPath.string( ) , &musicConfig ) ) {
+				Log::Print( "[rMusicManager] Failed to generate sound config for %s!" , file.fileName.c_str( ) );
+				return false;
 			}
-		}
 
-		if ( containsSound ) {
-			// gera chave tipo localplayer_idle_backward
-			Log::Print( "[rMusicManager] Found sprite animation folder: %s" , entry.path( ).string( ).c_str( ) );
-			toLoad.emplace_back( entry.path( ).string( ).c_str( ) );
-		}
-	}
+			musicType type = musicType::MainMenuMusic; // Default type, can be set later if needed
 
-	if ( toLoad.empty( ) ) {
-		Log::Print( "[rMusicManager] No music folders found in %s!" , basePath.string( ).c_str( ) );
-		return false;
-	}
+			if ( file.rawRecursivePath.find( "dungeon" ) != std::string::npos ) {
+				type = musicType::DungeonMusic;
+			}
+			else if ( file.rawRecursivePath.find( "boss" ) != std::string::npos ) {
+				type = musicType::BossMusic;
+			}
+			else if ( file.rawRecursivePath.find( "menu" ) != std::string::npos ) {
+				type = musicType::MainMenuMusic;
+			}
+			else {
+				Log::Print( "[rMusicManager] Unknown music type for %s!" , file.rawRecursivePath.c_str( ) );
+				return false;
+			}
 
-	for ( auto animationPath : toLoad ) {
-		Log::Print( "[rMusicManager] Loading %s!" , animationPath.c_str( ) );
-		if ( !this->loadSound( animationPath ) ) {
-			Log::Print( "[rMusicManager] Failed to load sound %s!" , animationPath.c_str( ) );
-			return false;
-		}
-		else {
-			Log::Print( "[rMusicManager] Successfully loaded sound %s!" , animationPath.c_str( ) );
+			musics[ type ].emplace_back( std::make_pair( file.rawRecursivePath , std::make_unique<rMusic>( file.filePath , musicConfig ) ) );
+			break;
 		}
 	}
 
-	Log::Print( "[rMusicManager] Initialized %d musics!" , this->musics.size( ) );
+	Log::Print( "[rMusicManager] Initialized %d musics!\nAvailable sounds:" , this->musics.size( ) );
 
-	return true;
-}
 
-bool rMusicManager::loadSound( std::string name ) {
-	fs::path clipPath = name;
-	fs::path configPath = name + "\\config.json";
-
-	if ( clipPath.empty( ) ) {
-		Log::Print( "[rMusicManager] Failed to load clip %s, path is empty!" , name.c_str( ) );
-		return false;
+	for ( const auto & it : this->musics ) {
+		for(int i =0; i < it.second.size( ); ++i) {
+			Log::Print( "[rMusicManager] [%s] music" , it.second.at(i).first.c_str( ) );
+		}	
 	}
 
-	if ( !fs::exists( clipPath ) || !fs::is_directory( clipPath ) ) {
-		Log::Print( "[rMusicManager] Folder not found: %s" , clipPath.string( ).c_str( ) );
-		return false;
-	}
-
-	std::string soundFilePath;
-	for ( const auto & entry : fs::directory_iterator( clipPath ) ) {
-		if ( !entry.is_regular_file( ) ) continue;
-		if ( entry.path( ).extension( ) != ".wav" ) continue; // Only load .wav files
-		const std::string filename = entry.path( ).string( );
-		soundFilePath = filename;
-		break;
-	}
-
-	if ( soundFilePath.empty( ) ) {
-		Log::Print( "[rMusicManager] No sound file found in %s!" , clipPath.string( ).c_str( ) );
-		return false;
-	}
-
-	fs::path basePath = this->getPath( );
-	std::string relativePath = fs::relative( clipPath , basePath ).string( );
-	std::replace( relativePath.begin( ) , relativePath.end( ) , '/' , '_' );
-	std::replace( relativePath.begin( ) , relativePath.end( ) , '\\' , '_' );
-
-	MusicConfig musicConfig;
-
-	if ( !generateMusicConfig( configPath.string( ) , &musicConfig ) ) {
-		Log::Print( "[rMusicManager] Failed to generate sound config for %s!" , name.c_str( ) );
-		return false;
-	}
-
-	musicType type = musicType::MainMenuMusic; // Default type, can be set later if needed
-
-	if ( relativePath.find( "dungeon" ) != std::string::npos ) {
-		type = musicType::DungeonMusic;
-	}
-	else if ( relativePath.find( "boss" ) != std::string::npos ) {
-		type = musicType::BossMusic;
-	}
-	else if ( relativePath.find( "menu" ) != std::string::npos ) {
-		type = musicType::MainMenuMusic;
-	}
-	else {
-		Log::Print( "[rMusicManager] Unknown music type for %s!" , relativePath.c_str( ) );
-		return false;
-	}
-
-	musics[ type ].emplace_back( std::make_pair( relativePath , std::make_unique<rMusic>( soundFilePath , musicConfig ) ) );
 	return true;
 }
 

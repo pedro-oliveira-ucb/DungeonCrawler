@@ -82,50 +82,30 @@ bool SoundConfig::generateSoundConfig( std::string filename , SoundConfig * buff
 
 bool rSoundsManager::initialize( )
 {
-	fs::path basePath = this->getPath( );
+	std::vector<std::vector<fileScanResult>> FilesOnFolder = this->recursiveGetFiles( this->getPath( ) , ".wav" );
 
-	if ( !fs::exists( basePath ) ) {
-		Log::Print( "[rSoundsManager] %s doesn't exist!" , basePath.string( ).c_str( ) );
+	if ( FilesOnFolder.empty( ) ) {
+		Log::Print( "[rSoundsManager] No files found in %s" , this->getPath( ).c_str( ) );
 		return false;
 	}
 
-	Log::Print( "[rSoundsManager] Recursively scanning folders in: %s" , basePath.string( ).c_str( ) );
+	for ( auto & files : FilesOnFolder ) {
+		std::vector<std::pair<int , std::string>> orderedFiles; // Para ordenar os arquivos por nome (0.png, 1.png, ...)
+	
+		for ( auto & file : files ) {
+			fs::path configPath = file.folderPath + "\\config.json";
 
-	std::regex soundFileRegex( R"(sound\.wav)" , std::regex::icase );
+			SoundConfig soundConfig;
 
-	std::vector<std::string> toLoad;
-
-	for ( const auto & entry : fs::recursive_directory_iterator( basePath ) ) {
-		if ( !fs::is_directory( entry ) ) continue;
-
-		bool containsSound = false;
-
-		// verifica se a pasta tem arquivos tipo 0.png, 1.png, etc.
-		for ( const auto & file : fs::directory_iterator( entry ) ) {
-			if ( fs::is_regular_file( file ) ) {
-				std::string filename = file.path( ).filename( ).string( );
-				if ( std::regex_match( filename , soundFileRegex ) ) {
-					containsSound = true;
-					break;
-				}
+			if ( !SoundConfig::generateSoundConfig( configPath.string( ) , &soundConfig ) ) {
+				Log::Print( "[rSoundsManager] Failed to generate sound config for %s!" , file.fileName.c_str( ) );
+				return false;
 			}
-		}
 
-		if ( containsSound ) {
-			// gera chave tipo localplayer_idle_backward
-			Log::Print( "[rSoundsManager] Found sprite animation folder: %s" , entry.path( ).string( ).c_str( ) );
-			toLoad.emplace_back( entry.path( ).string( ).c_str( ) );
-		}
-	}
-
-	for ( auto& animationPath : toLoad ) {
-		Log::Print( "[rSoundsManager] Loading %s!" , animationPath.c_str( ) );
-		if ( !this->loadSound( animationPath ) ) {
-			Log::Print( "[rSoundsManager] Failed to load sound %s!" , animationPath.c_str( ) );
-			return false;
-		}
-		else {
-			Log::Print( "[rSoundsManager] Successfully loaded sound %s!" , animationPath.c_str( ) );
+			std::unique_ptr<rSound> soundPtr = std::make_unique<rSound>( file.filePath , soundConfig );
+			this->sounds.emplace( std::make_pair( file.rawRecursivePath , std::move( soundPtr ) ) );
+			//just one sound per folder, so we can break after the first match
+			break;
 		}
 	}
 
@@ -134,53 +114,6 @@ bool rSoundsManager::initialize( )
 	for ( const auto & it : this->sounds ) {
 		Log::Print( "[rSoundsManager] [%s] sound" , it.first.c_str( ) );
 	}
-
-	return true;
-}
-
-
-bool rSoundsManager::loadSound( std::string name ) {
-	fs::path clipPath = name;
-	fs::path configPath = name + "\\config.json";
-
-	if ( clipPath.empty( ) ) {
-		Log::Print( "[rSpritesManager] Failed to load clip %s, path is empty!" , name.c_str( ) );
-		return false;
-	}
-
-	if ( !fs::exists( clipPath ) || !fs::is_directory( clipPath ) ) {
-		Log::Print( "[rSpritesManager] Folder not found: %s" , clipPath.string( ).c_str( ) );
-		return false;
-	}
-
-	std::string soundFilePath;
-	for ( const auto & entry : fs::directory_iterator( clipPath ) ) {
-		if ( !entry.is_regular_file( ) ) continue;
-		if ( entry.path( ).extension( ) != ".wav" ) continue; // Only load .wav files
-		const std::string filename = entry.path( ).string( );
-		soundFilePath = filename;
-		break;
-	}
-
-	if ( soundFilePath.empty( ) ) {
-		Log::Print( "[rSpritesManager] No sound file found in %s!" , clipPath.string( ).c_str( ) );
-		return false;
-	}
-
-	fs::path basePath = this->getPath( );
-	std::string relativePath = fs::relative( clipPath , basePath ).string( );
-	std::replace( relativePath.begin( ) , relativePath.end( ) , '/' , '_' );
-	std::replace( relativePath.begin( ) , relativePath.end( ) , '\\' , '_' );
-
-	SoundConfig soundConfig;
-
-	if ( !SoundConfig::generateSoundConfig( configPath.string( ) , &soundConfig ) ) {
-		Log::Print( "[rSpritesManager] Failed to generate sound config for %s!" , name.c_str( ) );
-		return false;
-	}
-
-	std::unique_ptr<rSound> soundPtr = std::make_unique<rSound>( soundFilePath , soundConfig );
-	this->sounds.emplace( std::make_pair( relativePath , std::move( soundPtr ) ) );
 
 	return true;
 }

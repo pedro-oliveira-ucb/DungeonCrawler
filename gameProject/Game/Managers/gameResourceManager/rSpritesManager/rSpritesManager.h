@@ -15,7 +15,6 @@ public:
 	rSpritesManager( std::string path ) :rBaseResource( path ) { }
 	bool initialize( ) override;
 
-	std::shared_ptr<rSpriteAnimation> loadClip( const std::string & name , SPRITE_TYPE type );
 	std::shared_ptr<rSpriteAnimation> getClip( const std::string & name ) const;
 };
 
