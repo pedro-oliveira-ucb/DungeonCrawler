@@ -1,7 +1,7 @@
 #include "gameInitializer.h"
 
 #include "../Managers/gameResourceManager/gameResourceManager.h"
-#include "../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
+#include "../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
 
 #include "../SDK/Events/EventManager.h"
 #include "../gameWindow/gameWindow.h"

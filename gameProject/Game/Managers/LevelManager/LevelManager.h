@@ -10,6 +10,7 @@ struct LevelData {
 	int enemyCount; // Número de inimigos no nível
 	int RespawnCount; // Número de ressucitações permitidas
 	int RespawnTimer = 10; // Tempo de respawn em segundos
+	int Traps = 0; // Quantidade de armadilhas no nível
     // Outras propriedades como spawn points, boss, etc.
 };
 

@@ -102,10 +102,10 @@
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameObjects\attackHandler\attackHandler.cpp">
+    <ClCompile Include="Game\Handlers\attackHandler\attackHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameObjects\entitiesHandler\entitiesHandler.cpp">
+    <ClCompile Include="Game\Handlers\entitiesHandler\entitiesHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\SDK\math\math.cpp">
@@ -123,7 +123,7 @@
     <ClCompile Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameObjects\gameSoundEventsHandler\gameSoundsEventHandler.cpp">
+    <ClCompile Include="Game\Handlers\gameSoundEventsHandler\gameSoundsEventHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\Managers\LevelManager\LevelManager.cpp">
@@ -156,7 +156,7 @@
     <ClCompile Include="Game\Managers\gameResourceManager\rShadersManager\rShadersManager.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameObjects\gamdDialogHandler\gameDialogHandler.cpp">
+    <ClCompile Include="Game\Handlers\gamdDialogHandler\gameDialogHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\gameRender\DialogsRender\DialogsRender.cpp">
@@ -171,10 +171,19 @@
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\ItemsInitializer\ItemsInitializer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameObjects\itemsHandler\itemsHandler.cpp">
+    <ClCompile Include="Game\Handlers\itemsHandler\itemsHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\Managers\gameResourceManager\rMapManager\rMapManager.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\SDK\Entities\Traps\CBaseTrap\CBaseTrap.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\SDK\Entities\Traps\CSpikeTrap\CSpikeTrap.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameInitializer\EntitiesInitializer\TrapsInitializer\TrapsInitializer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -266,10 +275,10 @@
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\AttacksInitializer\AttacksInitializer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameObjects\attackHandler\attackHandler.h">
+    <ClInclude Include="Game\Handlers\attackHandler\attackHandler.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameObjects\entitiesHandler\entitiesHandler.h">
+    <ClInclude Include="Game\Handlers\entitiesHandler\entitiesHandler.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\SDK\math\math.h">
@@ -290,7 +299,7 @@
     <ClInclude Include="Game\SDK\Entities\Attacks\CRangedAttack\CRangedAttack.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameObjects\gameSoundEventsHandler\gameSoundsEventHandler.h">
+    <ClInclude Include="Game\Handlers\gameSoundEventsHandler\gameSoundsEventHandler.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\SDK\Events\EventManager.h">
@@ -326,7 +335,7 @@
     <ClInclude Include="Game\Managers\gameResourceManager\rShadersManager\rShadersManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameObjects\gamdDialogHandler\gameDialogHandler.h">
+    <ClInclude Include="Game\Handlers\gamdDialogHandler\gameDialogHandler.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameRender\DialogsRender\DialogsRender.h">
@@ -341,10 +350,19 @@
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\ItemsInitializer\ItemsInitializer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameObjects\itemsHandler\itemsHandler.h">
+    <ClInclude Include="Game\Handlers\itemsHandler\itemsHandler.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\Managers\gameResourceManager\rMapManager\rMapManager.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Entities\Traps\CBaseTrap\CBaseTrap.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Entities\Traps\CSpikeTrap\CSpikeTrap.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameInitializer\EntitiesInitializer\TrapsInitializer\TrapsInitializer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

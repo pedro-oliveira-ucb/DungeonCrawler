@@ -6,8 +6,8 @@
 #include "../../Managers/collisionManager/collisionManager.h"
 #include "../../Managers/LevelManager/LevelManager.h"
 
-#include "../../gameObjects/entitiesHandler/entitiesHandler.h"
-#include "../../gameObjects/attackHandler/attackHandler.h"
+#include "../../Handlers/entitiesHandler/entitiesHandler.h"
+#include "../../Handlers/attackHandler/attackHandler.h"
 
 #include "../../../Globals/Globals.h"
 #include "../../../Utils/Log/Log.h"

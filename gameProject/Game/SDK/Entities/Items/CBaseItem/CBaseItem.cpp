@@ -1,7 +1,7 @@
 #include "CBaseItem.h"
 
 #include "../../../Events/EventManager.h"
-#include "../../../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../../../Handlers/entitiesHandler/entitiesHandler.h"
 #include "../../../../../Utils/Log/Log.h"
 
 CBaseItem::CBaseItem( CBaseEntityConstructor superConstructor, ItemType itemType )

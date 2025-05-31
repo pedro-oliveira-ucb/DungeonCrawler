@@ -23,9 +23,9 @@ bool gameThreads::deploy( ) {
 
 	for ( int i = 0; i < _gameThreads.size( ); i++ ) {
 		std::pair<CBaseThread * , std::string> thread = _gameThreads.at( i );
-		Log::Print( "[gameThreads] Initializing %s!" , thread.second );
+		Log::Print( "[gameThreads] Initializing %s!" , thread.second.c_str() );
 		thread.first->start( );
-		Log::Print( "[gameThreads] %s initialized!" , thread.second );
+		Log::Print( "[gameThreads] %s initialized!" , thread.second.c_str() );
 	}
 
 	return true;

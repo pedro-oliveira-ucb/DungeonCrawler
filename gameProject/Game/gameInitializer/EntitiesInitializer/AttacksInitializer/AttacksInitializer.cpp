@@ -1,8 +1,8 @@
 #include "AttacksInitializer.h"
 #include <optional>
 
-#include "../../../gameObjects/attackHandler/attackHandler.h"
-#include "../../../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
+#include "../../../Handlers/attackHandler/attackHandler.h"
+#include "../../../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
 
 #include "../../../SDK/Events/EventManager.h"
 

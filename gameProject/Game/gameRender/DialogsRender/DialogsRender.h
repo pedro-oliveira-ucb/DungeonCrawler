@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../../gameObjects/gamdDialogHandler/gameDialogHandler.h"
+#include "../../Handlers/gamdDialogHandler/gameDialogHandler.h"
 #include <raylib/raylib.h>
 
 struct dialogBox {

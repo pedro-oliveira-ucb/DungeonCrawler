@@ -1,9 +1,9 @@
 #include "LocalPlayerInitializer.h"
 
 #include "../../../SDK/Events/EventManager.h"
-#include "../../../gameObjects/entitiesHandler/entitiesHandler.h"
-#include "../../../gameObjects/attackHandler/attackHandler.h"
-#include "../../../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
+#include "../../../Handlers/entitiesHandler/entitiesHandler.h"
+#include "../../../Handlers/attackHandler/attackHandler.h"
+#include "../../../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
 
 #include <optional>
 

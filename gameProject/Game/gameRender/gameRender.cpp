@@ -3,9 +3,9 @@
 #include "RenderEntities/RenderEntities.h"
 #include "DialogsRender/DialogsRender.h"
 
-#include "../gameObjects/entitiesHandler/entitiesHandler.h"
-#include "../gameObjects/gameSoundEventsHandler/gameSoundsEventHandler.h"
-#include "../gameObjects/gamdDialogHandler/gameDialogHandler.h"
+#include "../Handlers/entitiesHandler/entitiesHandler.h"
+#include "../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
+#include "../Handlers/gamdDialogHandler/gameDialogHandler.h"
 #include "../Managers/gameResourceManager/gameResourceManager.h"
 
 #include "../../Utils/Log/Log.h"

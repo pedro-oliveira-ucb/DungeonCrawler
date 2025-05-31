@@ -8,6 +8,7 @@
 
 enum CBaseEntityType {
 	ITEM,
+    TRAP,
 	PLAYER,
 	MOB,
 	ATTACK

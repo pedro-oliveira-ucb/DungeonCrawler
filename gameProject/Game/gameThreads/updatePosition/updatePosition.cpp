@@ -5,7 +5,7 @@
 #include "../../gameControls/keybindHandler/keybindHandler.h"
 #include "../../gameControls/mouseMovement/mouseMovement.h"
 
-#include "../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../Handlers/entitiesHandler/entitiesHandler.h"
 
 #include "../../../Globals/Globals.h"
 #include "../../../Utils/Log/Log.h"

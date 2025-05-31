@@ -4,7 +4,7 @@
 
 #include "../../../../Globals/Globals.h"
 
-#include "../../../gameObjects/attackHandler/attackHandler.h"
+#include "../../../Handlers/attackHandler/attackHandler.h"
 #include "../../Events/EventManager.h"
 #include "../../../../Utils/Log/Log.h"
 

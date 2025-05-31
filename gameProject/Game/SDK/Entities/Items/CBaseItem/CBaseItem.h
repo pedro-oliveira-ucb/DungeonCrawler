@@ -13,7 +13,6 @@ class CBaseItem : public CBaseEntity
 
 	bool active;
 	ItemType type;
-	GVector2D generateRandomPosition( );
 public:
 	CBaseItem( CBaseEntityConstructor, ItemType );
 	CBaseItem( const CBaseItem & other );

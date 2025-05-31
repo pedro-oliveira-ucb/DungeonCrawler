@@ -41,6 +41,15 @@ CBaseEntityAnimationType CBaseEntityAnimation::getCurrentAnimationType( ) {
 	return this->currentAnimationType;
 }
 
+void CBaseEntityAnimation::setAnimationStep(int step ){
+	std::lock_guard<std::mutex> lock( animationMutex );
+	if ( currentAnimation && step >= 0 && step < currentAnimation->size( ) ) {
+		currentAnimationStep = step;
+		timeSinceLastFrame = 0.0f; // Reset time since last frame
+		this->spriteSize = currentAnimation->getFrame( currentAnimationStep )->getSpriteSize( );
+	}
+}
+
 void CBaseEntityAnimation::updateAnimation( bool loop , bool reverse ) {
 	auto currentTime = std::chrono::steady_clock::now( );
 	float deltaTime = std::chrono::duration<float>( currentTime - lastUpdateTime ).count( );
@@ -49,7 +58,6 @@ void CBaseEntityAnimation::updateAnimation( bool loop , bool reverse ) {
 	// Chama a implementação com deltaTime calculado
 	updateAnimationWithDeltaTime( deltaTime , loop , reverse );
 }
-
 
 int CBaseEntityAnimation::getCurrentAnimationStep( ) {
 	std::lock_guard<std::mutex> lock( animationMutex );
@@ -83,6 +91,7 @@ void CBaseEntityAnimation::updateAnimationWithDeltaTime( float deltaTime , bool 
 			// Reprodução para frente
 			if ( currentAnimationStep + framesToAdvance < totalFrames ) {
 				currentAnimationStep += framesToAdvance;
+				animationState == AnimationState::PLAYING;
 			}
 			else if ( loop ) {
 				// Completa um ciclo
@@ -99,6 +108,7 @@ void CBaseEntityAnimation::updateAnimationWithDeltaTime( float deltaTime , bool 
 			// Reprodução para trás
 			if ( currentAnimationStep >= framesToAdvance ) {
 				currentAnimationStep -= framesToAdvance;
+				animationState == AnimationState::PLAYING;
 			}
 			else if ( loop ) {
 				// Completa um ciclo

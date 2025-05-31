@@ -5,7 +5,8 @@
 #include "../../../Utils/utils.h"
 #include "../../../Globals/Globals.h"
 
-#include "../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../Handlers/entitiesHandler/entitiesHandler.h"
+#include "../../Handlers/trapsHandler/trapsHandler.h"
 #include "../collisionManager/collisionManager.h"
 
 LevelManager::LevelManager( ) {
@@ -47,6 +48,7 @@ void LevelManager::loadLevels( ) {
 	level.mapName = "Map1";
 	level.RespawnCount = 10;
 	level.RespawnTimer = 1;
+	level.Traps = 10;
 
 	levels.push_back( level );
 
@@ -55,6 +57,7 @@ void LevelManager::loadLevels( ) {
 	level.mapName = "Map1";
 	level.RespawnCount = 15;
 	level.RespawnTimer = 1;
+	level.Traps = 10;
 
 	levels.push_back( level );
 }
@@ -131,6 +134,10 @@ void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
 		enemies.push_back( enemy.get( ) );
 		// Adiciona aos handlers (precisa passar ponteiro do unique_ptr para addSpawnedEnemy)
 		entitiesHandler::Get( ).addSpawnedEnemy( &enemy ); // passa ponteiro para o unique_ptr
+	}
+
+	for ( int i = 0; i < data.Traps; i++ ) {
+		trapsHandler::Get( ).spawnTrap( TrapType::SPIKES );
 	}
 
 	// Inicialização das posições

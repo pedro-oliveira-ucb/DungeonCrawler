@@ -5,8 +5,9 @@
 #include "AttacksInitializer/AttacksInitializer.h"
 #include "EnemiesInitializer/EnemiesInitializer.h"
 #include "ItemsInitializer/ItemsInitializer.h"
+#include "TrapsInitializer/TrapsInitializer.h"
 
-#include "../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../Handlers/entitiesHandler/entitiesHandler.h"
 
 #include "../../Managers/gameResourceManager/gameResourceManager.h"
 #include "../../../Utils/Log/Log.h"
@@ -92,6 +93,13 @@ bool EntitiesInitializer::initialize( ) {
 	}
 
 	Log::Print( "[EntitiesInitializer] items initialized" );
+
+	if ( !TrapsInitializer::Get( ).initialize( ) ) {
+		Log::Print( "[EnemiesInitializer] Failed to initialize traps" );
+		return false;
+	}
+
+	Log::Print( "[EntitiesInitializer] traps initialized" );
 
 	return true;
 }

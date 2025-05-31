@@ -115,6 +115,7 @@ public:
 	static CBaseEntityAnimationType getReverseAnimation( CBaseEntityAnimationType anim );
 	static bool isDifferentAnimationType( CBaseEntityAnimationType animA , CBaseEntityAnimationType animB );
 
+	void setAnimationStep( int step );
 	void updateAnimation( bool loop = true , bool reverse = false );
 	void updateAnimationWithDeltaTime( float deltaTime , bool loop = true, bool reverse = false);
 	void * getCurrentTexture( );

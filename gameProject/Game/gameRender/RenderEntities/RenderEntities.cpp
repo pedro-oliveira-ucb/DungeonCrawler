@@ -3,9 +3,10 @@
 #include "../../Managers/LevelManager/LevelManager.h"
 
 
-#include "../../gameObjects/attackHandler/attackHandler.h"
-#include "../../gameObjects/entitiesHandler/entitiesHandler.h"
-#include "../../gameObjects/itemsHandler/itemsHandler.h"
+#include "../../Handlers/attackHandler/attackHandler.h"
+#include "../../Handlers/entitiesHandler/entitiesHandler.h"
+#include "../../Handlers/itemsHandler/itemsHandler.h"
+#include "../../Handlers/trapsHandler/trapsHandler.h"
 
 #include "./../../SDK/math/math.h"
 
@@ -47,6 +48,7 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 		rotationAngle = lookingAngleDeg - 90;
 		break;
 	case CBaseEntityType::ITEM:
+	case CBaseEntityType::TRAP:
 		rotationAngle = 0;
 		break;
 	default:
@@ -217,9 +219,28 @@ void renderItems( ) {
 	}
 }
 
+void renderTraps( ) {
+	std::vector<std::unique_ptr<CBaseTrap>> * traps = trapsHandler::Get( ).getSpawnedTraps( );
+	for ( int i = 0; i < traps->size( ); i++ ) {
+		CBaseTrap * trap = traps->at( i ).get( );
+
+		if ( trap == nullptr )
+			continue;
+
+		if ( trap->getEntityAnimations( ) == nullptr )
+			continue;
+
+		renderEntity( trap , true );
+	}
+}
+
+
 void RenderEntities::render( ) {
+	
+	renderTraps( );
 	renderEntity( entitiesHandler::Get( ).getLocalPlayer( ) , true );
 	renderAttacks( );
 	renderEnemies( );
 	renderItems( );
+
 }

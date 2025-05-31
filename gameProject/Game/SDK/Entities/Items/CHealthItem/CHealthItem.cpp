@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "../../../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../../../Handlers/entitiesHandler/entitiesHandler.h"
 #include "../../../Events/EventManager.h"
 
 

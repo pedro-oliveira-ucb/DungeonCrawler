@@ -4,8 +4,8 @@
 #include "../CPlayerEntity/CPlayerEntity.h"
 #include "../../math/math.h"
 
-#include "../../../gameObjects/attackHandler/attackHandler.h"
-#include "../../../gameObjects/entitiesHandler/entitiesHandler.h"
+#include "../../../Handlers/attackHandler/attackHandler.h"
+#include "../../../Handlers/entitiesHandler/entitiesHandler.h"
 #include "../../../Managers/collisionManager/collisionManager.h"
 
 #include "../../../../Utils/Log/Log.h"
