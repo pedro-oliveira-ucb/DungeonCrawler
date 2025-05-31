@@ -4,14 +4,21 @@
 #include <mutex> // Adicionado para uso de std::mutex
 #include "../../SDK/Entities/CEnemyEntity/CEnemyEntity.h"
 
+
+struct LevelEnemySpawnerData {
+    CEnemyType type;
+    int SpawnCount;
+	int RespawnCount;
+    int RespawnTimer = 10;
+	int respawnedCount = 0; // Contador de inimigos ressuscitados
+    std::chrono::steady_clock::time_point timeSinceLastRespawn;
+};
+
 struct LevelData {
 	int levelNumber; // Número do nível
 	std::string mapName; // Nome do mapa associado ao nível
-	int enemyCount; // Número de inimigos no nível
-	int RespawnCount; // Número de ressucitações permitidas
-	int RespawnTimer = 10; // Tempo de respawn em segundos
 	int Traps = 0; // Quantidade de armadilhas no nível
-    // Outras propriedades como spawn points, boss, etc.
+	std::vector<LevelEnemySpawnerData> enemySpawners; // Dados dos spawns de inimigos
 };
 
 class LevelManager {
@@ -19,7 +26,7 @@ private:
     // Variáveis que precisam ser protegidas para evitar condições de corrida
     std::vector<LevelData> levels;
     int currentLevelIndex = 0;
-    std::vector<CEnemyEntity* > enemies;
+    std::unordered_map<CEnemyType, std::vector<CEnemyEntity*> > enemies;
 
     bool started = false;
     int respawnCount = 0;
@@ -36,7 +43,11 @@ private:
 
     void updateEnemies( );
 
+    bool canRespawn( CEnemyType enemyType );
+
     void spawnEnemiesForLevel( const LevelData & data );
+    void generateLevel1( );
+    void generateLevel2( );
 
 public:
     LevelManager();

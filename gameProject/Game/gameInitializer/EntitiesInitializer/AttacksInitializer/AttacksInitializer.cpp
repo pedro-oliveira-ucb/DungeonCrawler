@@ -125,7 +125,7 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 	{
 		attackBuilder.damage = 20;
 		attackBuilder.delay = .5f;
-		attackBuilder.cooldown = 1.0f;
+		attackBuilder.cooldown = 0.2f;
 		attackBuilder.range = 30.f;
 		attackBuilder.speed = 30;
 		attackBuilder.type = CBaseAttackType_Melee;
@@ -181,7 +181,24 @@ bool AttacksInitializer::generateEnemiesAttacks( ) {
 		}
 	}
 
-	
+	{
+		attackBuilder.damage = 30;
+		attackBuilder.delay = .5f;
+		attackBuilder.cooldown = 1.0f;
+		attackBuilder.range = 60.f;
+		attackBuilder.speed = 20;
+		attackBuilder.type = CBaseAttackType_Melee;
+		attackBuilder.Name = "MeleeAttack";
+		//attack damage area
+		attackBuilder.area = GVector2D( 5 , 5 );
+
+		if ( !generateMobAttack<CMeleeAttack>( attackBuilder , "MeleeEnemy1" ) )
+		{
+			Log::Print( "[generateEnemiesAttacks] Failed to generate MeleeAttack of MeleeEnemy1" );
+			return false;
+		}
+	}
+
 	return true;
 }
 

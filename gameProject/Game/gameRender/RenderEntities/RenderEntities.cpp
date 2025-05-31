@@ -20,6 +20,8 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 		return;
 	}
 
+	DrawInfo = false;
+
 	CBaseEntityAnimation * entityAnimation = entity->getEntityAnimations( );
 
 	if ( entityAnimation == nullptr ) {

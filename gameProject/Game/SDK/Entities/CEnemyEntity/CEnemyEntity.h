@@ -6,7 +6,8 @@
 #include <memory>
 
 enum CEnemyType {
-    MELEE_ENEMY ,
+	MELEE_ENEMY , // Inimigo corpo a corpo com ataque fraco
+	MELEE_ENEMY_MEDIUM , // Inimigo corpo a corpo com ataque médio
     RANGED_ENEMY ,
     MAGIC_ENEMY ,
     BOSS_ENEMY ,            // Inimigo com muita vida e ataques variados

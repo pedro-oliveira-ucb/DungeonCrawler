@@ -15,51 +15,64 @@ LevelManager::LevelManager( ) {
 
 LevelManager levelManager;
 
-GVector2D getRandomAreaAroundLocalPlayer( CBaseEntity * ent ) {
 
-	auto player = entitiesHandler::Get( ).getLocalPlayer( );
+void LevelManager::generateLevel1( ) {
 
-	if ( player == nullptr ) {
-		return GVector2D( 0 , 0 );
-	}
-	GVector2D localPos = player->getEntityPosition( );
-
-	bool okayPlace = false;
-	GVector2D deriserdSpawnPlace;
-
-	while ( !okayPlace ) {
-		int RandomX = utils::Get( ).randomNumber( -850 , 850 );
-		int RandomY = utils::Get( ).randomNumber( -850 , 850 );
-		deriserdSpawnPlace = GVector2D( localPos.x + RandomX , localPos.y + RandomY );
-		if ( CollisionManager::Get( ).isSpaceFree( deriserdSpawnPlace , GVector2D( 150 , 150 ) ) ) {
-			okayPlace = true;
-		}
-	}
-
-	return deriserdSpawnPlace;
-}
-
-void LevelManager::loadLevels( ) {
 	std::lock_guard<std::mutex> lock( managerMutex );
+	//LEVEL 1
+	LevelEnemySpawnerData basicMeleeEnemySpawner;
+	basicMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY;
+	basicMeleeEnemySpawner.SpawnCount = 10;
+	basicMeleeEnemySpawner.RespawnCount = 5;
+	basicMeleeEnemySpawner.RespawnTimer = 5;
+	basicMeleeEnemySpawner.timeSinceLastRespawn = now;
+
+	LevelEnemySpawnerData mediumMeleeEnemySpawner;
+	mediumMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY_MEDIUM;
+	mediumMeleeEnemySpawner.SpawnCount = 5;
+	mediumMeleeEnemySpawner.RespawnCount = 5;
+	mediumMeleeEnemySpawner.RespawnTimer = 10;
+	mediumMeleeEnemySpawner.timeSinceLastRespawn = now;
 
 	LevelData level;
 	level.levelNumber = 1;
-	level.enemyCount = 5;
 	level.mapName = "Map1";
-	level.RespawnCount = 10;
-	level.RespawnTimer = 1;
 	level.Traps = 10;
-
+	level.enemySpawners.push_back( basicMeleeEnemySpawner );
+	level.enemySpawners.push_back( mediumMeleeEnemySpawner );
 	levels.push_back( level );
+}
 
-	level.levelNumber = 2;
-	level.enemyCount = 5;
-	level.mapName = "Map1";
-	level.RespawnCount = 15;
-	level.RespawnTimer = 1;
+void LevelManager::generateLevel2( ) {
+	std::lock_guard<std::mutex> lock( managerMutex );
+	//LEVEL 1
+	LevelEnemySpawnerData basicMeleeEnemySpawner;
+	basicMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY;
+	basicMeleeEnemySpawner.SpawnCount = 10;
+	basicMeleeEnemySpawner.RespawnCount = 5;
+	basicMeleeEnemySpawner.RespawnTimer = 5;
+	basicMeleeEnemySpawner.timeSinceLastRespawn = now;
+
+	LevelEnemySpawnerData mediumMeleeEnemySpawner;
+	mediumMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY_MEDIUM;
+	mediumMeleeEnemySpawner.SpawnCount = 5;
+	mediumMeleeEnemySpawner.RespawnCount = 5;
+	mediumMeleeEnemySpawner.RespawnTimer = 10;
+	mediumMeleeEnemySpawner.timeSinceLastRespawn = now;
+
+	LevelData level;
+	level.levelNumber = 1;
+	level.mapName = "Map2";
 	level.Traps = 10;
-
+	level.enemySpawners.push_back( basicMeleeEnemySpawner );
+	level.enemySpawners.push_back( mediumMeleeEnemySpawner );
 	levels.push_back( level );
+}
+
+
+void LevelManager::loadLevels( ) {
+	generateLevel1( );
+	generateLevel2( );
 }
 
 LevelData LevelManager::getCurrentLevel( ) {
@@ -76,35 +89,64 @@ void LevelManager::moveToNextLevel( ) {
 
 bool LevelManager::hasEnemyAlive( ) {
 	bool foundAliveEnemy = false;
+	bool canRespawn = false;
 
-	for ( const auto & enemy : enemies ) {
-		if ( enemy->isAlive( ) ) {
-			foundAliveEnemy = true;
+	for ( auto it = enemies.begin( ); it != enemies.end( );) {
+		for ( auto enemies : it->second ) {
+			if ( enemies->isAlive( ) ) {
+				foundAliveEnemy = true;
+			}
+			++enemies;
 		}
+		if ( this->levels[ currentLevelIndex ].enemySpawners.at( it->first ).respawnedCount <
+			this->levels[ currentLevelIndex ].enemySpawners.at( it->first ).RespawnCount ) {
+			canRespawn = true;
+		}
+		++it; // Move to the next enemy
 	}
 
-	return foundAliveEnemy || this->respawnCount < levels[ currentLevelIndex ].RespawnCount;
+	return foundAliveEnemy || canRespawn;
 }
 
 bool LevelManager::isLastLevel( ) {
 	return currentLevelIndex >= static_cast< int >( levels.size( ) ) - 1;
 }
 
+bool LevelManager::canRespawn( CEnemyType enemyType ) {
+	auto & currentLevel = levels[ currentLevelIndex ];
+	auto & enemySpawnHandler = currentLevel.enemySpawners.at( enemyType );
+
+	bool canRespawn = false;
+
+	if ( enemySpawnHandler.respawnedCount < enemySpawnHandler.RespawnCount ) {
+		auto lastUse = enemySpawnHandler.timeSinceLastRespawn;
+		std::chrono::duration<float> delta = now - lastUse;
+		if ( delta.count( ) >= enemySpawnHandler.RespawnTimer ) {
+			canRespawn = true;
+		}
+	}
+
+	return canRespawn;
+}
+
+
 void LevelManager::updateEnemies( ) {
-	auto lastUse = this->respawnTimer;
+
 	// Calcula delta time em segundos
-	std::chrono::duration<float> delta = now - lastUse;
+	auto & currentLevel = levels[ currentLevelIndex ];
 
-	bool canRespawn = delta.count( ) >= levels[ currentLevelIndex ].RespawnTimer;
-
-	for ( auto & enemy : enemies ) {
-		if ( !enemy->isAlive( ) && this->respawnCount < levels[ currentLevelIndex ].RespawnCount ) {
-			if ( canRespawn && enemy->deathAnimationFinished() ) {
-				enemy->setEntityPosition( getRandomAreaAroundLocalPlayer( enemy ) );
-				enemy->Respawn( );
-				this->respawnTimer = now;
-				canRespawn = false;
-				this->respawnCount++;
+	for ( auto it = enemies.begin( ); it != enemies.end( ); ++it ) {
+		auto & enemySpawnHandler = currentLevel.enemySpawners.at( it->first );
+		bool respawnEnemy = canRespawn( it->first );
+		if ( respawnEnemy ) {
+			for ( auto & enemy : it->second ) {
+				if ( !enemy->isAlive( ) && enemy->deathAnimationFinished( ) ) {
+					enemy->setEntityPosition( entitiesHandler::Get( ).getRandomPlaceAroundPlayer( 850 ) );
+					enemy->Respawn( );
+					enemySpawnHandler.respawnedCount++;
+					enemySpawnHandler.timeSinceLastRespawn = now;
+					break;
+				}
 			}
 		}
 	}
@@ -128,12 +170,12 @@ void LevelManager::updateLevel( )
 
 void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
 	auto enemyList = entitiesHandler::Get( ).getSpawnableEnemies( );
-	for ( int i = 0; i < data.enemyCount; i++ ) {
-		// Cria o clone como unique_ptr
-		std::unique_ptr<CEnemyEntity> enemy = enemyList->at( CEnemyType::MELEE_ENEMY )->uniqueClone( );
-		enemies.push_back( enemy.get( ) );
-		// Adiciona aos handlers (precisa passar ponteiro do unique_ptr para addSpawnedEnemy)
-		entitiesHandler::Get( ).addSpawnedEnemy( &enemy ); // passa ponteiro para o unique_ptr
+	for ( auto it = data.enemySpawners.begin( ); it != data.enemySpawners.end( ); ++it ) {
+		for ( int i = 0; i < it->SpawnCount; i++ ) {
+			std::unique_ptr<CEnemyEntity> enemy = enemyList->at( it->type )->uniqueClone( );
+			enemies[ it->type ].push_back( enemy.get( ) );
+			entitiesHandler::Get( ).addSpawnedEnemy( &enemy );
+		}
 	}
 
 	for ( int i = 0; i < data.Traps; i++ ) {
@@ -142,7 +184,9 @@ void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
 
 	// Inicialização das posições
 	for ( auto & e : enemies ) {
-		e->setEntityPosition( getRandomAreaAroundLocalPlayer( e ) );
-		e->Respawn( );
+		for ( auto & enemy : e.second ) {
+			enemy->setEntityPosition( entitiesHandler::Get( ).getRandomPlaceAroundPlayer( 850 ) );
+			enemy->Respawn( );
+		}
 	}
 }

@@ -24,7 +24,6 @@ void CBaseItem::applyEffect( ) {
 }
 
 void CBaseItem::Active() {
-	std::lock_guard<std::mutex> baseItemLock( baseItemMutex );
 	Log::Print( "Activating item, getting random place" );
 	GVector2D position = entitiesHandler::Get().getRandomPlaceAroundPlayer( 500 );
 	Log::Print( "Got random place, setting entity position" );

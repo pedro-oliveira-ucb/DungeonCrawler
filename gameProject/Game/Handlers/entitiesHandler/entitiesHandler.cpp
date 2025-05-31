@@ -163,18 +163,19 @@ void entitiesHandler::updateLocalPlayer( ) {
 
 GVector2D entitiesHandler::getRandomPlaceAroundPlayer( float radius )
 {
-	Log::Print( "generating random x" );
-	int randomX = utils::Get( ).randomNumber( -500 , 500 );
-	Log::Print( "generated random x, generating random y" );
-	int randomY = utils::Get( ).randomNumber( -500 , 500 );
-	Log::Print( "generated random y, getting player pos" );
 	GVector2D playerPos = localPlayer->getEntityPosition( );
-	Log::Print( "got playerpos, creating random pos" );
-	GVector2D randomSpot( randomX , randomY );
-	Log::Print( "random pos generated, summing vectors" );
-	GVector2D randomSpotAroundPlayer = playerPos + randomSpot;
-	Log::Print( "vectors summed, returning" );
-	return randomSpotAroundPlayer;
+	bool okayPlace = false;
+	GVector2D deriserdSpawnPlace;
+	//while ( !okayPlace ) {
+		int RandomX = utils::Get( ).randomNumber( -radius , radius );
+		int RandomY = utils::Get( ).randomNumber( -radius , radius );
+		deriserdSpawnPlace = GVector2D( playerPos.x + RandomX , playerPos.y + RandomY );
+		/*if ( CollisionManager::Get( ).isSpaceFree( deriserdSpawnPlace , GVector2D( 150 , 150 ) ) ) {
+			okayPlace = true;
+		}*/
+	//}
+
+	return deriserdSpawnPlace;
 }
 
 void entitiesHandler::updateEnemiesCollision( )

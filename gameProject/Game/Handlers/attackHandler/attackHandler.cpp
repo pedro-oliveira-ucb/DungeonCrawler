@@ -40,6 +40,9 @@ void attackHandler::updateAttacks( )
 						if ( targets.at( i ) == sender )
 							continue;
 
+						if ( targets.at( i )->getEntityType( ) == sender->getEntityType( ) )
+							continue;
+
 						// Se já foi atingida, ignora
 						if ( attack->hasAlreadyHit( targets.at( i ) ) )
 							continue;
@@ -95,7 +98,7 @@ void attackHandler::addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> 
 	this->availableLocalPlayerAttacks.emplace_back( availableAttackHolder( attack->getAttackType( ) , attack ) );
 }
 
-void attackHandler::addAvailableEnemyAttack( std::string enemyName,  std::shared_ptr<CBaseAttack> attack ) {
+void attackHandler::addAvailableEnemyAttack( std::string enemyName , std::shared_ptr<CBaseAttack> attack ) {
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );
 	this->availableEnemiesAttacks[ enemyName ].emplace_back( availableAttackHolder( attack->getAttackType( ) , attack ) );
 }
@@ -117,7 +120,7 @@ std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>>  attackHandle
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );
 	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> result;
 	auto it = this->availableEnemiesAttacks.find( enemyName );
-	if(it != this->availableEnemiesAttacks.end( )) {	
+	if ( it != this->availableEnemiesAttacks.end( ) ) {
 		//run this once, and store it	
 		for ( int i = 0; i < it->second.size( ); i++ ) {
 			availableAttackHolder * attack = &it->second.at( i );
