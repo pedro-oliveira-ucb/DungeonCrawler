@@ -22,6 +22,7 @@ class rMusic {
 private:
 	Music * music = nullptr;
 	std::string path;
+	float baseVolume = 1.0f;
 	MusicConfig config;
 	float currentVolume = 0.0f;
 	float fadeDuration = 1.0f;
@@ -32,17 +33,23 @@ private:
 
 	mutable std::mutex mtx; // Mutex para proteger membros compartilhados
 
+	bool paused = false;
+
 public:
 	rMusic( std::string filePath , MusicConfig config );
 	~rMusic( );
 
 	void initialize( );
+	void setVolumePercentage( float percentage );
 	void play( float fadeInTime = 0.0f );
 	void stop( float fadeOutTime = 0.0f );
+	void pause( );
+	void resume( );
 	void update( float deltaTime );
 
 	float getBaseVolume( );
 	void setVolume( float volume );
 	bool isPlaying( ) const;
 	bool isFading( ) const;
+	bool isPaused( ) const;
 };

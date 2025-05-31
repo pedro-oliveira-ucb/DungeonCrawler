@@ -17,7 +17,7 @@ bool rMapManager::initialize( ) {
 	}
 
 	for ( auto & files : FilesOnFolder ) {
-		Log::Print( "[rMapManager] Loading %s!" );
+		Log::Print( "[rMapManager] Loading!" );
 
 		for ( auto & file : files ) {
 			std::shared_ptr<rSprite> sprites;
@@ -33,7 +33,6 @@ bool rMapManager::initialize( ) {
 
 			Log::Print( "[rMapManager] Loaded %s " , mapName.c_str( ) );
 		}
-
 	}
 
 	Log::Print( "[rMapManager] Initialized %d map assets !\nAvailable assets:" , this->availableImages.size( ) );

@@ -19,6 +19,7 @@ public:
 	rSoundsManager( std::string path ) :rBaseResource( path ) { }
 
 	bool initialize( ) override;
+	void setVolume( float volume );
 	bool playSound( std::string soundName );
 };
 

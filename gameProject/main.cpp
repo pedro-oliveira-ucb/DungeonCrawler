@@ -5,6 +5,7 @@
 
 
 #include "Game/gameControls/keybindHandler/keybindHandler.h"
+#include "Game/Managers/gameResourceManager/gameResourceManager.h"
 #include "Game/game.h"
 #include "Game/gameRender/gameRender.h"
 #include "Globals/Globals.h"
@@ -46,81 +47,95 @@ int main( void ) {
 
 	DisableCursor( );
 
+
+
 	Log::Print( "[main] starting game!" );
-	game.start( );
-	Log::Print( "[main] game started!" );
-
-
-	// Shader loading & generic preparing.
-	Shader shader = LoadShader( 0 , "vignette.fs" );
-
-	int rLoc = GetShaderLocation( shader , "radius" );
-	int blurLoc = GetShaderLocation( shader , "blur" );
-	int colLoc = GetShaderLocation( shader , "color" );
-
-	// Radius and blur.
-	float radius = -0.29;
-
-	float blur = 1.1f;
-
-	Vector3 vColor = { 0.f, 0.f, 0.f }; // Vignette color.
-
-	RenderTexture2D vTexture = LoadRenderTexture( globals.screenWidth , globals.screenHeight ); // Vignette texture.
-
-	waitGameLoad( );
-
-	while ( true )
-	{
-		// Update values.
-		if ( IsKeyDown( KEY_UP ) ) radius += 0.01f;
-		if ( IsKeyDown( KEY_DOWN ) ) radius -= 0.01f;
-
-		if ( IsKeyDown( KEY_RIGHT ) ) blur += 0.01f;
-		if ( IsKeyDown( KEY_LEFT ) ) blur -= 0.01f;
-
-		Vector2 mousePos = GetMousePosition( );
-
-		globals.mousePosX = mousePos.x;
-		globals.mousePosY = mousePos.y;
-
-		keybindHandler::Get( ).update( );
-
-		gameRender::Get( ).processSoundEvents( );
-
-		SetShaderValue( shader , rLoc , &radius , SHADER_UNIFORM_FLOAT );
-		SetShaderValue( shader , blurLoc , &blur , SHADER_UNIFORM_FLOAT );
-		SetShaderValue( shader , colLoc , &vColor , SHADER_UNIFORM_VEC3 );
-
-		BeginDrawing( );
-		//remove old draws?
-		ClearBackground( WHITE );
-
-		gameRender::Get( ).render( );
-
-		// Draw vignette.
-		BeginShaderMode( shader );
-
-		Rectangle sourceRec = { 0.0f, 0.0f, ( float ) vTexture.texture.width, ( float ) vTexture.texture.height };
-		Vector2 destRec = { 0.0f, 0.0f };
-
-		DrawTextureRec(
-		    vTexture.texture, 
-			sourceRec ,
-			destRec ,
-		    BLANK
-		);
-
-		EndShaderMode( );
-		// Some information.
-		DrawText( TextFormat( "Radius: %.2f" , radius ) , 10 , 30 , 20 , WHITE );
-
-		DrawText( TextFormat( "Blur: %.2f" , blur ) , 10 , 60 , 20 , WHITE );
-
-		//DrawText( "Janela em fullscreen!" , 100 , 100 , 20 , BLACK );
-		EndDrawing( );
+	if ( !game.start( ) ) {
+		Log::Print( "[main] failed to start game!" );
 	}
+	else {
+		// Shader loading & generic preparing.
+		Shader shader = LoadShader( 0 , "vignette.fs" );
 
-	CloseWindow( );
+		int rLoc = GetShaderLocation( shader , "radius" );
+		int blurLoc = GetShaderLocation( shader , "blur" );
+		int colLoc = GetShaderLocation( shader , "color" );
+
+		// Radius and blur.
+		float radius = -0.29;
+
+		float blur = 1.1f;
+
+		Vector3 vColor = { 0.f, 0.f, 0.f }; // Vignette color.
+
+		RenderTexture2D vTexture = LoadRenderTexture( globals.screenWidth , globals.screenHeight ); // Vignette texture.
+
+		waitGameLoad( );
+
+		float MusicVolume = 80.0f;
+		float SoundVolume = 80.0f;
+
+		while ( true )
+		{
+			// Update values.
+			if ( IsKeyDown( KEY_UP ) ) MusicVolume += 0.5f;
+			if ( IsKeyDown( KEY_DOWN ) ) MusicVolume -= 0.5f;
+			if ( IsKeyDown( KEY_RIGHT ) ) SoundVolume += 0.5f;
+			if ( IsKeyDown( KEY_LEFT ) ) SoundVolume -= 0.5f;
+			if ( IsKeyPressed( KEY_ESCAPE ) ) {
+				globals.gamePaused = !globals.gamePaused;
+				Log::Print( "Game Paused: %d" , globals.gamePaused );
+			}
+
+
+			if ( globals.gamePaused ) {
+				_gameResourceManager.getMusicManager( )->pauseMusic( );
+			}
+			else {
+				_gameResourceManager.getMusicManager( )->resumeMusic( );
+			}
+
+			_gameResourceManager.getSoundManager( )->setVolume( globals.SoundVolume );
+			_gameResourceManager.getMusicManager( )->SetMusicVolume( globals.MusicVolume );
+
+			Vector2 mousePos = GetMousePosition( );
+			globals.mousePosX = mousePos.x;
+			globals.mousePosY = mousePos.y;
+			keybindHandler::Get( ).update( );
+			gameRender::Get( ).processSoundEvents( );
+
+			SetShaderValue( shader , rLoc , &radius , SHADER_UNIFORM_FLOAT );
+			SetShaderValue( shader , blurLoc , &blur , SHADER_UNIFORM_FLOAT );
+			SetShaderValue( shader , colLoc , &vColor , SHADER_UNIFORM_VEC3 );
+
+			BeginDrawing( );
+			ClearBackground( WHITE );
+			gameRender::Get( ).render( );
+
+			// Draw vignette.
+			BeginShaderMode( shader );
+			Rectangle sourceRec = { 0.0f, 0.0f, ( float ) vTexture.texture.width, ( float ) vTexture.texture.height };
+			Vector2 destRec = { 0.0f, 0.0f };
+			DrawTextureRec(
+				vTexture.texture ,
+				sourceRec ,
+				destRec ,
+				BLANK
+			);
+			EndShaderMode( );
+
+
+			// Some information.
+			DrawText( TextFormat( "Music Volume: %.2f" , globals.MusicVolume ) , 10 , 30 , 20 , WHITE );
+			DrawText( TextFormat( "Sound volume: %.2f" , globals.SoundVolume ) , 10 , 60 , 20 , WHITE );
+
+			//DrawText( "Janela em fullscreen!" , 100 , 100 , 20 , BLACK );
+			EndDrawing( );
+
+		}
+		CloseWindow( );
+	}
+	system( "pause" );
 
 	idle( );
 	return 1;

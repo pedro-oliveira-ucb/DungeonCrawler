@@ -19,6 +19,9 @@ void updateEntities::threadFunction( ) {
 	Log::Print( "[updateEntities] Hello world!" );
 
 	while ( true ) {
+		if ( globals.gamePaused )
+			continue;
+
 		attackHandler::Get( ).updateAttacks( );
 		itemsHandler::Get( ).updateItems( );
 		trapsHandler::Get( ).updateTraps( );

@@ -9,6 +9,7 @@ namespace fs = std::filesystem;
 
 rMusic::rMusic( std::string filePath , MusicConfig  cfg )
 	: path( filePath ) {
+	this->baseVolume = cfg.volume;
 	this->config.volume = cfg.volume;
 	this->config.loop = cfg.loop;
 	initialize( );
@@ -35,6 +36,13 @@ void rMusic::initialize( ) {
 	music->looping = config.loop;
 	SetMusicVolume( *music , 0.0f );
 	initialized = true;
+}
+
+void rMusic::setVolumePercentage(float percentage) {
+	std::lock_guard<std::mutex> lock( mtx );
+	percentage = std::clamp( percentage , 0.0f , 100.0f ); // Ensure percentage is between 0 and 100
+	float desiredVolume = this->baseVolume * ( percentage / 100.0f );
+	config.volume = desiredVolume;
 }
 
 void rMusic::play( float fadeInTime ) {
@@ -66,6 +74,23 @@ void rMusic::stop( float fadeOutTime ) {
 	}
 }
 
+void rMusic::pause( ) {
+	std::lock_guard<std::mutex> lock( mtx );
+	PauseMusicStream( *music );
+	this->paused = true;
+}
+
+void rMusic::resume( ) {
+	std::lock_guard<std::mutex> lock( mtx );
+	ResumeMusicStream( *music );
+	this->paused = false;
+}
+
+bool rMusic::isPaused( ) const {
+	std::lock_guard<std::mutex> lock( mtx );
+	return this->paused;
+}
+
 void rMusic::update( float deltaTime ) {
 	if ( !initialized || !isPlaying( ) ) return;
 
@@ -91,6 +116,9 @@ void rMusic::update( float deltaTime ) {
 			StopMusicStream( *music );
 		}
 		SetMusicVolume( *music , currentVolume );
+	}
+	else {
+		SetMusicVolume( *music , config.volume );
 	}
 }
 

@@ -21,6 +21,9 @@ void enemiesController::threadFunction( ) {
 
 	while ( true ) {
 
+		if ( globals.gamePaused )
+			continue;
+
 		if ( player == nullptr ) {
 			player = entitiesHandler::Get( ).getLocalPlayer( );
 			continue;

@@ -11,6 +11,7 @@ class gameRender : public CSingleton<gameRender>
 	void renderCustomCursor( );
 	void renderDialogs( );
 	void correctMousePosition( );
+	void renderPauseMenu( );
 
 public:
 	void render( );

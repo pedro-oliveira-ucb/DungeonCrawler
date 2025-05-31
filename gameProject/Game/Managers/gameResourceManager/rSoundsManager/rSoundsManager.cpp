@@ -48,7 +48,7 @@ bool SoundConfig::generateSoundConfig( std::string filename , SoundConfig * buff
 		}
 	}
 
-	std::string configString = utils::Get().readFileAsString( filename );
+	std::string configString = utils::Get( ).readFileAsString( filename );
 	if ( configString.empty( ) ) {
 		Log::Print( "[rSpritesManager] Config file is empty: %s" , filename.c_str( ) );
 		return false;
@@ -79,6 +79,14 @@ bool SoundConfig::generateSoundConfig( std::string filename , SoundConfig * buff
 	return true;
 }
 
+void rSoundsManager::setVolume( float volume ) {
+	std::lock_guard<std::mutex>( this->mtx );
+	for ( const auto & it : this->sounds ) {
+		it.second->setVolumePercentage( volume );
+	}
+}
+
+
 
 bool rSoundsManager::initialize( )
 {
@@ -91,7 +99,7 @@ bool rSoundsManager::initialize( )
 
 	for ( auto & files : FilesOnFolder ) {
 		std::vector<std::pair<int , std::string>> orderedFiles; // Para ordenar os arquivos por nome (0.png, 1.png, ...)
-	
+
 		for ( auto & file : files ) {
 			fs::path configPath = file.folderPath + "\\config.json";
 

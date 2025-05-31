@@ -12,17 +12,28 @@
 
 namespace fs = std::filesystem;
 
-rSound::rSound( std::string model, SoundConfig config )
-	: soundPath( model ), config(config){
+rSound::rSound( std::string model , SoundConfig config )
+	: soundPath( model ) , config( config ) {
 	// Lazy loading opcional: 
 	initializeSound( );
+	this->baseVolume = config.volume;
 }
 
 rSound::~rSound( ) {
 	if ( initialized ) {
-	
+
 	}
 }
+
+void rSound::setVolumePercentage( float percentage ) {
+	std::lock_guard<std::mutex> lock( soundMutex );
+	percentage = std::clamp( percentage , 0.0f , 100.0f );
+	float desiredVolume = baseVolume * ( percentage / 100.0f );
+	for( auto & soundPtr : this->sounds ) {
+		SetSoundVolume( *soundPtr , desiredVolume );
+	}
+}
+
 void rSound::initializeSound( ) {
 	if ( !initialized ) {
 		Log::Print( "Trying to load sound from path: %s" , soundPath.c_str( ) );
@@ -58,6 +69,13 @@ void rSound::initializeSound( ) {
 		}
 
 		this->initialized = true;
+	}
+}
+
+void rSound::pauseSounds( ) {
+	std::lock_guard<std::mutex> lock( soundMutex );
+	if ( !initialized ) {
+		initializeSound( );
 	}
 }
 

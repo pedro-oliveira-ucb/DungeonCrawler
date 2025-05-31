@@ -21,6 +21,7 @@ class rSound
 {
 	std::mutex soundMutex;
 	bool initialized = false;
+	float baseVolume = 1.0f;
 
 	std::string soundPath;
 	std::vector<std::unique_ptr<Sound>> sounds;
@@ -33,5 +34,8 @@ public:
 	~rSound( );
 
 	SoundConfig config;
+	void setVolume( float volume );
 	void playSound( );
+	void pauseSounds( );
+	void setVolumePercentage( float volume );
 };

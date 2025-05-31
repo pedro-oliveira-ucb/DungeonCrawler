@@ -139,7 +139,9 @@ void entitiesHandler::updateLocalPlayer( ) {
 		localPlayer->setSprinting( false );
 
 	GVector2D localPos = localPlayer->getEntityPosition( );
-	float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , GVector2D( globals.mousePosX , globals.mousePosY ) ) );
+	GVector2D mouseWorldPos = { globals.mousePosWorldX, globals.mousePosWorldY };
+	// Calcula ângulo com base nas posições no mundo
+	float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , mouseWorldPos ) );
 
 	// Ataques do jogador
 	if ( keybindHandler::Get( ).isPressed( keybind_identifier::ATTACK_SIMPLE ) ) {

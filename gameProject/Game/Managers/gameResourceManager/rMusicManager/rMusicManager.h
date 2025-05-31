@@ -25,6 +25,8 @@ class rMusicManager : public rBaseResource
 	musicType currentMusicType = MainMenuMusic;
 	musicType oldMusicType = NoMusic;
 
+	float originalBaseVolume = 1.0f;
+	float currentBaseVolume = 1.0f;
 	float volume = 1.0f;
 	float fadeSpeed = 1.0f; // Volume por segundo
 	bool onMusicTransition = false;
@@ -46,5 +48,8 @@ public:
 	bool initialize( ) override;
 	bool playMusic( musicType musicType );
 	void updateMusic( );
+	void SetMusicVolume( float volume );
+	void pauseMusic( );
+	void resumeMusic( );
 };
 

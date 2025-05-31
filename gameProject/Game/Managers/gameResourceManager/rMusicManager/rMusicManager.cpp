@@ -36,7 +36,6 @@ bool MusicConfig::createBaseMusicConfig( std::string filename ) {
 }
 
 bool MusicConfig::generateMusicConfig( std::string filename , MusicConfig * buffer ) {
-
 	if ( !fs::exists( filename ) ) {
 		Log::Print( "[rSpritesManager] Config file not found: %s" , filename.c_str( ) );
 		if ( !createBaseMusicConfig( filename ) ) {
@@ -73,6 +72,40 @@ bool MusicConfig::generateMusicConfig( std::string filename , MusicConfig * buff
 	buffer->volume = configJson[ "volume" ].get<float>( );
 
 	return true;
+}
+
+void rMusicManager::SetMusicVolume( float volume ) {
+	std::lock_guard<std::mutex> lock( this->musicMutex );
+
+	for ( const auto & it : this->musics ) {
+		for ( int i = 0; i < it.second.size( ); ++i ) {
+			it.second.at( i ).second->setVolumePercentage( volume );
+		}
+	}
+}
+
+void rMusicManager::pauseMusic( ) {
+	std::lock_guard<std::mutex> lock( this->musicMutex );
+
+	for ( const auto & it : this->musics ) {
+		for ( int i = 0; i < it.second.size( ); ++i ) {
+			if ( it.second.at( i ).second->isPlaying( ) ) {
+				it.second.at( i ).second->pause( );
+			}
+		}
+	}
+}
+
+void rMusicManager::resumeMusic( ) {
+	std::lock_guard<std::mutex> lock( this->musicMutex );
+
+	for ( const auto & it : this->musics ) {
+		for ( int i = 0; i < it.second.size( ); ++i ) {
+			if ( it.second.at( i ).second->isPaused( ) ) {
+				it.second.at( i ).second->resume( );
+			}
+		}
+	}
 }
 
 bool rMusicManager::initialize( )

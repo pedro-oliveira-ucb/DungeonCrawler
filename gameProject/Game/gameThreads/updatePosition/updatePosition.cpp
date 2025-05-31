@@ -17,7 +17,9 @@ void updatePositionEvent::threadFunction( ) {
 	keybindHandler::Get( ).initializeKeybinds( );
 
 	while ( true ) {
-	
+		if ( globals.gamePaused )
+			continue;
+
 		entitiesHandler::Get( ).updateLocalPlayer( );
 
 		std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );
