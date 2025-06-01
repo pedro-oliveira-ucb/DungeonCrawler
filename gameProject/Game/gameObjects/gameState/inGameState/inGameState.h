@@ -18,6 +18,6 @@ private:
     void setCameraPosition( );
     bool isPaused = false;
     float zoomLevel = 0.0f;
-    int currentExitFadeAlpha = 0.0f;
+    float currentExitFadeAlpha = 0.0f;
     void exitGame( gameStateManager * manager );
 };

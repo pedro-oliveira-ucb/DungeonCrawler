@@ -1,16 +1,15 @@
 #pragma once
 #include <chrono>
 #include "gameSettings/gameSettings.h"
-#include "currentGameState/currentGameState.h"
+#include "currentGame/currentGame.h"
 
 #include "../Utils/singleton.h"
 
-#define now std::chrono::high_resolution_clock::now( )
 
 class Globals : public CSingleton<Globals>
 {
 	gameSettings settings;
-	currentGameState state;
+	currentGame game;
 
 public:
 
@@ -18,7 +17,7 @@ public:
 	int screenHeight = 1080;
 
 	gameSettings * getGameSettings( );
-	currentGameState * getCurrentGameState( );
+	currentGame * getGame( );
 
 	bool updateWindow = false;
 	bool windowInitialized = false;

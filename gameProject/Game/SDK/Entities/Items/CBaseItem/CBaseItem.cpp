@@ -24,15 +24,10 @@ void CBaseItem::applyEffect( ) {
 }
 
 void CBaseItem::Active() {
-	Log::Print( "Activating item, getting random place" );
 	GVector2D position = entitiesHandler::Get().getRandomPlaceAroundPlayer( 500 );
-	Log::Print( "Got random place, setting entity position" );
 	this->setEntityPosition( position );
-	Log::Print( "Entity position setted, activating item" );
 	this->active = true;
-	Log::Print( "Item activated, triggering active event" );
 	EventManager::Get( ).Trigger( this->GetEntityName( ) + "_active" );
-	Log::Print( "Trigged event, item actived!" );
 }
 
 bool CBaseItem::isActive( ) {

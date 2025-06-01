@@ -109,6 +109,12 @@ void rMusicManager::resumeMusic( ) {
 	}
 }
 
+musicType rMusicManager::getcurrentMusicType( ) const
+{
+	std::lock_guard<std::mutex> lock( this->musicMutex );
+	return this->currentMusicType;
+}
+
 bool rMusicManager::initialize( )
 {
 	std::vector<std::vector<fileScanResult>> FilesOnFolder = this->recursiveGetFiles( this->getPath( ) , ".wav" );
@@ -182,10 +188,28 @@ bool rMusicManager::playMusic( musicType newType , float speed ) {
 	isFadingOut = true;
 	isFadingIn = false;
 	onMusicTransition = true;
-	if ( currentBaseVolume )
-		fadeSpeed = ( currentBaseVolume / speed * 0.5 ) + ( nextSound->getBaseVolume( ) / speed * 0.5 );
-	else
+	if ( currentBaseVolume > 0.0f && speed > 0.0f ) { // Verifica se há música antiga e speed é válido
+		fadeSpeed = ( currentBaseVolume + nextSound->getBaseVolume( ) ) / speed;
+	}
+	else if ( speed > 0.0f ) { // Nenhuma música antiga, apenas fade in
 		fadeSpeed = nextSound->getBaseVolume( ) / speed;
+	}
+	else {
+		if ( currentSound ) {
+			currentSound->stop( );
+			currentSound->setVolume( 0.0f ); // Garante que o som antigo pare e fique mudo
+		}
+		currentSound = nextSound;
+		nextSound = nullptr;
+		if ( currentSound ) {
+			currentSound->play( );
+			this->volume = currentSound->getBaseVolume( ); // Ajusta o volume principal da classe
+			currentSound->setVolume( this->volume );      // Ajusta o volume do objeto de som
+		}
+		onMusicTransition = false;
+		isFadingIn = false;
+		isFadingOut = false;
+	}
 
 	return true;
 }

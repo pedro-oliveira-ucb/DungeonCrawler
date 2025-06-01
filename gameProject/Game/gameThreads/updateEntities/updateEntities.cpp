@@ -18,9 +18,9 @@ void updateEntities::threadFunction( ) {
 	Log::Print( "[updateEntities] Hello world!" );
 
 	while ( true ) {
-		currentGameStateType gameState = Globals::Get( ).getCurrentGameState( )->getCurrentGameState( );
+		currentGameState gameState = Globals::Get( ).getGame( )->getCurrentGameState( );
 
-		if ( gameState == currentGameStateType::GAME_STATE_PAUSED || gameState == currentGameStateType::GAME_STATE_NONE ) {
+		if ( gameState != currentGameState::GAME_STATE_PLAYING  ) {
 			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 			continue;
 		} 
@@ -32,8 +32,7 @@ void updateEntities::threadFunction( ) {
 		entitiesHandler::Get( ).updateEnemiesCollision( );
 
 		levelManager.updateLevel( );
-
-		std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );
+		std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
 	}
 
 	Log::Print( "[updateEntities] bye!" );

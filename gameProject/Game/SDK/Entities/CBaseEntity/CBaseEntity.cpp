@@ -1,11 +1,15 @@
 #include "CBaseEntity.h"
 
-#include "../../../Managers/collisionManager/collisionManager.h"
-#include "../../Events/EventManager.h"
-#include "../../../../Utils/Log/Log.h"
 #include <unordered_map>
 #include <set>
 #include <cmath>
+
+#include "../../../../Globals/Globals.h"
+
+#include "../../../Managers/collisionManager/collisionManager.h"
+#include "../../Events/EventManager.h"
+#include "../../../../Utils/Log/Log.h"
+
 
 
 CBaseEntity::CBaseEntity( const CBaseEntity & other ) :
@@ -190,18 +194,14 @@ void CBaseEntity::clearMovementRequest( ) {
 void CBaseEntity::move( ) {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex );
 
-	// Tempo atual
-	auto now = std::chrono::high_resolution_clock::now( );
-
-	// Calcular delta time
+	// Calcular deltaTime em segundos
 	float deltaTime = 0.0f;
-	if ( this->lastMoveTime.time_since_epoch( ).count( ) > 0 ) {
-		std::chrono::duration<float> delta = now - this->lastMoveTime;
-		deltaTime = delta.count( );
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+	if ( this->lastMoveTime != 0.0 ) {
+		deltaTime = currentGameTime - lastMoveTime;
 	}
-
-	// Atualiza o lastMoveTime
-	this->lastMoveTime = now;
+	// Atualizar lastMoveTime
+	this->lastMoveTime = currentGameTime;
 
 	// Movimento final
 	GVector2D finalMovement( 0.f , 0.f );

@@ -28,8 +28,8 @@ inGameState::~inGameState( ) {
 
 void inGameState::OnEnter( gameStateManager * manager ) {
 	Log::Print( "[inGameState]: OnEnter" );
-	Globals::Get( ).getCurrentGameState( )->setCurrentGameState( currentGameStateType::GAME_STATE_PLAYING );
-	_gameResourceManager.getMusicManager( )->playMusic( musicType::DungeonMusic, 10 );
+	Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PLAYING );
+	_gameResourceManager.getMusicManager( )->playMusic( musicType::DungeonMusic , 10 );
 
 	// Carregar recursos específicos do menu: fontes, texturas, sons
 	// Exemplo:
@@ -61,69 +61,63 @@ void inGameState::setCameraPosition( ) {
 		// Converte mouse para coordenadas do mundo
 		Vector2 mouseWorld = GetScreenToWorld2D( GetMousePosition( ) , camera );
 		GVector2D mousePosWorld( mouseWorld.x , mouseWorld.y );
-		Globals::Get().mousePosWorldX = mousePosWorld.x;
-		Globals::Get().mousePosWorldY = mousePosWorld.y;
+		Globals::Get( ).mousePosWorldX = mousePosWorld.x;
+		Globals::Get( ).mousePosWorldY = mousePosWorld.y;
 	}
 }
 
 void inGameState::HandleInput( gameStateManager * manager ) {
-	if ( IsKeyPressed( KEY_ENTER ) ) {
-		std::cout << "inGameState: ENTER pressionado, mudando para InGame" << std::endl;
-		// Exemplo de transição para o estado de jogo
-		// manager->ChangeState(new InGameSta_example()); // Cuidado com memory leak, veja GameStateManager
-	}
-	if ( IsMouseButtonPressed( MOUSE_BUTTON_LEFT ) ) {
-		Vector2 mousePos = GetMousePosition( );
-		// Lógica para verificar cliques em botões
-		// if (CheckCollisionPointRec(mousePos, playButtonRect)) {
-		//    manager->ChangeState(new InGameSta_example());
-		// }
+	if ( IsKeyPressed( KEY_ESCAPE ) ) {
+		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PAUSED );
 	}
 }
 
 void inGameState::Update( gameStateManager * manager , float deltaTime ) {
-	// Lógica de atualização do menu (animações de botões, etc.)
+
+	float EXIT_FADE_DURATION = 5;
+	float alphaIncrementThisFrame = ( 255.0f / EXIT_FADE_DURATION ) * deltaTime;
+
+	currentGameState state = Globals::Get( ).getGame( )->getCurrentGameState( );
+
+	switch ( state ) {
+	case currentGameState::GAME_STATE_PAUSED:
+		_gameResourceManager.getMusicManager( )->pauseMusic( );
+		break;
+	case currentGameState::GAME_STATE_PLAYING:
+		Globals::Get( ).getGame( )->updateCurrentGameTime( deltaTime );
+		break;
+	case currentGameState::GAME_STATE_EXIT:
+		if ( _gameResourceManager.getMusicManager( )->getcurrentMusicType( ) != musicType::MainMenuMusic )
+			_gameResourceManager.getMusicManager( )->playMusic( musicType::MainMenuMusic , EXIT_FADE_DURATION / 2 );
+
+		currentExitFadeAlpha += alphaIncrementThisFrame;
+
+		// Clamp the alpha value to a maximum of 255.0f.
+		if ( currentExitFadeAlpha > 255.0f ) {
+			currentExitFadeAlpha = 255.0f;
+			manager->ChangeState( std::make_unique<mainMenuState>( ) );
+		}
+		break;
+	default:
+
+		break;
+	}
+
+	if ( state != currentGameState::GAME_STATE_PAUSED )
+		_gameResourceManager.getMusicManager( )->resumeMusic( );
 }
 
 void inGameState::exitGame( gameStateManager * manager ) {
-
-	// Increment the alpha value.
-	currentExitFadeAlpha += 1;
-
-	// Clamp the alpha value to a maximum of 255.0f.
-	if ( currentExitFadeAlpha > 255.0f ) {
-		currentExitFadeAlpha = 255.0f;
-	}
-
 	// Prepare the color for the fade rectangle.
 	// Alpha component is cast to unsigned char, as typically expected by color structures.
 	Color col = { 0, 0, 0, static_cast< unsigned char >( currentExitFadeAlpha ) };
 
 	// Draw the fade rectangle.
 	DrawRectangle( 0 , 0 , Globals::Get( ).screenWidth , Globals::Get( ).screenHeight , col );
-
-	// Check if the fade animation is complete.
-	if ( currentExitFadeAlpha >= 255.0f ) {
-		// Optionally reset currentExitFadeAlpha to 0.0f here if this state might be re-entered
-		// and the fade needs to start fresh. This is often handled by state initialization.
-		manager->ChangeState( std::make_unique<mainMenuState>( ) );
-	}
 }
 
 
 void inGameState::Render( gameStateManager * manager ) {
-
-	if ( IsKeyPressed( KEY_ESCAPE ) ) {
-		Globals::Get( ).getCurrentGameState( )->setCurrentGameState( currentGameStateType::GAME_STATE_PAUSED );
-	}
-	bool gamePaused = Globals::Get( ).getCurrentGameState( )->isGameinState( currentGameStateType::GAME_STATE_PAUSED );
-	bool gameExit = Globals::Get( ).getCurrentGameState( )->isGameinState( currentGameStateType::GAME_STATE_EXIT );
-
-	if ( gamePaused ) {
-		_gameResourceManager.getMusicManager( )->pauseMusic( );
-	}
-	else
-		_gameResourceManager.getMusicManager( )->resumeMusic( );
 
 	// Zoom com scroll do mouse
 	zoomLevel += GetMouseWheelMove( ) * 0.1f;
@@ -139,11 +133,12 @@ void inGameState::Render( gameStateManager * manager ) {
 	EndMode2D( );
 	//renderDialogs( );
 
-	if ( gamePaused ) {
+	switch ( Globals::Get( ).getGame( )->getCurrentGameState( ) ) {
+	case currentGameState::GAME_STATE_PAUSED:
 		gameRender::Get( ).renderPauseMenu( );
-	}
-
-	if ( gameExit ) {
+		break;
+	case currentGameState::GAME_STATE_EXIT:
 		exitGame( manager );
+		break;
 	}
 }

@@ -5,7 +5,7 @@ gameSettings * Globals::getGameSettings( )
 	return &this->settings;
 }
 
-currentGameState * Globals::getCurrentGameState( )
+currentGame * Globals::getGame( )
 {
-	return &this->state;
+	return &this->game;
 }

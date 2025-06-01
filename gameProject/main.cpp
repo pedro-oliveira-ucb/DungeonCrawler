@@ -92,6 +92,8 @@ int main( void ) {
 
 			gameRender::Get( ).renderCustomCursor( );
 
+			//Log::Print( "[main] current game time: %f" , Globals::Get( ).getGame( )->getCurrentGameTime( ) );
+
 			EndDrawing( );
 		}
 		CloseWindow( );

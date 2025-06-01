@@ -7,7 +7,7 @@ class CRangedAttack : public CBaseAttack
 {
 	void otherActiveLogic( CBaseEntity * sender ) override;
 	void otherDeactiveLogic( ) override;
-	std::chrono::steady_clock::time_point lastUpdateTime;
+	double lastUpdateTime;
 
 public:
 	CRangedAttack( CBaseEntityConstructor entityBuilder ,

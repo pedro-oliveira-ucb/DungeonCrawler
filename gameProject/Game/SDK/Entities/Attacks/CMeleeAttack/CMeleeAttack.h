@@ -5,7 +5,7 @@ class CMeleeAttack : public CBaseAttack
 {
 	void otherActiveLogic( CBaseEntity * sender ) override;
 	void otherDeactiveLogic( ) override;
-	std::chrono::steady_clock::time_point lastUpdateTime;
+	double lastUpdateTime = 0.0;
 public:
 	CMeleeAttack( CBaseEntityConstructor entityBuilder, 
 		CBaseAttackConstructor attackBuilder );

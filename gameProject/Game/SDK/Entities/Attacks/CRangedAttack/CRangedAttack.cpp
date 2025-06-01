@@ -14,14 +14,14 @@ void CRangedAttack::updateEntity( ) {
 	if ( this->IsActive( ) ) {
 
 		// Calcular deltaTime em segundos
+		// Calcular deltaTime em segundos
 		float deltaTime = 0.0f;
-		if ( this->lastUpdateTime.time_since_epoch( ).count( ) > 0 ) {
-			std::chrono::duration<float> delta = now - this->lastUpdateTime;
-			deltaTime = delta.count( );
+		double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+		if ( this->lastUpdateTime != 0.0 ) {
+			deltaTime = currentGameTime - lastUpdateTime;
 		}
-
 		// Atualizar lastUpdateTime
-		this->lastUpdateTime = now;
+		this->lastUpdateTime = currentGameTime;
 
 		float angleRad = this->getLookingAngle( ).getRadians( );
 		float speed = this->getSpeed( ); // unidades por segundo

@@ -41,11 +41,11 @@ void renderPauseMenu::render( ) {
 	Rectangle soundSlider = { boxTopLeft.x + spacing, y, contentWidth, 20 };
 
 	if ( components::Get().DrawButton( continueBtn , "Continuar" , LIGHTGRAY , DARKGRAY ) ) {
-		Globals::Get( ).getCurrentGameState( )->setCurrentGameState( currentGameStateType::GAME_STATE_PLAYING );
+		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PLAYING );
 	}
 
 	if ( components::Get( ).DrawButton( quitBtn , "Sair do jogo" , LIGHTGRAY , DARKGRAY ) ) {
-		Globals::Get( ).getCurrentGameState( )->setCurrentGameState( currentGameStateType::GAME_STATE_EXIT );
+		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_EXIT );
 	}
 
 	float musicVolume = Globals::Get( ).getGameSettings( )->getMusicVolume( );

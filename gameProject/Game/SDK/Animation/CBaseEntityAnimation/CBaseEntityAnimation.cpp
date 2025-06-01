@@ -1,6 +1,8 @@
 #include "CBaseEntityAnimation.h"
 #include <mutex>
 
+#include "../../../../Globals/Globals.h"
+
 #include "../../../../Utils/Log/Log.h"
 
 CBaseEntityAnimation::CBaseEntityAnimation( const CBaseEntityAnimation & other ) {
@@ -10,8 +12,8 @@ CBaseEntityAnimation::CBaseEntityAnimation( const CBaseEntityAnimation & other )
 	this->currentAnimationStep = 0;
 	this->timeSinceLastFrame = 0.0f;
 	this->animationState = AnimationState::PLAYING;
-	this->lastUpdateTime = std::chrono::steady_clock::now( );
-	this->lastUpdateTime = std::chrono::steady_clock::now( );
+	this->lastUpdateTime = 0.0;
+	this->lastUpdateTime = 0.0;
 	setCurrentAnimationType( other.currentAnimationType , true );
 }
 
@@ -41,7 +43,7 @@ CBaseEntityAnimationType CBaseEntityAnimation::getCurrentAnimationType( ) {
 	return this->currentAnimationType;
 }
 
-void CBaseEntityAnimation::setAnimationStep(int step ){
+void CBaseEntityAnimation::setAnimationStep( int step ) {
 	std::lock_guard<std::mutex> lock( animationMutex );
 	if ( currentAnimation && step >= 0 && step < currentAnimation->size( ) ) {
 		currentAnimationStep = step;
@@ -51,9 +53,12 @@ void CBaseEntityAnimation::setAnimationStep(int step ){
 }
 
 void CBaseEntityAnimation::updateAnimation( bool loop , bool reverse ) {
-	auto currentTime = std::chrono::steady_clock::now( );
-	float deltaTime = std::chrono::duration<float>( currentTime - lastUpdateTime ).count( );
-	lastUpdateTime = currentTime;
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+	double deltaTime = 0.0f;
+	if ( lastUpdateTime != 0.0 )
+		deltaTime = currentGameTime - lastUpdateTime;
+
+	lastUpdateTime = currentGameTime;
 
 	// Chama a implementação com deltaTime calculado
 	updateAnimationWithDeltaTime( deltaTime , loop , reverse );
@@ -210,8 +215,8 @@ CBaseAnimationGroupType getAnimationGroup( CBaseEntityAnimationType anim ) {
 	case RUNNING_FORWARD: case RUNNING_BACKWARD: case RUNNING_LEFT: case RUNNING_RIGHT:
 		return GROUP_RUNNING;
 
-	case ATTACKING_FORWARD: case ATTACKING_BACKWARD: case ATTACKING_LEFT: case ATTACKING_RIGHT:	
-	case ATTACKING_WALKING_FORWARD: case ATTACKING_WALKING_BACKWARD: case ATTACKING_WALKING_LEFT: case ATTACKING_WALKING_RIGHT: 
+	case ATTACKING_FORWARD: case ATTACKING_BACKWARD: case ATTACKING_LEFT: case ATTACKING_RIGHT:
+	case ATTACKING_WALKING_FORWARD: case ATTACKING_WALKING_BACKWARD: case ATTACKING_WALKING_LEFT: case ATTACKING_WALKING_RIGHT:
 	case ATTACKING_RUNNING_FORWARD: case ATTACKING_RUNNING_BACKWARD: case ATTACKING_RUNNING_LEFT: case ATTACKING_RUNNING_RIGHT:
 		return GROUP_ATTACKING;
 
@@ -239,14 +244,14 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 	}
 
 	auto it = animations.find( animationType );
-	if ( it != animations.end( ) && it->second.get() != nullptr ) {
+	if ( it != animations.end( ) && it->second.get( ) != nullptr ) {
 		this->currentAnimationType = animationType;
 		if ( this->isDifferentAnimationType( this->currentAnimationType , animationType ) ) {
 			this->currentAnimationStep = 0;
 			this->timeSinceLastFrame = 0.0f;
 			this->animationState = AnimationState::PLAYING;
 		}
-		else if ( this->currentAnimation != nullptr && this->currentAnimation->size() != it->second->size() ) {
+		else if ( this->currentAnimation != nullptr && this->currentAnimation->size( ) != it->second->size( ) ) {
 			//update frame step on equal animations
 			float CurrentFramePercentage = ( this->currentAnimationStep / this->currentAnimation->size( ) );
 			int correctedFrameStep = static_cast< int >( CurrentFramePercentage * it->second->size( ) );

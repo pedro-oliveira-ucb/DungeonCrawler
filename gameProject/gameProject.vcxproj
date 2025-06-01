@@ -141,7 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Globals\currentGameState\currentGameState.cpp" />
+    <ClCompile Include="Globals\currentGame\currentGame.cpp" />
     <ClCompile Include="Globals\gameSettings\gameSettings.cpp" />
     <ClCompile Include="Game\gameRender\components\components.cpp" />
     <ClCompile Include="Game\gameObjects\gameState\gameState.cpp" />
@@ -213,7 +213,7 @@
     <ClCompile Include="Game\gameResources\gameResource\rShader\vignetteShader\vignetteShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Globals\currentGameState\currentGameState.h" />
+    <ClInclude Include="Globals\currentGame\currentGame.h" />
     <ClInclude Include="Globals\gameSettings\gameSettings.h" />
     <ClInclude Include="Game\gameRender\components\components.h" />
     <ClInclude Include="Game\gameObjects\gameState\gameState.h" />

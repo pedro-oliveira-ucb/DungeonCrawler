@@ -18,9 +18,9 @@ void enemiesController::threadFunction( ) {
 	CPlayerEntity * player = entitiesHandler::Get( ).getLocalPlayer( );
 
 	while ( true ) {
-		currentGameStateType gameState = Globals::Get( ).getCurrentGameState( )->getCurrentGameState( );
+		currentGameState gameState = Globals::Get( ).getGame( )->getCurrentGameState( );
 
-		if ( gameState == currentGameStateType::GAME_STATE_PAUSED || gameState == currentGameStateType::GAME_STATE_NONE ) {
+		if ( gameState != currentGameState::GAME_STATE_PLAYING ) {
 			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 			continue;
 		}
@@ -32,8 +32,7 @@ void enemiesController::threadFunction( ) {
 
 
 		entitiesHandler::Get( ).updateSpawnedEnemies( player );
-
-		std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );
+		std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
 	}
 
 	Log::Print( "[enemiesController] bye!" );

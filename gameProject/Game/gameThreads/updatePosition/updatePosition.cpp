@@ -16,16 +16,16 @@ void updatePositionEvent::threadFunction( ) {
 	keybindHandler::Get( ).initializeKeybinds( );
 
 	while ( true ) {
-		currentGameStateType gameState = Globals::Get( ).getCurrentGameState( )->getCurrentGameState( );
+		currentGameState gameState = Globals::Get( ).getGame( )->getCurrentGameState( );
 
-		if ( gameState == currentGameStateType::GAME_STATE_PAUSED || gameState == currentGameStateType::GAME_STATE_NONE ) {
+		if ( gameState != currentGameState::GAME_STATE_PLAYING ) {
 			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 			continue;
 		}
 
 		entitiesHandler::Get( ).updateLocalPlayer( );
 
-		std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );
+		std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
 	}
 
 	Log::Print( "[updatePositionEvent] bye!" );

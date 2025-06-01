@@ -88,7 +88,7 @@ class CBaseEntity {
     bool beingHit = false;
     bool finishedDeathAnimation = false;
     bool sprinting = false;
-    std::chrono::steady_clock::time_point lastMoveTime;
+    double lastMoveTime;
 
 public:
 

@@ -23,7 +23,8 @@ shadersInitializer _shadersInitializer;
 bool gameInitializer::initializeEvents( ) {
 
 	std::vector<std::string> eventsNames {
-		"dialog_Update"
+		"dialog_Update",
+		"menu_gameStart"
 	};
 
 	for ( std::string event : eventsNames ) {

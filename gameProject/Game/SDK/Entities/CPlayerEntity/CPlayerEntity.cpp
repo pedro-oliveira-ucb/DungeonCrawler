@@ -26,6 +26,7 @@ CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder , std::unordered_ma
 		return;
 
 	float minAttackDis = 999999;
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
 
 	for ( auto it = this->attacks.begin( ); it != this->attacks.end( ); ++it ) {
 		if ( it->second->getRange( ) < minAttackDis ) {
@@ -33,7 +34,7 @@ CPlayerEntity::CPlayerEntity( CBaseEntityConstructor builder , std::unordered_ma
 		}
 		this->availableAttacksInternal.emplace_back( it->second->getAttackType( ) );
 
-		this->attackUseTime.emplace( it->first , now );
+		this->attackUseTime.emplace( it->first , currentGameTime );
 	}
 
 	this->minimumAttackDistance = minAttackDis;
@@ -52,13 +53,15 @@ void CPlayerEntity::initializePlayerAttacks( ) {
 	std::lock_guard<std::mutex> lock( localPlayerMutex );
 	float minAttackDis = 999999;
 
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+
 	for ( auto it = this->attacks.begin( ); it != this->attacks.end( ); ++it ) {
 		if ( it->second->getRange( ) < minAttackDis ) {
 			minAttackDis = it->second->getRange( );
 		}
 		this->availableAttacksInternal.emplace_back( it->second->getAttackType( ) );
 
-		this->attackUseTime.emplace( it->first , now );
+		this->attackUseTime.emplace( it->first , currentGameTime );
 	}
 
 	this->minimumAttackDistance = minAttackDis;
@@ -75,11 +78,12 @@ void CPlayerEntity::UseAttack( CBaseAttackType attack ) {
 	if ( this->attackUseTime.find( attack ) == this->attackUseTime.end( ) )
 		return;
 
-	auto lastUse = this->attackUseTime.at( attack );
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+	double lastUse = this->attackUseTime.at( attack );
 	// Calcula delta time em segundos
-	std::chrono::duration<float> delta = now - lastUse;
+	double delta = currentGameTime - lastUse;
 
-	if ( delta.count( ) < this->attacks.at( attack )->getCooldown( ) ) {
+	if ( delta < this->attacks.at( attack )->getCooldown( ) ) {
 		return;
 	}
 
@@ -98,38 +102,22 @@ void CPlayerEntity::UseAttack( CBaseAttackType attack ) {
 }
 
 void CPlayerEntity::updateAnimationCycles( ) {
-	// Detecta o início de uma animação de ataque
-	if ( this->inAttackLoadingAnimation && !( previousEntityState & CBaseEntityState::ATTACKING ) ) {
-		this->AnimationCycleOnAttackInit = this->getEntityAnimations( )->getAnimationCycle( );
-	}
-
-	// Detecta quando o jogador começa a receber dano
-	if ( this->isBeingHit( ) && !( previousEntityState & CBaseEntityState::HURT ) ) {
-		this->AnimationCycleOnHurtInit = this->getEntityAnimations( )->getAnimationCycle( );
-	}
+	
 }
 
 void CPlayerEntity::updateMovementSounds( ) {
 	// Emite eventos de som de passos quando o jogador está em movimento
 	if ( ( previousEntityState & CBaseEntityState::MOVING ) || ( previousEntityState & CBaseEntityState::RUNNING ) ) {
 		bool running = ( previousEntityState & CBaseEntityState::RUNNING );
-		int stepTrigger = running ? 15 : 16;
+		double stepTrigger = running ? 0.5 : 0.8;
 
-		if ( this->AnimationCycleOnStep != this->getEntityAnimations( )->getAnimationCycle( ) ) {
-			this->AnimationCycleOnStep = this->getEntityAnimations( )->getAnimationCycle( );
+		double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+		double deltaTime = currentGameTime - this->lastStepSoundTime;
+
+		if ( deltaTime > stepTrigger ) {
+			this->lastStepSoundTime = currentGameTime;
+			EventManager::Get( ).Trigger( this->GetEntityName( ) + "_walking" );
 		}
-		else {
-			if ( this->AnimationCycleSinceLastStep <= stepTrigger ) {
-				this->AnimationCycleSinceLastStep++;
-			}
-			else {
-				EventManager::Get( ).Trigger( this->GetEntityName( ) + "_walking" );
-				this->AnimationCycleSinceLastStep = 0;
-			}
-		}
-	}
-	else {
-		this->AnimationCycleSinceLastStep = 0;
 	}
 }
 
@@ -213,15 +201,14 @@ bool CPlayerEntity::handleAttackState( std::uint32_t & state ) {
 	// Finaliza o estado de ataque quando a animação termina
 	if ( !attackAnimationEnded ) {
 		state |= CBaseEntityState::ATTACKING;
-		loopAnimation = false;
 	}
 	else {
 		this->inAttackLoadingAnimation = false;
 		this->alreadyThrowedAttack = false;
-		this->attackUseTime.at( this->currentLoadingAttack ) = now;
+		this->attackUseTime.at( this->currentLoadingAttack ) = Globals::Get( ).getGame( )->getCurrentGameTime( );
 	}
 
-
+	loopAnimation = false;
 	return sentAttack;
 }
 

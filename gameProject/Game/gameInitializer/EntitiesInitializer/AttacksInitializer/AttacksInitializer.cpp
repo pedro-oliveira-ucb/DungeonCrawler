@@ -123,11 +123,11 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 
 	CBaseAttackConstructor attackBuilder;
 	{
-		attackBuilder.damage = 20;
+		attackBuilder.damage = 100;
 		attackBuilder.delay = .5f;
-		attackBuilder.cooldown = 0.2f;
+		attackBuilder.cooldown = 1.0f;
 		attackBuilder.range = 30.f;
-		attackBuilder.speed = 30;
+		attackBuilder.speed = 30.f;
 		attackBuilder.type = CBaseAttackType_Melee;
 		attackBuilder.Name = "MeleeAttack";
 		//attack damage area

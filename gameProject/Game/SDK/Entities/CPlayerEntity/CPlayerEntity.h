@@ -12,7 +12,7 @@
 class CPlayerEntity : public CBaseEntity {
 
     std::unordered_map<CBaseAttackType, std::shared_ptr<CBaseAttack>> attacks; // Lista de ataques do jogador
-	std::unordered_map<CBaseAttackType , std::chrono::steady_clock::time_point> attackUseTime; // Lista de ciclos de animação dos ataques do jogador
+	std::unordered_map<CBaseAttackType , double> attackUseTime; // Lista de ciclos de animação dos ataques do jogador
 
     bool inAttackLoadingAnimation = false;
     bool alreadyThrowedAttack = false;
@@ -20,11 +20,9 @@ class CPlayerEntity : public CBaseEntity {
     CBaseAttackType currentLoadingAttack;
     int AnimationCycleOnAttackInit = -1;
     int lastTimeAttacking = -1;
+    double lastStepSoundTime = -1;
 
-    int AnimationCycleOnHurtInit = -1;
-    int AnimationCycleOnStep = -1;
-
-    int AnimationCycleSinceLastStep = 0;
+    double AnimationCycleSinceLastStep = 0;
 
 
     DIRECTION localDirection;

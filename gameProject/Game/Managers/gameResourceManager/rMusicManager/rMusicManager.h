@@ -18,7 +18,7 @@ enum musicType
 
 class rMusicManager : public rBaseResource
 {
-	std::mutex musicMutex;
+	mutable std::mutex musicMutex;
 
 	std::unordered_map<musicType , std::vector<std::pair<std::string, std::unique_ptr<rMusic>>>> musics;
 	int currentPlayingSound = -1;
@@ -45,6 +45,7 @@ public:
 	rMusicManager( rMusicManager && ) = delete;
 	rMusicManager & operator=( rMusicManager && ) = delete;
 
+	musicType getcurrentMusicType( ) const;
 	bool initialize( ) override;
 	bool playMusic( musicType musicType, float fadeSpeed );
 	void updateMusic( );

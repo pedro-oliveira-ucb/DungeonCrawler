@@ -74,7 +74,7 @@ class CBaseEntityAnimation {
 	std::mutex animationMutex;
 	std::unordered_map<CBaseEntityAnimationType , std::shared_ptr<rSpriteAnimation>> animations;
 	std::shared_ptr<rSpriteAnimation> currentAnimation;
-	std::chrono::steady_clock::time_point lastUpdateTime;
+	double lastUpdateTime = 0.0;
 
 	GVector2D spriteSize;
 	int animationFPS = 10;
@@ -83,7 +83,7 @@ class CBaseEntityAnimation {
 	void * texture;
 
 	int animationCycle = 0;
-	float timeSinceLastFrame = 0.0f;
+	double timeSinceLastFrame = 0.0f;
 	bool playingReverse = false;
 	bool looping = true;
 	AnimationState animationState = AnimationState::PLAYING;

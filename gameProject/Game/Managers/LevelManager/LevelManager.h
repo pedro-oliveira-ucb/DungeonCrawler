@@ -11,7 +11,7 @@ struct LevelEnemySpawnerData {
 	int RespawnCount;
     int RespawnTimer = 10;
 	int respawnedCount = 0; // Contador de inimigos ressuscitados
-    std::chrono::steady_clock::time_point timeSinceLastRespawn;
+    double lastRespawnTime;
 };
 
 struct LevelData {
@@ -30,7 +30,7 @@ private:
 
     bool started = false;
     int respawnCount = 0;
-    std::chrono::steady_clock::time_point respawnTimer;
+    double respawnTimer;
 
     // Mutex para proteger as variáveis acima
     std::mutex managerMutex;

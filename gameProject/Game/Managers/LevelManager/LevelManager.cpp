@@ -20,19 +20,21 @@ void LevelManager::generateLevel1( ) {
 
 	std::lock_guard<std::mutex> lock( managerMutex );
 	//LEVEL 1
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+
 	LevelEnemySpawnerData basicMeleeEnemySpawner;
 	basicMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY;
 	basicMeleeEnemySpawner.SpawnCount = 10;
 	basicMeleeEnemySpawner.RespawnCount = 5;
 	basicMeleeEnemySpawner.RespawnTimer = 5;
-	basicMeleeEnemySpawner.timeSinceLastRespawn = now;
+	basicMeleeEnemySpawner.lastRespawnTime = currentGameTime;
 
 	LevelEnemySpawnerData mediumMeleeEnemySpawner;
 	mediumMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY_MEDIUM;
 	mediumMeleeEnemySpawner.SpawnCount = 5;
 	mediumMeleeEnemySpawner.RespawnCount = 5;
 	mediumMeleeEnemySpawner.RespawnTimer = 10;
-	mediumMeleeEnemySpawner.timeSinceLastRespawn = now;
+	mediumMeleeEnemySpawner.lastRespawnTime = currentGameTime;
 
 	LevelData level;
 	level.levelNumber = 1;
@@ -46,19 +48,22 @@ void LevelManager::generateLevel1( ) {
 void LevelManager::generateLevel2( ) {
 	std::lock_guard<std::mutex> lock( managerMutex );
 	//LEVEL 1
+	//LEVEL 1
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+
 	LevelEnemySpawnerData basicMeleeEnemySpawner;
 	basicMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY;
 	basicMeleeEnemySpawner.SpawnCount = 10;
 	basicMeleeEnemySpawner.RespawnCount = 5;
 	basicMeleeEnemySpawner.RespawnTimer = 5;
-	basicMeleeEnemySpawner.timeSinceLastRespawn = now;
+	basicMeleeEnemySpawner.lastRespawnTime = currentGameTime;
 
 	LevelEnemySpawnerData mediumMeleeEnemySpawner;
 	mediumMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY_MEDIUM;
 	mediumMeleeEnemySpawner.SpawnCount = 5;
 	mediumMeleeEnemySpawner.RespawnCount = 5;
 	mediumMeleeEnemySpawner.RespawnTimer = 10;
-	mediumMeleeEnemySpawner.timeSinceLastRespawn = now;
+	mediumMeleeEnemySpawner.lastRespawnTime = currentGameTime;
 
 	LevelData level;
 	level.levelNumber = 1;
@@ -118,10 +123,11 @@ bool LevelManager::canRespawn( CEnemyType enemyType ) {
 
 	bool canRespawn = false;
 
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+
 	if ( enemySpawnHandler.respawnedCount < enemySpawnHandler.RespawnCount ) {
-		auto lastUse = enemySpawnHandler.timeSinceLastRespawn;
-		std::chrono::duration<float> delta = now - lastUse;
-		if ( delta.count( ) >= enemySpawnHandler.RespawnTimer ) {
+		double delta = currentGameTime - enemySpawnHandler.lastRespawnTime;
+		if ( delta >= enemySpawnHandler.RespawnTimer ) {
 			canRespawn = true;
 		}
 	}
@@ -134,6 +140,7 @@ void LevelManager::updateEnemies( ) {
 
 	// Calcula delta time em segundos
 	auto & currentLevel = levels[ currentLevelIndex ];
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
 
 	for ( auto it = enemies.begin( ); it != enemies.end( ); ++it ) {
 		auto & enemySpawnHandler = currentLevel.enemySpawners.at( it->first );
@@ -144,7 +151,7 @@ void LevelManager::updateEnemies( ) {
 					enemy->setEntityPosition( entitiesHandler::Get( ).getRandomPlaceAroundPlayer( 850 ) );
 					enemy->Respawn( );
 					enemySpawnHandler.respawnedCount++;
-					enemySpawnHandler.timeSinceLastRespawn = now;
+					enemySpawnHandler.lastRespawnTime = currentGameTime;
 					break;
 				}
 			}
