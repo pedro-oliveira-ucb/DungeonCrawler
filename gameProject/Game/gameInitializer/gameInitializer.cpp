@@ -10,6 +10,7 @@
 #include "../../../../Utils/Log/Log.h"
 
 #include "EntitiesInitializer/EntitiesInitializer.h"
+#include "ShadersInitializer/shadersInitializer.h"
 
 
 gameResourceManager _gameResourceManager;
@@ -17,34 +18,10 @@ gameWindow _gameWindow;
 gameThreads _gameThreads;
 
 EntitiesInitializer _entitiesInitializer;
-
-bool gameInitializer::initializeResources( ) {
-	if ( !_gameResourceManager.initialize( "resources" ) ) {
-		Log::Print( "[gameInitializer] gameResourceManager failed to initialize!" );
-		return false;
-	}
-
-	Log::Print( "[gameInitializer] assets initialized!" );
-
-	if ( !_entitiesInitializer.initialize(  ) ) {
-		Log::Print( "[gameInitializer] EntitiesInitializer failed to initialize!" );
-		return false;
-	}
-
-	Log::Print( "[gameInitializer] entities initialized!" );
-
-	if ( !initializeEvents( ) ) {
-		Log::Print( "[gameInitializer] EventsInitializer failed to initialize!" );
-		return false;
-	}
-
-	Log::Print( "[gameInitializer] entities initialized!" );
-
-	return true;
-}
+shadersInitializer _shadersInitializer;
 
 bool gameInitializer::initializeEvents( ) {
-	
+
 	std::vector<std::string> eventsNames {
 		"dialog_Update"
 	};
@@ -63,6 +40,44 @@ bool gameInitializer::initializeEvents( ) {
 	return true;
 }
 
+
+bool gameInitializer::initializeResources( ) {
+	if ( !_gameResourceManager.initialize( "resources" ) ) {
+		Log::Print( "[gameInitializer] gameResourceManager failed to initialize!" );
+		return false;
+	}
+	Log::Print( "[gameInitializer] assets initialized!" );
+
+
+	if ( !_shadersInitializer.initialize( ) ) {
+		Log::Print( "[gameInitializer] shadersInitializer failed to initialize!" );
+		return false;
+	}
+	Log::Print( "[gameInitializer] shaders initialized!" );
+
+
+	if ( !_entitiesInitializer.initialize(  ) ) {
+		Log::Print( "[gameInitializer] EntitiesInitializer failed to initialize!" );
+		return false;
+	}
+	Log::Print( "[gameInitializer] entities initialized!" );
+
+
+	if ( !initializeEvents( ) ) {
+		Log::Print( "[gameInitializer] EventsInitializer failed to initialize!" );
+		return false;
+	}
+	Log::Print( "[gameInitializer] entities initialized!" );
+
+
+	if ( !initializeEvents( ) ) {
+		Log::Print( "[gameInitializer] EventsInitializer failed to initialize!" );
+		return false;
+	}
+	Log::Print( "[gameInitializer] entities initialized!" );
+
+	return true;
+}
 
 bool gameInitializer::initializeThreads( ) {
 	return _gameThreads.deploy( );

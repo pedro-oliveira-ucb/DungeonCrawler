@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameResources\gameResource\rShader\fogShader\fogShader.cpp" />
     <ClCompile Include="Game\SDK\Entities\Traps\CSpikeTrap\CSpikeTrap.cpp" />
     <ClCompile Include="Game\SDK\Entities\Traps\CBaseTrap\CBaseTrap.cpp" />
     <ClCompile Include="Game\SDK\Entities\Items\CHealthItem\CHealthItem.cpp" />
@@ -191,6 +192,8 @@
     <ClCompile Include="Game\Managers\gameResourceManager\rMapManager\rMapManager.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\TrapsInitializer\TrapsInitializer.cpp" />
     <ClCompile Include="Game\Handlers\trapsHandler\trapsHandler.cpp" />
+    <ClCompile Include="Game\Handlers\shadersHandler\shadersHandler.cpp" />
+    <ClCompile Include="Game\gameInitializer\ShadersInitializer\shadersInitializer.cpp" />
     <ClCompile Include="Utils\utils.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
@@ -199,8 +202,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game\gameThreads\updatePosition\updatePosition.cpp" />
     <ClCompile Include="Game\SDK\math\Vector2D\GVector2D.cpp" />
+    <ClCompile Include="Game\gameResources\gameResource\rShader\vignetteShader\vignetteShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\gameResources\gameResource\rShader\fogShader\fogShader.h" />
     <ClInclude Include="Game\SDK\Entities\Traps\CSpikeTrap\CSpikeTrap.h" />
     <ClInclude Include="Game\SDK\Entities\Traps\CBaseTrap\CBaseTrap.h" />
     <ClInclude Include="Game\SDK\Entities\Items\CHealthItem\CHealthItem.h" />
@@ -253,6 +258,8 @@
     <ClInclude Include="Game\Managers\gameResourceManager\rMapManager\rMapManager.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\TrapsInitializer\TrapsInitializer.h" />
     <ClInclude Include="Game\Handlers\trapsHandler\trapsHandler.h" />
+    <ClInclude Include="Game\Handlers\shadersHandler\shadersHandler.h" />
+    <ClInclude Include="Game\gameInitializer\ShadersInitializer\shadersInitializer.h" />
     <ClInclude Include="Utils\utils.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />
@@ -261,6 +268,10 @@
     <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h" />
     <ClInclude Include="Game\SDK\math\Vector2D\GVector2D.h" />
     <ClInclude Include="Utils\singleton.h" />
+    <ClInclude Include="Game\gameResources\gameResource\rShader\vignetteShader\vignetteShader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="glsl assets\shaders\fog.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

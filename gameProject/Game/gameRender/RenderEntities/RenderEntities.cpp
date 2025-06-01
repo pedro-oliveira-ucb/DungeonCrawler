@@ -45,6 +45,28 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 	float baseAngle = entity->getEntityLookingDirectionBaseAngle( );
 	float lookingAngleDeg = entity->getLookingAngle( ).getDegrees( );
 
+	// calcula percentagem de vida [0..1]
+	float maxH = float( entity->getMaxHealth( ) );
+	float currH = float( entity->getHealth( ) );
+	float ratio = currH / maxH;  // 1.0 = cheio, 0.0 = vazio
+
+	// interpola R e G (B fica 0)
+	unsigned char R = unsigned char( ( 1.0f - ratio ) * 255.0f ); // vai de 0 → 255
+	unsigned char G = unsigned char( ratio * 255.0f );          // vai de 255 → 0
+
+	Color healthColor = { R, G, 0, 255 };
+
+	// dimensões da barra
+	int barWidth = 5;
+	int fullH = size.y;
+
+	// posição do canto superior esquerdo da barra (supondo pos no centro da entidade)
+	int barX = ( int ) pos.x + ( int ) size.x / 2 + 5;
+	int barY = int( pos.y ) - fullH / 2;
+
+	// altura da parte preenchida
+	int lifeH = int( ratio * fullH );
+
 	switch ( entity->getEntityType( ) ) {
 	case CBaseEntityType::ATTACK:
 		rotationAngle = lookingAngleDeg - 90;
@@ -52,6 +74,28 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 	case CBaseEntityType::ITEM:
 	case CBaseEntityType::TRAP:
 		rotationAngle = 0;
+		break;
+	case CBaseEntityType::MOB:
+
+		// desenha a parte “cheia” com a cor interpolada
+		DrawRectangle(
+			barX ,
+			barY + ( fullH - lifeH ) ,
+			barWidth ,
+			lifeH ,
+			healthColor
+		);
+
+		// borda fixa
+		DrawRectangleLines(
+			barX ,
+			barY ,
+			barWidth ,
+			fullH ,
+			BLACK
+		);
+
+		rotationAngle = math::AngleDiff( lookingAngleDeg , baseAngle );
 		break;
 	default:
 		rotationAngle = math::AngleDiff( lookingAngleDeg , baseAngle );
@@ -105,46 +149,7 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 			BLUE
 		);
 
-		// calcula percentagem de vida [0..1]
-		float maxH = float( entity->getMaxHealth( ) );
-		float currH = float( entity->getHealth( ) );
-		float ratio = currH / maxH;  // 1.0 = cheio, 0.0 = vazio
-
-		// interpola R e G (B fica 0)
-		unsigned char R = unsigned char( ( 1.0f - ratio ) * 255.0f ); // vai de 0 → 255
-		unsigned char G = unsigned char( ratio * 255.0f );          // vai de 255 → 0
-
-		Color healthColor = { R, G, 0, 255 };
-
-		// dimensões da barra
-		int barWidth = 5;
-		int fullH = size.y;
-
-		// posição do canto superior esquerdo da barra (supondo pos no centro da entidade)
-		int barX = (int)pos.x + (int)size.x / 2 + 5;
-		int barY = int(pos.y) - fullH / 2;
-
-		// altura da parte preenchida
-		int lifeH = int( ratio * fullH );
-
-		// desenha a parte “cheia” com a cor interpolada
-		DrawRectangle(
-			barX ,
-			barY + ( fullH - lifeH ) ,
-			barWidth ,
-			lifeH ,
-			healthColor
-		);
-
-		// borda fixa
-		DrawRectangleLines(
-			barX ,
-			barY ,
-			barWidth ,
-			fullH ,
-			BLACK
-		);
-
+	
 		//Moving angle
 		DrawLine(
 			pos.x ,

@@ -79,28 +79,30 @@ void entitiesHandler::updateSpawnedEnemies( CPlayerEntity * localPlayer ) {
 		GVector2D myPos = entity->getEntityPosition( );
 		GVector2D toPlayer = playerPos - myPos;
 
-		float angle = atan2( toPlayer.y , toPlayer.x ) * 180.0f / 3.14159265f;
-		float distance = calcularDistancia( myPos , playerPos );
-		entity->setLookingAngle( angle );
-		float minimumDistanceToAttack = 0.0f;
-		entity->getMinimumDistanceToAttack( &minimumDistanceToAttack );
+		if ( localPlayer->isAlive( ) ) {
+			float angle = atan2( toPlayer.y , toPlayer.x ) * 180.0f / 3.14159265f;
+			float distance = calcularDistancia( myPos , playerPos );
+			entity->setLookingAngle( angle );
+			float minimumDistanceToAttack = 0.0f;
+			entity->getMinimumDistanceToAttack( &minimumDistanceToAttack );
 
-		if ( distance > minimumDistanceToAttack + 10 ) {
-			GVector2D bestDir = CEnemyEntity::findBestDirectionToPlayer( entity , toPlayer );
-			if ( bestDir.x != 0 ) {
-				entity->addMoveRequest( bestDir.x > 0 ? MOVEMENT_RIGHT : MOVEMENT_LEFT );
+			if ( distance > minimumDistanceToAttack + 10 ) {
+				GVector2D bestDir = CEnemyEntity::findBestDirectionToPlayer( entity , toPlayer );
+				if ( bestDir.x != 0 ) {
+					entity->addMoveRequest( bestDir.x > 0 ? MOVEMENT_RIGHT : MOVEMENT_LEFT );
+				}
+
+				if ( bestDir.y != 0 ) {
+					entity->addMoveRequest( bestDir.y > 0 ? MOVEMENT_BACKWARD : MOVEMENT_FORWARD );
+				}
 			}
+			else {
+				std::vector<CBaseAttackType> availableAttacks = entity->getAvailableAttacks( );
+				if ( availableAttacks.empty( ) )
+					continue;
 
-			if ( bestDir.y != 0 ) {
-				entity->addMoveRequest( bestDir.y > 0 ? MOVEMENT_BACKWARD : MOVEMENT_FORWARD );
+				entity->UseAttack( availableAttacks.at( 0 ) );
 			}
-		}
-		else {
-			std::vector<CBaseAttackType> availableAttacks = entity->getAvailableAttacks( );
-			if ( availableAttacks.empty( ) )
-				continue;
-
-			entity->UseAttack( availableAttacks.at( 0 ) );
 		}
 
 		entity->updateEntity( );

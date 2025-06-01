@@ -22,6 +22,7 @@ void CollisionManager::UpdateEntities( std::vector<CBaseEntity *> entities ) {
 		spatialGrid[ cell ].insert( entity );
 	}
 }
+
 std::vector<CBaseEntity *> CollisionManager::GetNearbyEntities( const GVector2D & pos ) {
 	std::vector<CBaseEntity *> result;
 	std::lock_guard<std::mutex> lock( mutex );
@@ -64,7 +65,6 @@ bool CollisionManager::checkSpacialCollision( CBaseEntity * a , GVector2D Positi
 		Position.y < posB.y + sizeB.y &&
 		Position.y + Size.y > posB.y );
 }
-
 
 bool CollisionManager::CanMoveTo( CBaseEntity * entity , GVector2D & newPos ) {
 	auto nearby = GetNearbyEntities( newPos );

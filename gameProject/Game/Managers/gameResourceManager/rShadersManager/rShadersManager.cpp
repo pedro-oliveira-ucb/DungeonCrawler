@@ -77,23 +77,23 @@ bool rShadersManager::loadShader( const std::string & name )
 
 	bool fs = false;
 
-	std::string shaderFilePath;
+	std::string VSshaderFilePath;
+	std::string FSshaderFilePath;
 	for ( const auto & entry : fs::directory_iterator( clipPath ) ) {
 		if ( !entry.is_regular_file( ) ) continue;
 
-		if ( entry.path( ).extension( ) != ".fs" ) {
-			fs = false;
-			if(entry.path().extension() != ".vs") {
-				continue;
-			}
+		if ( entry.path( ).extension( ) == ".fs" ) {
+			FSshaderFilePath = entry.path( ).string( );
+			continue;
 		}
-		// only load .fs and .vs files
-		const std::string filename = entry.path( ).string( );
-		shaderFilePath = filename;
-		break;
+
+		if ( entry.path( ).extension( ) == ".vs" ) {
+			VSshaderFilePath = entry.path( ).string( );
+			continue;
+		}
 	}
 
-	if ( shaderFilePath.empty( ) ) {
+	if ( FSshaderFilePath.empty( ) || VSshaderFilePath.empty() ) {
 		Log::Print( "[rShadersManager] No shader file found in %s!" , clipPath.string( ).c_str( ) );
 		return false;
 	}
@@ -104,36 +104,20 @@ bool rShadersManager::loadShader( const std::string & name )
 	std::replace( relativePath.begin( ) , relativePath.end( ) , '\\' , '_' );
 
 	// Exemplo simples de load com caminhos fixos
-	rShaderConfig cfg { fs ? "" : shaderFilePath, fs ? shaderFilePath : "" };
+	rShaderConfig cfg { VSshaderFilePath, FSshaderFilePath };
 	auto shaderPtr = std::make_unique<rShader>( cfg );
-	if ( !shaderPtr->initialize( ) ){
-		Log::Print( "[rShadersManager] Failed to initialize shader %s!" , name.c_str( ) );
-		return false;
-	}
 
 	shaders.emplace( relativePath , std::move( shaderPtr ) );
 	return true;
 }
 
-bool rShadersManager::addShader( const std::string & key , const rShaderConfig & config )
+std::shared_ptr<rShader> rShadersManager::getShader( const std::string & key ) const
 {
-	auto shaderPtr = std::make_unique<rShader>( config );
-	if ( !shaderPtr->initialize( ) )
-		return false;
-
 	std::lock_guard<std::mutex> lock( mtx );
-	shaders.emplace( key , std::move( shaderPtr ) );
-	return true;
-}
-
-void rShadersManager::renderAllShaders( )
-{
-	// Exemplo para demonstrar encapsulação, caso queira aplicar cada shader
-	std::lock_guard<std::mutex> lock( mtx );
-	for ( auto & pair : shaders )
-	{
-		 pair.second->beginShaderMode();
-			
-		 pair.second->endShaderMode();
+	if ( this->shaders.find( key ) != this->shaders.end( ) ) {
+		return this->shaders.at( key );
 	}
+
+	return nullptr;
 }
+

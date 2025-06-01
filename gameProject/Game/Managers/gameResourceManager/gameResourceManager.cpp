@@ -38,8 +38,6 @@ bool gameResourceManager::initialize( std::string path ) {
         return false;
     }
 
-  
-
     this->musicMananger->playMusic( musicType::DungeonMusic );
     return true;
 }

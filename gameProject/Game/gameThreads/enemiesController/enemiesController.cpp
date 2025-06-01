@@ -18,9 +18,7 @@ void enemiesController::threadFunction( ) {
 
 	CPlayerEntity * player = entitiesHandler::Get( ).getLocalPlayer( );
 
-
 	while ( true ) {
-
 		if ( globals.gamePaused )
 			continue;
 
@@ -28,6 +26,7 @@ void enemiesController::threadFunction( ) {
 			player = entitiesHandler::Get( ).getLocalPlayer( );
 			continue;
 		}
+
 
 		entitiesHandler::Get( ).updateSpawnedEnemies( player );
 
