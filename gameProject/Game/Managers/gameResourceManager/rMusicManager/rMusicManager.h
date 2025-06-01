@@ -22,7 +22,7 @@ class rMusicManager : public rBaseResource
 
 	std::unordered_map<musicType , std::vector<std::pair<std::string, std::unique_ptr<rMusic>>>> musics;
 	int currentPlayingSound = -1;
-	musicType currentMusicType = MainMenuMusic;
+	musicType currentMusicType = NoMusic;
 	musicType oldMusicType = NoMusic;
 
 	float originalBaseVolume = 1.0f;
@@ -46,9 +46,9 @@ public:
 	rMusicManager & operator=( rMusicManager && ) = delete;
 
 	bool initialize( ) override;
-	bool playMusic( musicType musicType );
+	bool playMusic( musicType musicType, float fadeSpeed );
 	void updateMusic( );
-	void SetMusicVolume( float volume );
+	void setMusicVolume( float volume );
 	void pauseMusic( );
 	void resumeMusic( );
 };

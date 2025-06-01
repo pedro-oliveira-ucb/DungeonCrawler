@@ -86,8 +86,6 @@ void rSoundsManager::setVolume( float volume ) {
 	}
 }
 
-
-
 bool rSoundsManager::initialize( )
 {
 	std::vector<std::vector<fileScanResult>> FilesOnFolder = this->recursiveGetFiles( this->getPath( ) , ".wav" );

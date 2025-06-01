@@ -6,7 +6,7 @@
 void shaderHandler::initializeRenderTexture( )
 {
     RenderTexture2D * txt = new RenderTexture2D( );
-	*txt = LoadRenderTexture( globals.screenWidth , globals.screenHeight );
+	*txt = LoadRenderTexture( Globals::Get().screenWidth , Globals::Get( ).screenHeight );
     this->renderTexture = static_cast< void * >( txt );
 }
 

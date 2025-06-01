@@ -4,7 +4,11 @@
 #include <iomanip> 
 
 #include "Game/gameControls/keybindHandler/keybindHandler.h"
+#include "Game/gameObjects/gameState/mainMenuState/mainMenuState.h"
+#include "Game/gameObjects/gameState/inGameState/inGameState.h"
+
 #include "Game/Managers/gameResourceManager/gameResourceManager.h"
+#include "Game/Managers/gameStateManagers/gameStateManager.h"
 
 #include "Game/Handlers/shadersHandler/shadersHandler.h"
 
@@ -28,20 +32,31 @@ int main( void ) {
 	Log::Print( "[Render] Initialized window!" );
 
 	SetConfigFlags( FLAG_VSYNC_HINT );
-	//	raylib::SetConfigFlags( raylib::FLAG_FULLSCREEN_MODE ); // Define a flag de fullscreen
-	InitWindow( globals.screenWidth , globals.screenHeight , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
+	//SetConfigFlags( FLAG_FULLSCREEN_MODE ); 
+	InitWindow( Globals::Get( ).screenWidth , Globals::Get( ).screenHeight , "Janela Fullscreen" ); // Tamanhos ignorados no fullscreen
 	InitAudioDevice( );      // Initialize audio device
 	DisableCursor( );
+
+	gameStateManager gameStateManager_;
+	// Define o estado inicial
+   // gameStateManager.ChangeState(std::make_unique<MainMenuState>());
+   // OU se MainMenuState não precisar de argumentos no construtor:
+
+	BeginDrawing( );
+	ClearBackground( BLACK );
+	DrawText( "Loading" , Globals::Get( ).screenWidth / 2 - MeasureText( "Loading" , 20 ) / 2 , Globals::Get( ).screenHeight / 2 - 10 , 20 , WHITE );
+	EndDrawing( );
 
 	Log::Print( "[main] starting game!" );
 	if ( !game.start( ) ) {
 		Log::Print( "[main] failed to start game!" );
 	}
 	else {
-
 		while ( !game.isResourcesLoaded( ) ) {
 			std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 		}
+
+		gameStateManager_.ChangeState( std::make_unique<mainMenuState>( ) );
 
 		shaderHandler::Get( ).initializeRenderTexture( );
 		shaderHandler::Get( ).preLoadAll( );
@@ -51,23 +66,20 @@ int main( void ) {
 
 		while ( true )
 		{
-			if ( IsKeyPressed( KEY_ESCAPE ) ) { 
-				globals.gamePaused = !globals.gamePaused;
-			}
-
-			if ( globals.gamePaused ) {
-				_gameResourceManager.getMusicManager( )->pauseMusic( );
-			}
-			else {
-				_gameResourceManager.getMusicManager( )->resumeMusic( );
-			}
-
-			_gameResourceManager.getSoundManager( )->setVolume( globals.SoundVolume );
-			_gameResourceManager.getMusicManager( )->SetMusicVolume( globals.MusicVolume );
+			_gameResourceManager.getSoundManager( )->setVolume( Globals::Get().getGameSettings()->getSoundVolume() );
+			_gameResourceManager.getMusicManager( )->setMusicVolume( Globals::Get( ).getGameSettings( )->getMusicVolume( ) );
 
 			Vector2 mousePos = GetMousePosition( );
-			globals.mousePosX = mousePos.x;
-			globals.mousePosY = mousePos.y;
+			Globals::Get().mousePosX = mousePos.x;
+			Globals::Get().mousePosY = mousePos.y;
+
+			// --- Entrada ---
+			gameStateManager_.HandleInput( );
+
+			// --- Atualização ---
+			float deltaTime = GetFrameTime( );
+			gameStateManager_.Update( deltaTime );
+
 			keybindHandler::Get( ).update( );
 			gameRender::Get( ).processSoundEvents( );
 			shaderHandler::Get( ).updateAll( );
@@ -75,9 +87,10 @@ int main( void ) {
 			BeginDrawing( );
 			ClearBackground( WHITE );
 
-			gameRender::Get( ).render( );
+			// --- Renderização ---
+			gameStateManager_.Render( ); // O estado atual desenha o que precisa
 
-			shaderHandler::Get( ).renderAll( );
+			gameRender::Get( ).renderCustomCursor( );
 
 			EndDrawing( );
 		}

@@ -242,12 +242,11 @@ void renderTraps( ) {
 }
 
 
-void RenderEntities::render( ) {
+void renderEntities::render( ) {
 	
 	renderTraps( );
 	renderEntity( entitiesHandler::Get( ).getLocalPlayer( ) , true );
 	renderAttacks( );
 	renderEnemies( );
 	renderItems( );
-
 }

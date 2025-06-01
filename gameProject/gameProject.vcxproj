@@ -141,12 +141,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Game\gameResources\gameResource\rShader\fogShader\fogShader.cpp" />
+    <ClCompile Include="Globals\currentGameState\currentGameState.cpp" />
+    <ClCompile Include="Globals\gameSettings\gameSettings.cpp" />
+    <ClCompile Include="Game\gameRender\components\components.cpp" />
+    <ClCompile Include="Game\gameObjects\gameState\gameState.cpp" />
+    <ClCompile Include="Game\Managers\gameStateManagers\gameStateManager.cpp" />
     <ClCompile Include="Game\SDK\Entities\Traps\CSpikeTrap\CSpikeTrap.cpp" />
     <ClCompile Include="Game\SDK\Entities\Traps\CBaseTrap\CBaseTrap.cpp" />
     <ClCompile Include="Game\SDK\Entities\Items\CHealthItem\CHealthItem.cpp" />
     <ClCompile Include="Game\SDK\Entities\Items\CBaseItem\CBaseItem.cpp" />
-    <ClCompile Include="Game\gameRender\DialogsRender\DialogsRender.cpp" />
+    <ClCompile Include="Game\gameRender\renderDialogs\renderDialogs.cpp" />
     <ClCompile Include="Game\Handlers\gamdDialogHandler\gameDialogHandler.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rShader\rShader.cpp" />
     <ClCompile Include="Game\gameThreads\enemiesController\enemiesController.cpp" />
@@ -179,9 +183,8 @@
     <ClCompile Include="Game\gameResources\rBaseResource\rBaseResource.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.cpp" />
-    <ClCompile Include="Game\gameRender\RenderEntities\RenderEntities.cpp" />
+    <ClCompile Include="Game\gameRender\renderEntities\renderEntities.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\LocalPlayerInitializer\LocalPlayerInitializer.cpp" />
-    <ClCompile Include="Game\gameControls\mouseMovement\mouseMovement.cpp" />
     <ClCompile Include="Game\gameThreads\updateEntities\updateEntities.cpp" />
     <ClCompile Include="Game\SDK\math\math.cpp" />
     <ClCompile Include="Game\Managers\gameResourceManager\rSoundsManager\rSoundsManager.cpp" />
@@ -194,6 +197,11 @@
     <ClCompile Include="Game\Handlers\trapsHandler\trapsHandler.cpp" />
     <ClCompile Include="Game\Handlers\shadersHandler\shadersHandler.cpp" />
     <ClCompile Include="Game\gameInitializer\ShadersInitializer\shadersInitializer.cpp" />
+    <ClCompile Include="Game\gameObjects\gameState\mainMenuState\mainMenuState.cpp" />
+    <ClCompile Include="Game\gameObjects\gameState\loadingScreenState\loadingScreenState.cpp" />
+    <ClCompile Include="Game\gameObjects\gameState\inGameState\inGameState.cpp" />
+    <ClCompile Include="Game\gameRender\renderPauseMenu\renderPauseMenu.cpp" />
+    <ClCompile Include="Game\gameRender\renderCustomCursor\renderCustomCursor.cpp" />
     <ClCompile Include="Utils\utils.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
@@ -205,12 +213,16 @@
     <ClCompile Include="Game\gameResources\gameResource\rShader\vignetteShader\vignetteShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game\gameResources\gameResource\rShader\fogShader\fogShader.h" />
+    <ClInclude Include="Globals\currentGameState\currentGameState.h" />
+    <ClInclude Include="Globals\gameSettings\gameSettings.h" />
+    <ClInclude Include="Game\gameRender\components\components.h" />
+    <ClInclude Include="Game\gameObjects\gameState\gameState.h" />
+    <ClInclude Include="Game\Managers\gameStateManagers\gameStateManager.h" />
     <ClInclude Include="Game\SDK\Entities\Traps\CSpikeTrap\CSpikeTrap.h" />
     <ClInclude Include="Game\SDK\Entities\Traps\CBaseTrap\CBaseTrap.h" />
     <ClInclude Include="Game\SDK\Entities\Items\CHealthItem\CHealthItem.h" />
     <ClInclude Include="Game\SDK\Entities\Items\CBaseItem\CBaseItem.h" />
-    <ClInclude Include="Game\gameRender\DialogsRender\DialogsRender.h" />
+    <ClInclude Include="Game\gameRender\renderDialogs\renderDialogs.h" />
     <ClInclude Include="Game\Handlers\gamdDialogHandler\gameDialogHandler.h" />
     <ClInclude Include="Game\gameResources\gameResource\rShader\rShader.h" />
     <ClInclude Include="Game\gameThreads\enemiesController\enemiesController.h" />
@@ -245,9 +257,8 @@
     <ClInclude Include="Game\gameResources\rBaseResource\rBaseResource.h" />
     <ClInclude Include="Game\gameResources\gameResource\rSprites\rSprite\rSprite.h" />
     <ClInclude Include="Game\gameResources\gameResource\rSprites\rSpriteAnimation\rSpriteAnimation.h" />
-    <ClInclude Include="Game\gameRender\RenderEntities\RenderEntities.h" />
+    <ClInclude Include="Game\gameRender\renderEntities\renderEntities.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\LocalPlayerInitializer\LocalPlayerInitializer.h" />
-    <ClInclude Include="Game\gameControls\mouseMovement\mouseMovement.h" />
     <ClInclude Include="Game\gameThreads\updateEntities\updateEntities.h" />
     <ClInclude Include="Game\SDK\math\math.h" />
     <ClInclude Include="Game\Managers\gameResourceManager\rSoundsManager\rSoundsManager.h" />
@@ -260,6 +271,11 @@
     <ClInclude Include="Game\Handlers\trapsHandler\trapsHandler.h" />
     <ClInclude Include="Game\Handlers\shadersHandler\shadersHandler.h" />
     <ClInclude Include="Game\gameInitializer\ShadersInitializer\shadersInitializer.h" />
+    <ClInclude Include="Game\gameObjects\gameState\mainMenuState\mainMenuState.h" />
+    <ClInclude Include="Game\gameObjects\gameState\loadingScreenState\loadingScreenState.h" />
+    <ClInclude Include="Game\gameObjects\gameState\inGameState\inGameState.h" />
+    <ClInclude Include="Game\gameRender\renderPauseMenu\renderPauseMenu.h" />
+    <ClInclude Include="Game\gameRender\renderCustomCursor\renderCustomCursor.h" />
     <ClInclude Include="Utils\utils.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />

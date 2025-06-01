@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include "../../gameControls/keybindHandler/keybindHandler.h"
-#include "../../gameControls/mouseMovement/mouseMovement.h"
 
 #include "../../Handlers/entitiesHandler/entitiesHandler.h"
 
@@ -17,8 +16,12 @@ void updatePositionEvent::threadFunction( ) {
 	keybindHandler::Get( ).initializeKeybinds( );
 
 	while ( true ) {
-		if ( globals.gamePaused )
+		currentGameStateType gameState = Globals::Get( ).getCurrentGameState( )->getCurrentGameState( );
+
+		if ( gameState == currentGameStateType::GAME_STATE_PAUSED || gameState == currentGameStateType::GAME_STATE_NONE ) {
+			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 			continue;
+		}
 
 		entitiesHandler::Get( ).updateLocalPlayer( );
 

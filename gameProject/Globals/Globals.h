@@ -1,19 +1,25 @@
 #pragma once
 #include <chrono>
+#include "gameSettings/gameSettings.h"
+#include "currentGameState/currentGameState.h"
+
+#include "../Utils/singleton.h"
 
 #define now std::chrono::high_resolution_clock::now( )
 
-class Globals
+class Globals : public CSingleton<Globals>
 {
+	gameSettings settings;
+	currentGameState state;
+
 public:
+
 	int screenWidth = 1920;
 	int screenHeight = 1080;
 
-	float SoundVolume = 80.0f;
-	float MusicVolume = 80.0f;
+	gameSettings * getGameSettings( );
+	currentGameState * getCurrentGameState( );
 
-	bool exitGame = false;
-	bool gamePaused = false;
 	bool updateWindow = false;
 	bool windowInitialized = false;
 	bool resourcesLoaded = false;
@@ -23,12 +29,6 @@ public:
 
 	float mousePosWorldX;
 	float mousePosWorldY;
-
-	void * resourceManagerPointer = nullptr;
-	void * windowPointer = nullptr;
-
-	float mouseWheelDelta = 0.0f; // <-- Adicionado para armazenar o scroll atual
 };
 
-extern Globals globals;
 

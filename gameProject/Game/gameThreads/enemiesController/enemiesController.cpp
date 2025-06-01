@@ -1,7 +1,6 @@
 #include "enemiesController.h"
 
 #include "../../gameControls/keybindHandler/keybindHandler.h"
-#include "../../gameControls/mouseMovement/mouseMovement.h"
 
 #include "../../Managers/collisionManager/collisionManager.h"
 #include "../../Managers/LevelManager/LevelManager.h"
@@ -19,8 +18,12 @@ void enemiesController::threadFunction( ) {
 	CPlayerEntity * player = entitiesHandler::Get( ).getLocalPlayer( );
 
 	while ( true ) {
-		if ( globals.gamePaused )
+		currentGameStateType gameState = Globals::Get( ).getCurrentGameState( )->getCurrentGameState( );
+
+		if ( gameState == currentGameStateType::GAME_STATE_PAUSED || gameState == currentGameStateType::GAME_STATE_NONE ) {
+			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 			continue;
+		}
 
 		if ( player == nullptr ) {
 			player = entitiesHandler::Get( ).getLocalPlayer( );

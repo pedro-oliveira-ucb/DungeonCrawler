@@ -141,7 +141,7 @@ void entitiesHandler::updateLocalPlayer( ) {
 		localPlayer->setSprinting( false );
 
 	GVector2D localPos = localPlayer->getEntityPosition( );
-	GVector2D mouseWorldPos = { globals.mousePosWorldX, globals.mousePosWorldY };
+	GVector2D mouseWorldPos = { Globals::Get().mousePosWorldX, Globals::Get().mousePosWorldY };
 	// Calcula ângulo com base nas posições no mundo
 	float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , mouseWorldPos ) );
 

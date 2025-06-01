@@ -1,8 +1,8 @@
 #pragma once
 
-
-class renderEntities
+class renderPauseMenu
 {
 public:
 	void render( );
 };
+

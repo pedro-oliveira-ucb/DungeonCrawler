@@ -1,8 +1,7 @@
 #pragma once
-
-
-class renderEntities
+class renderCustomCursor
 {
 public:
 	void render( );
 };
+

@@ -1,10 +1,10 @@
-#include "DialogsRender.h"
+#include "renderDialogs.h"
 
 #include "../../SDK/Events/EventManager.h"
 
 #include "../../../Globals/Globals.h"
 
-dialogBox DialogsRender::renderDialogBox( std::string text , Font font ) {
+dialogBox renderDialogs::renderDialogBox( std::string text , Font font ) {
 	dialogBox box;
 	box.text = text;
 	box.fontSize = 20;
@@ -19,14 +19,14 @@ dialogBox DialogsRender::renderDialogBox( std::string text , Font font ) {
 	box.width = box.textWidth + ( box.padding * 2 );
 	box.height = 50.f;
 
-	box.y = globals.screenHeight - box.height * 5;
+	box.y = Globals::Get( ).screenHeight - box.height * 5;
 	// Calculate the X position to center the box
-	box.x = ( globals.screenWidth / 2 ) - ( box.width / 2 );
+	box.x = ( Globals::Get().screenWidth / 2 ) - ( box.width / 2 );
 	DrawRectangle( box.x , box.y , box.width , box.height , BLACK );
 	return box;
 }
 
-void DialogsRender::renderDialogText( dialogBox box ) {
+void renderDialogs::renderDialogText( dialogBox box ) {
 
 	const char * textToDraw = box.text.c_str( );
 	float textPositionX = box.x + box.padding;
@@ -37,7 +37,7 @@ void DialogsRender::renderDialogText( dialogBox box ) {
 	DrawTextEx( box.textFont , textToDraw , textPosition , box.fontSize , 0 , WHITE );
 }
 
-void DialogsRender::render( ) {
+void renderDialogs::render( ) {
 
 	if ( this->currentDialog.empty( ) ) {
 		this->currentDialog = gameDialogHandler::Get( ).getDialog( );

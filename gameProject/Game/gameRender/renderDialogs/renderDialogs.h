@@ -14,7 +14,7 @@ struct dialogBox {
 	float x , y , width , height;
 };
 
-class DialogsRender 
+class renderDialogs 
 {
 	float dialogStartTime = 0;
 	float dialogEndTime = 0;

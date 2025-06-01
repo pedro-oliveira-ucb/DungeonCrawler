@@ -1,3 +1,11 @@
 #include "Globals.h"
 
-Globals globals;
+gameSettings * Globals::getGameSettings( )
+{
+	return &this->settings;
+}
+
+currentGameState * Globals::getCurrentGameState( )
+{
+	return &this->state;
+}

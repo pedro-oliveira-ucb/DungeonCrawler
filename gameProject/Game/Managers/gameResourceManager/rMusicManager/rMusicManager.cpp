@@ -74,7 +74,8 @@ bool MusicConfig::generateMusicConfig( std::string filename , MusicConfig * buff
 	return true;
 }
 
-void rMusicManager::SetMusicVolume( float volume ) {
+
+void rMusicManager::setMusicVolume( float volume ) {
 	std::lock_guard<std::mutex> lock( this->musicMutex );
 
 	for ( const auto & it : this->musics ) {
@@ -155,15 +156,15 @@ bool rMusicManager::initialize( )
 
 
 	for ( const auto & it : this->musics ) {
-		for(int i =0; i < it.second.size( ); ++i) {
-			Log::Print( "[rMusicManager] [%s] music" , it.second.at(i).first.c_str( ) );
-		}	
+		for ( int i = 0; i < it.second.size( ); ++i ) {
+			Log::Print( "[rMusicManager] [%s] music" , it.second.at( i ).first.c_str( ) );
+		}
 	}
 
 	return true;
 }
 
-bool rMusicManager::playMusic( musicType newType ) {
+bool rMusicManager::playMusic( musicType newType , float speed ) {
 	std::lock_guard<std::mutex> lock( this->musicMutex );
 	if ( onMusicTransition || newType == currentMusicType )
 		return false;
@@ -181,6 +182,10 @@ bool rMusicManager::playMusic( musicType newType ) {
 	isFadingOut = true;
 	isFadingIn = false;
 	onMusicTransition = true;
+	if ( currentBaseVolume )
+		fadeSpeed = ( currentBaseVolume / speed * 0.5 ) + ( nextSound->getBaseVolume( ) / speed * 0.5 );
+	else
+		fadeSpeed = nextSound->getBaseVolume( ) / speed;
 
 	return true;
 }
