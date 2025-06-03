@@ -29,8 +29,6 @@ private:
     std::unordered_map<CEnemyType, std::vector<CEnemyEntity*> > enemies;
 
     bool started = false;
-    int respawnCount = 0;
-    double respawnTimer;
 
     // Mutex para proteger as variáveis acima
     std::mutex managerMutex;
@@ -53,6 +51,7 @@ public:
     LevelManager();
     void loadLevels();
     void updateLevel( );
+    void restartCurrentLevel( );
 };
 
 extern LevelManager levelManager;

@@ -28,10 +28,13 @@ mainMenuState::~mainMenuState( ) {
 void mainMenuState::OnEnter( gameStateManager * manager ) {
 	Log::Print( "[mainMenuState]: OnEnter" );
 
+	this->setEntering( true );
+
 	Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_NONE );
 	if ( _gameResourceManager.getMusicManager( )->getcurrentMusicType( ) != musicType::MainMenuMusic )
 		_gameResourceManager.getMusicManager( )->playMusic( musicType::MainMenuMusic , 1 );
 
+	
 	// Carregar recursos específicos do menu: fontes, texturas, sons
 	// Exemplo:
 	// font = LoadFont("resources/myfont.png");
@@ -51,10 +54,7 @@ void mainMenuState::HandleInput( gameStateManager * manager ) {
 	if ( IsKeyPressed( KEY_ENTER ) ) {
 		std::cout << "MainMenuState: ENTER pressionado, mudando para InGame" << std::endl;
 		EventManager::Get( ).Trigger( "menu_gameStart" );
-		manager->ChangeState( std::make_unique<inGameState>( ) );
-
-		// Exemplo de transição para o estado de jogo
-		// manager->ChangeState(new InGameSta_example()); // Cuidado com memory leak, veja GameStateManager
+		this->setExiting( true );
 	}
 	if ( IsMouseButtonPressed( MOUSE_BUTTON_LEFT ) ) {
 		Vector2 mousePos = GetMousePosition( );
@@ -67,6 +67,13 @@ void mainMenuState::HandleInput( gameStateManager * manager ) {
 
 void mainMenuState::Update( gameStateManager * manager , float deltaTime ) {
 	// Lógica de atualização do menu (animações de botões, etc.)
+
+	gameStateTransitionState transitionState = this->updateStateTransition( deltaTime );
+	switch ( transitionState ) {
+		case gameStateTransitionState::EXIT_FINISHED:
+			manager->ChangeState( std::make_unique<inGameState>( ) );
+		break;
+	}
 }
 
 void mainMenuState::Render( gameStateManager * manager ) {
@@ -75,5 +82,5 @@ void mainMenuState::Render( gameStateManager * manager ) {
 	// DrawTexture(titleTexture, SCREEN_WIDTH / 2 - titleTexture.width / 2, 100, WHITE);
 	DrawText( "MENU PRINCIPAL" , 190 , 200 , 20 , LIGHTGRAY );
 	DrawText( "Pressione ENTER para iniciar" , 200 , 250 , 20 , DARKGRAY );
-	// Desenhar botões, etc.
+	this->renderTransition( manager );
 }

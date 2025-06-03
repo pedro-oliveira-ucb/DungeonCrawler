@@ -57,5 +57,8 @@ void loadingScreenState::Render( gameStateManager * manager ) {
     // DrawTexture(titleTexture, SCREEN_WIDTH / 2 - titleTexture.width / 2, 100, WHITE);
     DrawText( "MENU PRINCIPAL" , 190 , 200 , 20 , LIGHTGRAY );
     DrawText( "Pressione ENTER para iniciar" , 200 , 250 , 20 , DARKGRAY );
+
     // Desenhar botões, etc.
+
+    this->renderTransition( manager );
 }

@@ -36,6 +36,7 @@ public:
     void updateSpawnedEnemies( CPlayerEntity* localPlayer  );
     void updateEnemiesCollision( );
 	void updateLocalPlayer( );
+	void clearSpawnedEntities( );
 
     GVector2D getRandomPlaceAroundPlayer( float radius );
 };

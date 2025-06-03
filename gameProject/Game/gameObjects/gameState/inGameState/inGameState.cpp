@@ -2,8 +2,11 @@
 
 #include "../mainMenuState/mainMenuState.h"
 
+#include "../../../gameObjects/gameMap/gameMap.h"
+
 #include "../../../Managers/gameStateManagers/gameStateManager.h" // Para transições de estado
 #include "../../../Managers/gameResourceManager/gameResourceManager.h"
+#include "../../../Handlers/shadersHandler/shadersHandler.h"
 
 #include "../../../Handlers/entitiesHandler/entitiesHandler.h"
 
@@ -17,12 +20,10 @@
 
 
 inGameState::inGameState( ) {
-	// Construtor (evite carregar recursos pesados aqui, prefira OnEnter)
 	Log::Print( "[inGameState]: Constructor" );
 }
 
 inGameState::~inGameState( ) {
-	// Destrutor (evite descarregar recursos pesados aqui, prefira OnExit)
 	Log::Print( "[inGameState]: Destructor" );
 }
 
@@ -30,20 +31,12 @@ void inGameState::OnEnter( gameStateManager * manager ) {
 	Log::Print( "[inGameState]: OnEnter" );
 	Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PLAYING );
 	_gameResourceManager.getMusicManager( )->playMusic( musicType::DungeonMusic , 10 );
-
-	// Carregar recursos específicos do menu: fontes, texturas, sons
-	// Exemplo:
-	// font = LoadFont("resources/myfont.png");
-	// titleTexture = LoadTexture("resources/title.png");
-	// Inicializar posições de botões, etc.
+	gameMap::Get( ).init( );
 }
 
 void inGameState::OnExit( gameStateManager * manager ) {
-	Log::Print( "[inGameState]: OnExit" );
 	// Descarregar recursos específicos do menu para liberar memória
-	// Exemplo:
-	// UnloadFont(font);
-	// UnloadTexture(titleTexture);
+	Log::Print( "[inGameState]: OnExit" );
 }
 
 void inGameState::setCameraPosition( ) {
@@ -75,7 +68,8 @@ void inGameState::HandleInput( gameStateManager * manager ) {
 void inGameState::Update( gameStateManager * manager , float deltaTime ) {
 
 	float EXIT_FADE_DURATION = 5;
-	float alphaIncrementThisFrame = ( 255.0f / EXIT_FADE_DURATION ) * deltaTime;
+
+	gameStateTransitionState stateTransition = this->updateStateTransition( deltaTime );
 
 	currentGameState state = Globals::Get( ).getGame( )->getCurrentGameState( );
 
@@ -90,13 +84,7 @@ void inGameState::Update( gameStateManager * manager , float deltaTime ) {
 		if ( _gameResourceManager.getMusicManager( )->getcurrentMusicType( ) != musicType::MainMenuMusic )
 			_gameResourceManager.getMusicManager( )->playMusic( musicType::MainMenuMusic , EXIT_FADE_DURATION / 2 );
 
-		currentExitFadeAlpha += alphaIncrementThisFrame;
-
-		// Clamp the alpha value to a maximum of 255.0f.
-		if ( currentExitFadeAlpha > 255.0f ) {
-			currentExitFadeAlpha = 255.0f;
-			manager->ChangeState( std::make_unique<mainMenuState>( ) );
-		}
+		this->setExiting( true );
 		break;
 	default:
 
@@ -105,17 +93,15 @@ void inGameState::Update( gameStateManager * manager , float deltaTime ) {
 
 	if ( state != currentGameState::GAME_STATE_PAUSED )
 		_gameResourceManager.getMusicManager( )->resumeMusic( );
+
+	switch ( stateTransition ) {
+	case gameStateTransitionState::EXIT_FINISHED:
+		manager->ChangeState( std::make_unique<mainMenuState>( ) );
+		break;
+	}
+
+	shaderHandler::Get( ).updateAll( );
 }
-
-void inGameState::exitGame( gameStateManager * manager ) {
-	// Prepare the color for the fade rectangle.
-	// Alpha component is cast to unsigned char, as typically expected by color structures.
-	Color col = { 0, 0, 0, static_cast< unsigned char >( currentExitFadeAlpha ) };
-
-	// Draw the fade rectangle.
-	DrawRectangle( 0 , 0 , Globals::Get( ).screenWidth , Globals::Get( ).screenHeight , col );
-}
-
 
 void inGameState::Render( gameStateManager * manager ) {
 
@@ -128,17 +114,20 @@ void inGameState::Render( gameStateManager * manager ) {
 
 	BeginMode2D( camera );
 	{
+		gameRender::Get( ).renderMap( );
 		gameRender::Get( ).renderEntities( );
 	}
 	EndMode2D( );
 	//renderDialogs( );
 
-	switch ( Globals::Get( ).getGame( )->getCurrentGameState( ) ) {
-	case currentGameState::GAME_STATE_PAUSED:
+	if ( Globals::Get( ).getGame( )->getCurrentGameState( ) == currentGameState::GAME_STATE_PAUSED ) {
 		gameRender::Get( ).renderPauseMenu( );
-		break;
-	case currentGameState::GAME_STATE_EXIT:
-		exitGame( manager );
-		break;
 	}
+
+	
+
+	shaderHandler::Get( ).renderAll( );
+
+
+	this->renderTransition( manager );
 }

@@ -4,8 +4,8 @@
 #include <iomanip> 
 
 #include "Game/gameControls/keybindHandler/keybindHandler.h"
-#include "Game/gameObjects/gameState/mainMenuState/mainMenuState.h"
-#include "Game/gameObjects/gameState/inGameState/inGameState.h"
+
+#include "Game/gameObjects/gameState/inPreMainMenuState/inPreMainMenuState.h"
 
 #include "Game/Managers/gameResourceManager/gameResourceManager.h"
 #include "Game/Managers/gameStateManagers/gameStateManager.h"
@@ -56,13 +56,10 @@ int main( void ) {
 			std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 		}
 
-		gameStateManager_.ChangeState( std::make_unique<mainMenuState>( ) );
-
 		shaderHandler::Get( ).initializeRenderTexture( );
 		shaderHandler::Get( ).preLoadAll( );
 
-		float MusicVolume = 80.0f;
-		float SoundVolume = 80.0f;
+		gameStateManager_.ChangeState( std::make_unique<inPreMainMenuState>( ) );
 
 		while ( true )
 		{

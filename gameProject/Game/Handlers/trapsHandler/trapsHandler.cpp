@@ -51,12 +51,12 @@ void trapsHandler::addSpawnableTrap( std::unique_ptr<CBaseTrap> trap )
 	spawnableTraps.emplace( trap->getTrapType( ) , std::move( trap ) );
 }
 
-void trapsHandler::spawnTrap( TrapType itemType ) {
+CBaseTrap * trapsHandler::spawnTrap( TrapType itemType ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 
 	auto it = spawnableTraps.find( itemType );
 	if ( it == spawnableTraps.end( ) )
-		return;
+		return nullptr;
 
 	if ( it->second.get( ) != nullptr ) {
 		std::unique_ptr<CBaseTrap> trapClone = it->second->TrapClone( );
@@ -65,6 +65,11 @@ void trapsHandler::spawnTrap( TrapType itemType ) {
 		Log::Print( "Item activated, trying to push to vector" );
 		spawnedTraps.push_back( std::move( trapClone ) );
 	}
+}
+
+void trapsHandler::clearSpawnedTraps( ) {
+	std::lock_guard<std::mutex> lock( handlerMutex );
+	spawnedTraps.clear( );
 }
 
 std::unique_ptr<CBaseTrap> * trapsHandler::getSpawnableTrap( TrapType traptype )

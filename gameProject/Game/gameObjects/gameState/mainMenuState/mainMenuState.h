@@ -15,5 +15,5 @@ public:
     gameStateType GetType( ) const override { return gameStateType::MAIN_MENU; }
 
 private:
-   
+  
 };

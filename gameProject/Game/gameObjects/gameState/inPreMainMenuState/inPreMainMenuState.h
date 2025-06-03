@@ -1,11 +1,11 @@
 #pragma once
 #include "../gameState.h"
-#include <raylib/raylib.h>
 
-class inGameState : public gameState {
+
+class inPreMainMenuState : public gameState {
 public:
-    inGameState( );
-    ~inGameState( ) override;
+    inPreMainMenuState( );
+    ~inPreMainMenuState( ) override;
 
     void OnEnter( gameStateManager * manager ) override;
     void OnExit( gameStateManager * manager ) override;
@@ -14,8 +14,6 @@ public:
     void Render( gameStateManager * manager ) override;
     gameStateType GetType( ) const override { return gameStateType::LOADING; }
 private:
-    Camera2D camera = { 0 };
-    void setCameraPosition( );
-    bool isPaused = false;
-    float zoomLevel = 0.0f;
+    float m_runningTime = 0.0f;
+    void * renderTexturePointer = nullptr;
 };

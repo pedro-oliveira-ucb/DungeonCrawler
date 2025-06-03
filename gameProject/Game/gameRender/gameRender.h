@@ -12,4 +12,6 @@ public:
 	void renderDialogs( );
 	void renderPauseMenu( );
 	void renderEntities( );
+	void renderGameOver( );
+	void renderMap( );
 };

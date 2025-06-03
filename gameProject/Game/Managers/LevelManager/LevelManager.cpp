@@ -87,9 +87,21 @@ LevelData LevelManager::getCurrentLevel( ) {
 void LevelManager::moveToNextLevel( ) {
 	if ( !isLastLevel( ) ) {
 		++currentLevelIndex;
-		this->respawnCount = 0;
 		spawnEnemiesForLevel( levels[ currentLevelIndex ] );
 	}
+}
+
+void LevelManager::restartCurrentLevel( ) {
+	CPlayerEntity * player = entitiesHandler::Get( ).getLocalPlayer( );
+	if ( player == nullptr ) {
+		return;
+	}
+
+	if ( !player->isAlive( ) && player->deathAnimationFinished() ) {
+		player->Respawn( );
+	}
+
+	spawnEnemiesForLevel( levels[ currentLevelIndex ] );
 }
 
 bool LevelManager::hasEnemyAlive( ) {
@@ -176,6 +188,10 @@ void LevelManager::updateLevel( )
 }
 
 void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
+
+	entitiesHandler::Get( ).clearSpawnedEntities( );
+	trapsHandler::Get( ).clearSpawnedTraps( );
+
 	auto enemyList = entitiesHandler::Get( ).getSpawnableEnemies( );
 	for ( auto it = data.enemySpawners.begin( ); it != data.enemySpawners.end( ); ++it ) {
 		for ( int i = 0; i < it->SpawnCount; i++ ) {

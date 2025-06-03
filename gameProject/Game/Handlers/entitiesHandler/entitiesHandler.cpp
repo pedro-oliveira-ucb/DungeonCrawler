@@ -31,6 +31,12 @@ std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> * entitiesHandler
 	return &spawnableEnemies;
 }
 
+void entitiesHandler::clearSpawnedEntities( ) {
+	std::lock_guard<std::mutex> lock( handlerMutex );
+	spawnedEnemies.clear( );
+}
+
+
 std::vector<std::unique_ptr<CEnemyEntity>> * entitiesHandler::getSpawnedEnemies( ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 	return &spawnedEnemies;

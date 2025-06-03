@@ -87,9 +87,6 @@
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\LocalPlayerInitializer\LocalPlayerInitializer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameControls\mouseMovement\mouseMovement.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Game\gameThreads\updateEntities\updateEntities.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -159,9 +156,6 @@
     <ClCompile Include="Game\Handlers\gamdDialogHandler\gameDialogHandler.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameRender\DialogsRender\DialogsRender.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Game\SDK\Entities\Items\CBaseItem\CBaseItem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -198,9 +192,6 @@
     <ClCompile Include="Game\gameInitializer\ShadersInitializer\shadersInitializer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Handlers\gameHandler\gameHandler.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Managers\gameStateManagers\gameStateManager.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -211,6 +202,30 @@
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\gameObjects\gameState\loadingScreenState\loadingScreenState.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals\currentGame\currentGame.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals\gameSettings\gameSettings.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameRender\components\components.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameRender\renderDialogs\renderDialogs.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameObjects\gameState\inGameState\inGameState.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameRender\renderPauseMenu\renderPauseMenu.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameRender\renderCustomCursor\renderCustomCursor.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameRender\renderGameOver\renderGameOver.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -285,9 +300,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\LocalPlayerInitializer\LocalPlayerInitializer.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\gameControls\mouseMovement\mouseMovement.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameThreads\updateEntities\updateEntities.h">
@@ -365,9 +377,6 @@
     <ClInclude Include="Game\Handlers\gamdDialogHandler\gameDialogHandler.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameRender\DialogsRender\DialogsRender.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="Game\SDK\Entities\Items\CBaseItem\CBaseItem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
@@ -404,9 +413,6 @@
     <ClInclude Include="Game\gameInitializer\ShadersInitializer\shadersInitializer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Handlers\gameHandler\gameHandler.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="Game\Managers\gameStateManagers\gameStateManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
@@ -417,6 +423,30 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameObjects\gameState\loadingScreenState\loadingScreenState.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals\currentGame\currentGame.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals\gameSettings\gameSettings.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameRender\components\components.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameRender\renderDialogs\renderDialogs.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameObjects\gameState\inGameState\inGameState.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameRender\renderPauseMenu\renderPauseMenu.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameRender\renderCustomCursor\renderCustomCursor.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameRender\renderGameOver\renderGameOver.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

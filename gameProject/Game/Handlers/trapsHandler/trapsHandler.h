@@ -15,7 +15,8 @@ public:
 	void addSpawnableTrap( std::unique_ptr<CBaseTrap> item );
 	std::unique_ptr<CBaseTrap> * getSpawnableTrap( TrapType type );
 
-	void spawnTrap ( TrapType type );
+	CBaseTrap * spawnTrap ( TrapType type );
+	void clearSpawnedTraps( );
 
 	std::vector<std::unique_ptr<CBaseTrap>> * getSpawnedTraps( );
 };
