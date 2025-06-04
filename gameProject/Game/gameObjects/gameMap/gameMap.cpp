@@ -20,7 +20,7 @@ mapType gameMap::getCurrentMapType( ) const
 	return this->currentMapType;
 }
 
-mapTileSet gameMap::getCurrentTileSet( ) const
+TileSet gameMap::getCurrentTileSet( ) const
 {
 	std::lock_guard<std::mutex> lock( this->mapMutex );
 	return this->currentTileSet;
@@ -36,4 +36,10 @@ GVector2D gameMap::getMapPosition( ) const
 {
 	std::lock_guard<std::mutex> lock( this->mapMutex );
 	return this->mapPosition;
+}
+
+bool gameMap::inInMap(GVector2D & position) const
+{
+	std::lock_guard<std::mutex> lock( this->mapMutex );
+
 }

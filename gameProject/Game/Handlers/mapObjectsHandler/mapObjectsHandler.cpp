@@ -5,7 +5,7 @@ void mapObjectsHandler::addGameObject( mapType type , mapObjectType objectType, 
 	this->mapObjects[ type ][ objectType] = object;
 }
 
-void mapObjectsHandler::addTileSet( mapType type , const mapTileSet & tiles ){
+void mapObjectsHandler::addTileSet( mapType type , const TileSet & tiles ){
 	this->mapTiles[ type ] = tiles;
 }
 
@@ -23,7 +23,7 @@ std::shared_ptr<rMapObject> * mapObjectsHandler::getGameObject( mapType type , m
 	return &that->second;
 }
 
-mapTileSet * mapObjectsHandler::getTileSet( mapType type )
+TileSet * mapObjectsHandler::getTileSet( mapType type )
 {
 	if(this->mapTiles.find( type ) != this->mapTiles.end()) {
 		return &this->mapTiles[ type ];

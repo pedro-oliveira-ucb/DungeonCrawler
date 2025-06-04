@@ -13,19 +13,23 @@ enum mapType {
 	bossMap
 };
 
-#define mapTileSet std::vector<std::vector<mapObjectType>>
+using TileRow = std::vector<mapObjectType>;
+using TileSet = std::vector<TileRow>;
+
+#define baseTileW 16  // largura de 1 célula, em pixels
+#define baseTileH 16  // altura de 1 célula, em pixels
 
 class mapObjectsHandler : public CSingleton<mapObjectsHandler>
 {
 	std::unordered_map< mapType , std::unordered_map< mapObjectType , std::shared_ptr<rMapObject>>> mapObjects;
-	std::unordered_map< mapType , mapTileSet> mapTiles;
+	std::unordered_map< mapType , TileSet> mapTiles;
 	mutable std::mutex mapMutex;
 public:
 	void addGameObject( mapType type , mapObjectType , std::shared_ptr<rMapObject> );
-	void addTileSet( mapType type , const mapTileSet & tiles );
+	void addTileSet( mapType type , const TileSet & tiles );
 
 	std::shared_ptr<rMapObject> * getGameObject( mapType type , mapObjectType );
-	mapTileSet * getTileSet( mapType type );
+	TileSet * getTileSet( mapType type );
 	std::unordered_map< mapObjectType , std::shared_ptr<rMapObject>> * getAllMapObjects( mapType type );
 
 };

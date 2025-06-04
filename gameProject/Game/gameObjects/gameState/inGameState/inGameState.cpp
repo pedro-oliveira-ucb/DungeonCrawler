@@ -105,6 +105,8 @@ void inGameState::Update( gameStateManager * manager , float deltaTime ) {
 
 void inGameState::Render( gameStateManager * manager ) {
 
+	ClearBackground( BLACK );
+
 	// Zoom com scroll do mouse
 	zoomLevel += GetMouseWheelMove( ) * 0.1f;
 	zoomLevel = Clamp( zoomLevel , 1.f , 2.0f );
@@ -124,10 +126,7 @@ void inGameState::Render( gameStateManager * manager ) {
 		gameRender::Get( ).renderPauseMenu( );
 	}
 
-	
-
 	shaderHandler::Get( ).renderAll( );
-
 
 	this->renderTransition( manager );
 }

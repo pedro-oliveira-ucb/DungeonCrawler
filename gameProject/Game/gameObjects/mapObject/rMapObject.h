@@ -7,12 +7,11 @@
 enum class mapObjectType
 {
 	mapObjectNone,
-	tallWall,
-	shortWall,
-	lateralTallWall, 
-	lateralShortWall,
-	ground,
-	door,
+	tallWall, //64x64
+	rightlateralTallWall, //64x64
+	leftlateralTallWall ,  // 64x64
+	ground, //16x16
+	door, //64x64
 	mapObjectCount
 };
 
@@ -37,12 +36,10 @@ public:
 		switch ( type ) {
 		case mapObjectType::tallWall:
 			return "tallWall";
-		case mapObjectType::shortWall:
-			return "shortWall";
-		case mapObjectType::lateralTallWall:
-			return "lateralTallWall";
-		case mapObjectType::lateralShortWall:
-			return "lateralShortWall";
+		case mapObjectType::leftlateralTallWall:
+			return "leftlateralTallWall";
+		case mapObjectType::rightlateralTallWall:
+			return "rightlateralTallWall";
 		case mapObjectType::ground:
 			return "ground";
 		case mapObjectType::door:

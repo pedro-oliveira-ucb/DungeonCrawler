@@ -12,7 +12,7 @@ class gameMap : public CSingleton<gameMap>
 private:
 	mutable std::mutex mapMutex;
 	mapType currentMapType = firstMap;
-	mapTileSet  currentTileSet;
+	TileSet  currentTileSet;
 	std::unordered_map < mapObjectType , std::shared_ptr<rMapObject>> * currentMapObjects;
 	GVector2D mapPosition = GVector2D( 0 , 0 );
 public:
@@ -20,9 +20,11 @@ public:
 	// Load the map from a file
 	void setMap( mapType );
 	mapType getCurrentMapType( ) const;
-	mapTileSet getCurrentTileSet( ) const;
+	TileSet getCurrentTileSet( ) const;
 	// Get the current map objects
 	std::unordered_map < mapObjectType , std::shared_ptr<rMapObject>> * getCurrentMapObjects( ) const;
 	GVector2D getMapPosition( ) const;
+
+	bool inInMap( const GVector2D & position ) const;
 };
 
