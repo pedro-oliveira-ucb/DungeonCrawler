@@ -7,30 +7,14 @@
 #include <raylib/raylib.h>
 
 
-void renderTilesetEmGrid(
-	const TileSet & tileSet ,
-	std::unordered_map<mapObjectType , std::shared_ptr<rMapObject>> * tileObjects ,
+void renderTilesetEmGrid( std::vector<DoorMapObject> * doors ,
+	const TileSet & tileSet , std::unordered_map<mapObjectType ,
+	std::shared_ptr<rMapObject>> *tileObjects ,
 	const GVector2D & mapScreenPosition
 ) {
-
 	std::unordered_map< mapObjectType , GVector2D> spriteAreaInCells;
 
-	// 1) Descobre a área (em células) de cada sprite de mapObjectType
-	for ( const auto & pair : *tileObjects ) {
-		mapObjectType tileType = pair.first;
-		auto mapObject = pair.second;
-		if ( mapObject ) {
-			auto sprite = mapObject->getSprite( );
-			if ( sprite && sprite->get( ) ) {
-				// Calcula a área do sprite em células (16px cada)
-				GVector2D area;
-				GVector2D spriteSize = sprite->get( )->getSpriteSize( );
-				area.x = static_cast< int >( spriteSize.x / 16 ); // Largura em células
-				area.y = static_cast< int >( spriteSize.y / 16 ); // Largura em células
-				spriteAreaInCells[ tileType ] = area;
-			}
-		}
-	}
+	bool doorsEmpty = doors->empty( );
 
 	size_t maxCols = 0;
 	for ( const auto & row : tileSet ) {
@@ -73,15 +57,12 @@ void renderTilesetEmGrid(
 			Texture2D * tileTexture = reinterpret_cast< Texture2D * >( textureAddress );
 
 			if ( !col ) {
-				columnHeight = tileSize.y; // Define a largura da coluna com base no primeiro tile
-				DrawRectangle( static_cast< int >( currentScreenX ) , static_cast< int >( currentScreenY ) , static_cast< int >( tileSize.x ) , static_cast< int >( tileSize.y ) , Fade( RED , 0.5f ) );
+				columnHeight = tileSize.y; // Define a largura da coluna com base no primeiro tile	
 				if ( !row )
 				{
 					rowWidth = tileSize.x; // Define a altura da linha com base no primeiro tile
-					DrawRectangle( static_cast< int >( currentScreenX ) , static_cast< int >( currentScreenY ) , static_cast< int >( tileSize.x ) , static_cast< int >( tileSize.y ) , Fade( BLUE , 0.5f ) );
 				}
 			}
-
 
 			if ( tileSize.x < rowWidth ) {
 				float tempWidth = 0.0f;
@@ -94,10 +75,16 @@ void renderTilesetEmGrid(
 					tempWidth += tileSize.x; // Ajusta a posição X para alinhar com a largura da coluna
 				}
 			}
-			else {
+			else if ( tileType != mapObjectType::door ) {
 				DrawTexture( *tileTexture , static_cast< int >( currentScreenX ) , static_cast< int >( currentScreenY ) , WHITE );
 			}
+			else if ( doorsEmpty ) {
+				DoorMapObject door;
+				door.position = GVector2D( static_cast< int >( currentScreenX ) , static_cast< int >( currentScreenY ) );
+				door.unlocked = false;
 
+				doors->emplace_back( door ); // Adiciona a porta à lista de portas
+			}
 
 			currentScreenY += columnHeight; // empilha verticalmente os tiles da coluna
 		}
@@ -118,21 +105,32 @@ void renderMap::render( ) {
 	}
 
 	GVector2D mapScreenPosition = gameMap::Get( ).getMapPosition( ); // Posição inicial do mapa na tela
+	renderTilesetEmGrid( &this->doors, tileSet , tileObjects , mapScreenPosition );
+}
 
-	float currentScreenY = mapScreenPosition.y;
+void renderMap::renderDoors( ) {
+	if ( this->doors.empty( ) )
+		return;
 
-	/*
-	mapTileSet tile =
-	{
-		{lt,t,t,t,d,t,t,t,lt},
-		{lt,g,g,g,g,g,g,g,lt},
-		{lt,g,g,g,g,g,g,g,lt},
-		{lt,g,g,g,g,g,g,g,lt},
-		{lt,g,g,g,g,g,g,g,lt},
-		{lt,g,g,g,g,g,g,g,lt},
-		{lt,t,t,t,t,t,t,t,lt}
-	};
-	*/
+	mapType type = gameMap::Get( ).getCurrentMapType( );
 
-	renderTilesetEmGrid( tileSet , tileObjects , mapScreenPosition );
+	std::shared_ptr<rMapObject> * mapObject = mapObjectsHandler::Get( ).getGameObject( type , mapObjectType::door );
+
+	if ( !mapObject )
+		return;
+
+	void * spriteAddress = mapObject->get( )->getSprite( )->get( )->getTexture( );
+
+	if ( spriteAddress == nullptr )
+		return;
+
+	Texture2D * texture = reinterpret_cast< Texture2D * >( spriteAddress );
+
+	if ( texture == nullptr )
+		return;
+
+	for ( const auto & door : this->doors ) {
+		DrawTexture( *texture , static_cast< int >( door.position.x ) , static_cast< int >( door.position.y ) , WHITE );
+	}
+
 }

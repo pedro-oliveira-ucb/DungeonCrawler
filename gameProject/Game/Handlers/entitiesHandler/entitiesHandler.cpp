@@ -147,7 +147,7 @@ void entitiesHandler::updateLocalPlayer( ) {
 		localPlayer->setSprinting( false );
 
 	GVector2D localPos = localPlayer->getEntityPosition( );
-	GVector2D mouseWorldPos = { Globals::Get().mousePosWorldX, Globals::Get().mousePosWorldY };
+	GVector2D mouseWorldPos = { Globals::Get( ).mousePosWorldX, Globals::Get( ).mousePosWorldY };
 	// Calcula ângulo com base nas posições no mundo
 	float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , mouseWorldPos ) );
 
@@ -173,17 +173,18 @@ void entitiesHandler::updateLocalPlayer( ) {
 
 GVector2D entitiesHandler::getRandomPlaceAroundPlayer( float radius )
 {
+	std::lock_guard<std::mutex> lock( handlerMutex );
 	GVector2D playerPos = localPlayer->getEntityPosition( );
 	bool okayPlace = false;
-	GVector2D deriserdSpawnPlace;
-	//while ( !okayPlace ) {
+	GVector2D deriserdSpawnPlace = GVector2D(0,0);
+	do {
 		int RandomX = utils::Get( ).randomNumber( -radius , radius );
 		int RandomY = utils::Get( ).randomNumber( -radius , radius );
 		deriserdSpawnPlace = GVector2D( playerPos.x + RandomX , playerPos.y + RandomY );
-		/*if ( CollisionManager::Get( ).isSpaceFree( deriserdSpawnPlace , GVector2D( 150 , 150 ) ) ) {
+		if ( CollisionManager::Get( ).isSpaceFree( deriserdSpawnPlace , GVector2D( 150 , 150 ) ) ) {
 			okayPlace = true;
-		}*/
-	//}
+		}
+	} while ( !okayPlace );
 
 	return deriserdSpawnPlace;
 }

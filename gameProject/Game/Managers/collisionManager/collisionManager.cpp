@@ -1,5 +1,7 @@
 #include "collisionManager.h"
 
+#include "../../gameObjects/gameMap/gameMap.h"
+
 CollisionManager & CollisionManager::Get( ) {
 	static CollisionManager instance;
 	return instance;
@@ -68,6 +70,13 @@ bool CollisionManager::checkSpacialCollision( CBaseEntity * a , GVector2D Positi
 
 bool CollisionManager::CanMoveTo( CBaseEntity * entity , GVector2D & newPos ) {
 	auto nearby = GetNearbyEntities( newPos );
+
+	bool inMap = gameMap::Get( ).inInMap( newPos );
+
+	if ( !inMap ) {
+		return false;
+	}
+
 	for ( auto * other : nearby ) {
 		if ( other != entity && other->isAlive( ) ) {
 			if ( checkCollision( entity , other , newPos ) ) {
@@ -80,6 +89,13 @@ bool CollisionManager::CanMoveTo( CBaseEntity * entity , GVector2D & newPos ) {
 
 bool CollisionManager::isSpaceFree( GVector2D Position , GVector2D Size ) {
 	auto nearby = GetNearbyEntities( Position );
+
+	bool inMap = gameMap::Get( ).inInMap( Position );
+
+	if ( !inMap ) {
+		return false;
+	}
+
 	for ( auto * other : nearby ) {
 		if ( checkSpacialCollision( other , Position , Size ) ) {
 			return false;

@@ -14,4 +14,5 @@ public:
 	void renderEntities( );
 	void renderGameOver( );
 	void renderMap( );
+	void renderMapDoors( );
 };

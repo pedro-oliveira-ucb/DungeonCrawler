@@ -55,3 +55,7 @@ void gameRender::renderGameOver( ) {
 void gameRender::renderMap( ) {
 	mapRender.render( );
 }
+
+void gameRender::renderMapDoors( ) {
+	mapRender.renderDoors( );
+}

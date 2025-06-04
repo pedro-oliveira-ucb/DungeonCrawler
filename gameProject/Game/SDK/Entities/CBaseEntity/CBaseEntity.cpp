@@ -4,6 +4,7 @@
 #include <set>
 #include <cmath>
 
+#include "../../../gameObjects/gameMap/gameMap.h"
 #include "../../../../Globals/Globals.h"
 
 #include "../../../Managers/collisionManager/collisionManager.h"
@@ -144,9 +145,11 @@ void CBaseEntity::setEntityPosition( GVector2D pos ) {
 }
 
 void CBaseEntity::Hit( int damage ) {
-	std::lock_guard<std::mutex> lock( this->cBaseMutex );
-	this->health -= damage;
-	this->beingHit = true;
+	{
+		std::lock_guard<std::mutex> lock( this->cBaseMutex );
+		this->health -= damage;
+		this->beingHit = true;
+	}
 
 	if ( this->isAlive( ) )
 		EventManager::Get( ).Trigger( this->Name + "_hurt" );
@@ -233,7 +236,7 @@ void CBaseEntity::move( ) {
 	if ( finalMovement.x != 0.0f || finalMovement.y != 0.0f ) {
 		GVector2D newPos = this->entityPosition + finalMovement;
 
-		if ( CollisionManager::Get( ).CanMoveTo( this , newPos ) ) {
+		if ( CollisionManager::Get( ).CanMoveTo( this , newPos )  ) {
 			float angleRadians = std::atan2( finalMovement.y , finalMovement.x );
 			float angleDegrees = angleRadians * ( 180.0f / static_cast< float >( M_PI ) );
 			this->movementAngle = angleDegrees;

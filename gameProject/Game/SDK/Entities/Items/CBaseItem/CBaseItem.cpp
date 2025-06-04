@@ -24,10 +24,19 @@ void CBaseItem::applyEffect( ) {
 }
 
 void CBaseItem::Active() {
-	GVector2D position = entitiesHandler::Get().getRandomPlaceAroundPlayer( 500 );
-	this->setEntityPosition( position );
-	this->active = true;
-	EventManager::Get( ).Trigger( this->GetEntityName( ) + "_active" );
+	GVector2D position = GVector2D( 0 , 0 );
+	{ 
+		position =  entitiesHandler::Get( ).getRandomPlaceAroundPlayer( 500 );
+	}
+	{
+		this->setEntityPosition( position );
+	}
+	{
+		this->active = true;
+	}
+	{
+		EventManager::Get( ).Trigger( this->GetEntityName( ) + "_active" );
+	}
 }
 
 bool CBaseItem::isActive( ) {

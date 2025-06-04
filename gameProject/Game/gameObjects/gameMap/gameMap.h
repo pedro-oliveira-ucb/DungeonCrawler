@@ -7,6 +7,7 @@
 #include "../../SDK/math/Vector2D/GVector2D.h"
 
 
+
 class gameMap : public CSingleton<gameMap>
 {
 private:
@@ -15,6 +16,8 @@ private:
 	TileSet  currentTileSet;
 	std::unordered_map < mapObjectType , std::shared_ptr<rMapObject>> * currentMapObjects;
 	GVector2D mapPosition = GVector2D( 0 , 0 );
+	GVector2D mapSize = GVector2D( 0 , 0 );
+	GVector2D calculateTileSize();
 public:
 	void init();
 	// Load the map from a file
@@ -24,7 +27,8 @@ public:
 	// Get the current map objects
 	std::unordered_map < mapObjectType , std::shared_ptr<rMapObject>> * getCurrentMapObjects( ) const;
 	GVector2D getMapPosition( ) const;
+	GVector2D getMapSize( ) const;
 
-	bool inInMap( const GVector2D & position ) const;
+	bool inInMap( GVector2D position );
 };
 

@@ -118,6 +118,7 @@ void inGameState::Render( gameStateManager * manager ) {
 	{
 		gameRender::Get( ).renderMap( );
 		gameRender::Get( ).renderEntities( );
+		gameRender::Get( ).renderMapDoors( );
 	}
 	EndMode2D( );
 	//renderDialogs( );
