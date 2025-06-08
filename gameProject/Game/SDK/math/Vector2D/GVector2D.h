@@ -60,6 +60,16 @@ public:
 		return *this;
 	}
 
+	bool operator<( const GVector2D & other ) const {
+		return ( x < other.x ) || ( x == other.x && y < other.y );
+	}
+
+	float distTo( const GVector2D & other ) const {
+		float dx = x - other.x;
+		float dy = y - other.y;
+		return std::sqrt( dx * dx + dy * dy );
+	}
+
 	// Calcula o comprimento (magnitude) do vetor
 	float length( ) const {
 		return std::sqrt( x * x + y * y );

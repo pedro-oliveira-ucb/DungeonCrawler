@@ -65,6 +65,7 @@ bool ItemsInitializer::initialize( ) {
 	builder.entityType = CBaseEntityType::ITEM;
 	builder.health = 100;
 	builder.movementSpeed = 30;
+	builder.entityHitbox = GVector2D( 20 , 20 );
 	builder.Name = "HealthItem";
 	auto enemy = generateHealthItem( builder , builder.Name , ItemType::HEALTH_ITEM , 15 );
 	if ( !enemy ) {

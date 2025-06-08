@@ -39,6 +39,7 @@ T * AttacksInitializer::generateAttack( std::string animationName , CBaseAttackC
 	builder.entityType = CBaseEntityType::ATTACK;
 	builder.health = 100;
 	builder.movementSpeed = 10;
+	builder.entityHitbox = attackBuilder.area;
 	builder.Name = animationName;
 
 	T * result = new T( builder , attackBuilder );
@@ -131,7 +132,7 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 		attackBuilder.type = CBaseAttackType_Melee;
 		attackBuilder.Name = "MeleeAttack";
 		//attack damage area
-		attackBuilder.area = GVector2D( 5 , 5 );
+		attackBuilder.area = GVector2D( 50 , 20 );
 
 		if ( !generateLocalPlayerAttack<CMeleeAttack>( attackBuilder ) )
 		{
@@ -149,7 +150,7 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 		attackBuilder.type = CBaseAttackType_Ranged;
 		attackBuilder.Name = "MagicAttack";
 		//attack damage area
-		attackBuilder.area = GVector2D( 10 , 10 );
+		attackBuilder.area = GVector2D( 50 , 50 );
 
 		if ( !generateLocalPlayerAttack<CRangedAttack>( attackBuilder ) ) {
 			Log::Print( "[generateLocalPlayerAttacks] Failed to generate RangedAttack" );
@@ -172,7 +173,7 @@ bool AttacksInitializer::generateEnemiesAttacks( ) {
 		attackBuilder.type = CBaseAttackType_Melee;
 		attackBuilder.Name = "MeleeAttack";
 		//attack damage area
-		attackBuilder.area = GVector2D( 5 , 5 );
+		attackBuilder.area = GVector2D( 50 , 20 );
 
 		if ( !generateMobAttack<CMeleeAttack>(  attackBuilder, "BasicEnemy" ) )
 		{
@@ -190,11 +191,29 @@ bool AttacksInitializer::generateEnemiesAttacks( ) {
 		attackBuilder.type = CBaseAttackType_Melee;
 		attackBuilder.Name = "MeleeAttack";
 		//attack damage area
-		attackBuilder.area = GVector2D( 5 , 5 );
+		attackBuilder.area = GVector2D( 50 , 20 );
 
 		if ( !generateMobAttack<CMeleeAttack>( attackBuilder , "MeleeEnemy1" ) )
 		{
 			Log::Print( "[generateEnemiesAttacks] Failed to generate MeleeAttack of MeleeEnemy1" );
+			return false;
+		}
+	}
+
+	{
+		attackBuilder.damage = 30;
+		attackBuilder.delay = .5f;
+		attackBuilder.cooldown = 1.5f;
+		attackBuilder.range = 300.f;
+		attackBuilder.speed = 100;
+		attackBuilder.type = CBaseAttackType_Ranged;
+		attackBuilder.Name = "RangeAttack";
+		//attack damage area
+		attackBuilder.area = GVector2D( 10 , 10 );
+
+		if ( !generateMobAttack<CRangedAttack>( attackBuilder , "RangedEnemy1" ) )
+		{
+			Log::Print( "[generateEnemiesAttacks] Failed to generate RangeAttack of RangedEnemy1" );
 			return false;
 		}
 	}

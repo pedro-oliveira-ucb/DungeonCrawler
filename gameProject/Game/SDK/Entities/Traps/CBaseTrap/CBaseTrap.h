@@ -21,7 +21,7 @@ public:
 	CBaseTrap( const CBaseTrap & other );
 
 	virtual void applyEffect( );
-	void initialize( );
+	void initialize( GVector2D position );
 	bool isInitialized( ) const; 
 	void unitialize( );
 	void activeTrap( );

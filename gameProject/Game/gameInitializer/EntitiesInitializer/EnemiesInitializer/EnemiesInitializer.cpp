@@ -36,10 +36,6 @@ std::unique_ptr<CEnemyEntity> generateEnemy( CBaseEntityConstructor & builder , 
 		 CBaseEntityAnimationType::ATTACKING_BACKWARD ,
 		 CBaseEntityAnimationType::ATTACKING_LEFT ,
 		 CBaseEntityAnimationType::ATTACKING_RIGHT,
-		 CBaseEntityAnimationType::ATTACKING_WALKING_FORWARD ,
-		 CBaseEntityAnimationType::ATTACKING_WALKING_BACKWARD ,
-		 CBaseEntityAnimationType::ATTACKING_WALKING_LEFT ,
-		 CBaseEntityAnimationType::ATTACKING_WALKING_RIGHT,
 		 CBaseEntityAnimationType::HURT_FORWARD ,
 		 CBaseEntityAnimationType::HURT_BACKWARD ,
 		 CBaseEntityAnimationType::HURT_LEFT ,
@@ -104,41 +100,72 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 bool EnemiesInitializer::initialize( )
 {
 	CBaseEntityConstructor builder;
-	builder.entityPosition = GVector2D( 0 , 0 );
-	builder.entityType = CBaseEntityType::MOB;
-	builder.health = 100;
-	builder.movementSpeed = 30;
-	builder.Name = "BasicEnemy";
-	auto BasicEnemy = generateEnemy( builder , "BasicEnemy" , CEnemyType::MELEE_ENEMY );
-	if ( !BasicEnemy ) {
-		Log::Print( "[Enemies Initializer] Failed to create enemy BasicEnemy!" );
-		return false;
+	{	
+		builder.entityPosition = GVector2D( 0 , 0 );
+		builder.entityType = CBaseEntityType::MOB;
+		builder.health = 100;
+		builder.movementSpeed = 30;
+		builder.entityHitbox = GVector2D( 25 , 25 );
+		builder.Name = "BasicEnemy";
+		auto BasicEnemy = generateEnemy( builder , "BasicEnemy" , CEnemyType::MELEE_ENEMY );
+		if ( !BasicEnemy ) {
+			Log::Print( "[Enemies Initializer] Failed to create enemy BasicEnemy!" );
+			return false;
+		}
+
+		if ( !initializeEvents( "BasicEnemy" ) ) {
+			Log::Print( "[Enemies Initializer] Failed to initialize enemy BasicEnemy events!" );
+			return false;
+		}
+
+		entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::MELEE_ENEMY , std::move( BasicEnemy ) );
 	}
 
-	if ( !initializeEvents( "BasicEnemy" ) ) {
-		Log::Print( "[Enemies Initializer] Failed to initialize enemy BasicEnemy events!" );
-		return false;
+	
+	{
+		builder.entityPosition = GVector2D( 0 , 0 );
+		builder.entityType = CBaseEntityType::MOB;
+		builder.health = 100;
+		builder.entityHitbox = GVector2D( 25 , 25 );
+		builder.movementSpeed = 50;
+		builder.Name = "MeleeEnemy1";
+		auto MeleeEnemy1 = generateEnemy( builder , "MeleeEnemy1" , CEnemyType::MELEE_ENEMY );
+		if ( !MeleeEnemy1 ) {
+			Log::Print( "[Enemies Initializer] Failed to create enemy MeleeEnemy1!" );
+			return false;
+		}
+
+		if ( !initializeEvents( "MeleeEnemy1" ) ) {
+			Log::Print( "[Enemies Initializer] Failed to initialize enemy MeleeEnemy1 events!" );
+			return false;
+		}
+
+		entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::MELEE_ENEMY_MEDIUM , std::move( MeleeEnemy1 ) );
 	}
 
-	entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::MELEE_ENEMY , std::move( BasicEnemy ) );
 
-	builder.entityPosition = GVector2D( 0 , 0 );
-	builder.entityType = CBaseEntityType::MOB;
-	builder.health = 100;
-	builder.movementSpeed = 50;
-	builder.Name = "MeleeEnemy1";
-	auto MeleeEnemy1 = generateEnemy( builder , "MeleeEnemy1" , CEnemyType::MELEE_ENEMY );
-	if ( !MeleeEnemy1 ) {
-		Log::Print( "[Enemies Initializer] Failed to create enemy MeleeEnemy1!" );
-		return false;
+
+	{
+		builder.entityPosition = GVector2D( 0 , 0 );
+		builder.entityType = CBaseEntityType::MOB;
+		builder.health = 100;
+		builder.entityHitbox = GVector2D( 25 , 25 );
+		builder.movementSpeed = 50;
+		builder.Name = "RangedEnemy1";
+		auto RangedEnemy1 = generateEnemy( builder , "RangedEnemy1" , CEnemyType::RANGED_ENEMY );
+		if ( !RangedEnemy1 ) {
+			Log::Print( "[Enemies Initializer] Failed to create enemy RangedEnemy1!" );
+			return false;
+		}
+
+		if ( !initializeEvents( "RangedEnemy1" ) ) {
+			Log::Print( "[Enemies Initializer] Failed to initialize enemy RangedEnemy1 events!" );
+			return false;
+		}
+		entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::RANGED_ENEMY , std::move( RangedEnemy1 ) );
 	}
 
-	if ( !initializeEvents( "MeleeEnemy1" ) ) {
-		Log::Print( "[Enemies Initializer] Failed to initialize enemy MeleeEnemy1 events!" );
-		return false;
-	}
 
-	entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::MELEE_ENEMY_MEDIUM , std::move( MeleeEnemy1 ) );
 
 
 	return true;

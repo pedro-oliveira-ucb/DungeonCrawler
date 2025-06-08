@@ -48,9 +48,9 @@ std::vector<CBaseEntity *> CollisionManager::GetNearbyEntities( const GVector2D 
 }
 
 bool CollisionManager::checkCollision( CBaseEntity * a , CBaseEntity * b , GVector2D newPosA ) {
-	GVector2D sizeA = a->getEntityAnimations( )->getCurrentTextureSize( );
+	GVector2D sizeA = a->getHitbox( ).getHitboxSize( );
 	GVector2D posB = b->getEntityPosition( );
-	GVector2D sizeB = b->getEntityAnimations( )->getCurrentTextureSize( );
+	GVector2D sizeB = b->getHitbox().getHitboxSize();
 
 	return ( newPosA.x < posB.x + sizeB.x &&
 		newPosA.x + sizeA.x > posB.x &&
@@ -60,7 +60,7 @@ bool CollisionManager::checkCollision( CBaseEntity * a , CBaseEntity * b , GVect
 
 bool CollisionManager::checkSpacialCollision( CBaseEntity * a , GVector2D Position , GVector2D Size ) {
 	GVector2D posB = a->getEntityPosition( );
-	GVector2D sizeB = a->getEntityAnimations( )->getCurrentTextureSize( );
+	GVector2D sizeB = a->getHitbox( ).getHitboxSize( );
 
 	return ( Position.x < posB.x + sizeB.x &&
 		Position.x + Size.x > posB.x &&

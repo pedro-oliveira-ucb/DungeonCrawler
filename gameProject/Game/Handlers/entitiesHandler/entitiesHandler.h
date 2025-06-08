@@ -11,32 +11,32 @@
 
 class entitiesHandler : public CSingleton<entitiesHandler> {
 private:
-    CPlayerEntity * localPlayer = nullptr;
+	CPlayerEntity * localPlayer = nullptr;
 
-    std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> spawnableEnemies;
+	std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> spawnableEnemies;
 
-    std::vector<std::unique_ptr<CBaseEntity>> spawnedEntities;
-    std::vector<std::unique_ptr<CEnemyEntity>> spawnedEnemies;
-    std::mutex handlerMutex;
+	std::vector<std::unique_ptr<CBaseEntity>> spawnedEntities;
+	std::vector<std::unique_ptr<CEnemyEntity>> spawnedEnemies;
+	std::mutex handlerMutex;
 
 public:
-    void setLocalPlayer( CPlayerEntity * player );
-    CPlayerEntity * getLocalPlayer( );
+	void setLocalPlayer( CPlayerEntity * player );
+	CPlayerEntity * getLocalPlayer( );
 
-    void addSpawnableEnemy( CEnemyType type , std::unique_ptr<CEnemyEntity> enemy );   
+	void addSpawnableEnemy( CEnemyType type , std::unique_ptr<CEnemyEntity> enemy );
 
-    void addSpawnedEnemy( std::unique_ptr<CEnemyEntity> * enemy );
-    void addSpawnedEntity( std::unique_ptr<CBaseEntity> * entity );
-  
-    std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> * getSpawnableEnemies( );
+	void addSpawnedEnemy( std::unique_ptr<CEnemyEntity> enemy );
+	void addSpawnedEntity( std::unique_ptr<CBaseEntity> * entity );
 
-    std::vector<std::unique_ptr<CEnemyEntity>> * getSpawnedEnemies( );
-    std::vector<std::unique_ptr<CBaseEntity>> * getSpawnedEntities( );
+	std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> * getSpawnableEnemies( );
 
-    void updateSpawnedEnemies( CPlayerEntity* localPlayer  );
-    void updateEnemiesCollision( );
+	std::vector<std::unique_ptr<CEnemyEntity>> * getSpawnedEnemies( );
+	std::vector<std::unique_ptr<CBaseEntity>> * getSpawnedEntities( );
+
+	void updateSpawnedEnemies( int index, bool followPlayer );
+	void updateEnemiesCollision( );
 	void updateLocalPlayer( );
 	void clearSpawnedEntities( );
 
-    GVector2D getRandomPlaceAroundPlayer( float radius );
+	GVector2D getRandomPlaceAroundPlayer( float radius );
 };

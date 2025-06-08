@@ -21,7 +21,7 @@ void renderPauseMenu::render( ) {
 	DrawRectangleRec( { boxTopLeft.x, boxTopLeft.y, boxSize.x, boxSize.y } , Fade( DARKGRAY , 0.85f ) );
 
 	// Título
-	const char * title = "PAUSADO";
+	const char * title = "PAUSED";
 	int titleFontSize = 30;
 	int titleWidth = MeasureText( title , titleFontSize );
 	DrawText( title , boxCenter.x - titleWidth / 2 , boxTopLeft.y + spacing / 2 , titleFontSize , RAYWHITE );
@@ -40,19 +40,19 @@ void renderPauseMenu::render( ) {
 
 	Rectangle soundSlider = { boxTopLeft.x + spacing, y, contentWidth, 20 };
 
-	if ( components::Get().DrawButton( continueBtn , "Continuar" , LIGHTGRAY , DARKGRAY ) ) {
+	if ( components::Get().DrawButton( continueBtn , "Continue" , LIGHTGRAY , DARKGRAY ) ) {
 		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PLAYING );
 	}
 
-	if ( components::Get( ).DrawButton( quitBtn , "Sair do jogo" , LIGHTGRAY , DARKGRAY ) ) {
+	if ( components::Get( ).DrawButton( quitBtn , "Quit" , LIGHTGRAY , DARKGRAY ) ) {
 		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_EXIT );
 	}
 
 	float musicVolume = Globals::Get( ).getGameSettings( )->getMusicVolume( );
 	float soundVolume = Globals::Get( ).getGameSettings( )->getSoundVolume( );
 
-	components::Get( ).DrawSlider( musicSlider , &musicVolume , "Volume da música" , 0.0f , 100.0f , GRAY , RED );
-	components::Get( ).DrawSlider( soundSlider , &soundVolume , "Volume dos efeitos" , 0.0f , 100.0f , GRAY , RED );
+	components::Get( ).DrawSlider( musicSlider , &musicVolume , "Music volume" , 0.0f , 100.0f , GRAY , RED );
+	components::Get( ).DrawSlider( soundSlider , &soundVolume , "Effects volume" , 0.0f , 100.0f , GRAY , RED );
 
 	Globals::Get( ).getGameSettings( )->setMusicVolume( musicVolume );
 	Globals::Get( ).getGameSettings( )->setSoundVolume( soundVolume );

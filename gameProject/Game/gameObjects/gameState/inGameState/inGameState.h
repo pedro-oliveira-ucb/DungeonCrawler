@@ -18,4 +18,5 @@ private:
     void setCameraPosition( );
     bool isPaused = false;
     float zoomLevel = 0.0f;
+    int currentPlayerRoom = -1;
 };

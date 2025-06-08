@@ -27,9 +27,15 @@
 
 Game game;
 
+void getWindowSize( ) {
+	Globals::Get( ).screenWidth = 1920;
+	Globals::Get( ).screenHeight = 1080;
+}
+
 int main( void ) {
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	Log::Print( "[Render] Initialized window!" );
+
 
 	SetConfigFlags( FLAG_VSYNC_HINT );
 	//SetConfigFlags( FLAG_FULLSCREEN_MODE ); 

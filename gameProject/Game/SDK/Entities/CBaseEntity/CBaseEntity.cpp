@@ -44,7 +44,7 @@ CBaseEntity::CBaseEntity( CBaseEntityConstructor builder ) :
 	this->movementAngle = 0.f;
 	this->lookingAngle = 0.0f;
 	this->entityLookingDirection = DIRECTION::LEFT;
-	
+	this->entityHitbox = builder.entityHitbox;
 }
 
 bool CBaseEntity::isSprinting( ) const {

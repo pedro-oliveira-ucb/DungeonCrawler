@@ -60,6 +60,7 @@ bool TrapsInitializer::initialize( )
 	builder.entityPosition = GVector2D( 0 , 0 );
 	builder.entityType = CBaseEntityType::TRAP;
 	builder.health = 100;
+	builder.entityHitbox = GVector2D( 20 , 20 );
 	builder.movementSpeed = 30;
 	builder.Name = "SpikeTrap";
 	auto trap = generateSpikeTrap( builder , builder.Name , TrapType::SPIKES , 30 );

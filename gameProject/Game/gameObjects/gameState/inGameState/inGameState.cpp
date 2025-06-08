@@ -6,9 +6,11 @@
 
 #include "../../../Managers/gameStateManagers/gameStateManager.h" // Para transições de estado
 #include "../../../Managers/gameResourceManager/gameResourceManager.h"
-#include "../../../Handlers/shadersHandler/shadersHandler.h"
+#include "../../../Managers/LevelManager/LevelManager.h"
 
+#include "../../../Handlers/shadersHandler/shadersHandler.h"
 #include "../../../Handlers/entitiesHandler/entitiesHandler.h"
+#include "../../../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
 
 #include "../../../gameRender/gameRender.h"
 
@@ -29,9 +31,14 @@ inGameState::~inGameState( ) {
 
 void inGameState::OnEnter( gameStateManager * manager ) {
 	Log::Print( "[inGameState]: OnEnter" );
+	
+	levelManager.initialize( );
+	Log::Print( "[inGameState]: levelManager initialized" );
+	levelManager.start( );
+	Log::Print( "[inGameState]: levelManager started" );
+
 	Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PLAYING );
 	_gameResourceManager.getMusicManager( )->playMusic( musicType::DungeonMusic , 10 );
-	gameMap::Get( ).init( );
 }
 
 void inGameState::OnExit( gameStateManager * manager ) {
@@ -61,7 +68,27 @@ void inGameState::setCameraPosition( ) {
 
 void inGameState::HandleInput( gameStateManager * manager ) {
 	if ( IsKeyPressed( KEY_ESCAPE ) ) {
-		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PAUSED );
+		currentGameState state = Globals::Get( ).getGame( )->getCurrentGameState( );
+		currentGameState newState = state == currentGameState::GAME_STATE_PAUSED ? currentGameState::GAME_STATE_PLAYING : currentGameState::GAME_STATE_PAUSED;
+		Globals::Get( ).getGame( )->setCurrentGameState( newState );
+	}
+	if ( IsKeyPressed( KEY_E ) ) {
+		CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
+		if ( local != nullptr ) {
+			GVector2D localPos = local->getEntityPosition( );
+			std::map<GVector2D , DoorInstanceData> doors = gameMap::Get( ).getDoorInstancesCopy( );
+			if ( !doors.empty( ) ) {
+				for ( const auto & door : doors ) {
+					if ( door.second.unlocked )
+						continue;
+
+					if ( door.first.distTo( localPos ) <= 100 ) {
+						gameMap::Get( ).getDoorInstanceData( door.first )->unlocked = true;
+						gameSoundsEventHandler::Get( ).addEventToQueue( "door_open" );
+					}
+				}
+			}
+		}
 	}
 }
 

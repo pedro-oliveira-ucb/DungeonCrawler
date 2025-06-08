@@ -77,6 +77,7 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 	builder.entityType = CBaseEntityType::PLAYER;
 	builder.health = 100;
 	builder.movementSpeed = 100;
+	builder.entityHitbox = GVector2D( 25 , 25 );
 	builder.Name = animationName;
 
 	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks = attackHandler::Get( ).getAvailableLocalPlayerAttack( );

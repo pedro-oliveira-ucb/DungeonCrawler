@@ -1,6 +1,7 @@
 #include "enemiesController.h"
 
 #include "../../gameControls/keybindHandler/keybindHandler.h"
+#include "../../gameObjects/gameMap/gameMap.h"
 
 #include "../../Managers/collisionManager/collisionManager.h"
 #include "../../Managers/LevelManager/LevelManager.h"
@@ -29,9 +30,8 @@ void enemiesController::threadFunction( ) {
 			player = entitiesHandler::Get( ).getLocalPlayer( );
 			continue;
 		}
+	
 
-
-		entitiesHandler::Get( ).updateSpawnedEnemies( player );
 		std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
 	}
 

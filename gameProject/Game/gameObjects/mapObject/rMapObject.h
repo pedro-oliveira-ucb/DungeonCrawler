@@ -12,7 +12,15 @@ enum class mapObjectType
 	leftlateralTallWall ,  // 64x64
 	ground, //16x16
 	door, //64x64
+	unlocked_door,//64x64
 	mapObjectCount
+};
+
+enum mapType {
+	firstMap ,
+	secondMap ,
+	thirdMap ,
+	bossMap
 };
 
 class rMapObject
@@ -44,6 +52,8 @@ public:
 			return "ground";
 		case mapObjectType::door:
 			return "door";
+		case mapObjectType::unlocked_door:
+			return "unlocked_door";
 		default:
 			return "unknown";
 		}

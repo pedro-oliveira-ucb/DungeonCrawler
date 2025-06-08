@@ -24,9 +24,8 @@ void CBaseTrap::applyEffect( ) {
 
 }
 
-void CBaseTrap::initialize( ) {
+void CBaseTrap::initialize( GVector2D position) {
 	std::lock_guard<std::mutex> baseItemLock( baseTrapMutex );
-	GVector2D position = entitiesHandler::Get( ).getRandomPlaceAroundPlayer( 500 );
 	this->setEntityPosition( position );
 	this->initialized = true;
 	this->getEntityAnimations( )->setAnimationStep( 1 );

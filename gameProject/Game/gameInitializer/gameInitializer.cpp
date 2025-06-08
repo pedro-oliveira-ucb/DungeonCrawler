@@ -11,7 +11,7 @@
 
 #include "EntitiesInitializer/EntitiesInitializer.h"
 #include "ShadersInitializer/shadersInitializer.h"
-#include "mapObjectsInitializer/mapObjectsInitializer.h"
+#include "mapInitializer/mapInitializer.h"
 
 
 gameResourceManager _gameResourceManager;
@@ -20,7 +20,7 @@ gameThreads _gameThreads;
 
 EntitiesInitializer _entitiesInitializer;
 shadersInitializer _shadersInitializer;
-mapObjectsInitializer _mapObjectsInitializer;
+mapInitializer _mapInitializer;
 
 bool gameInitializer::initializeEvents( ) {
 
@@ -65,8 +65,8 @@ bool gameInitializer::initializeResources( ) {
 	Log::Print( "[gameInitializer] entities initialized!" );
 
 
-	if(!_mapObjectsInitializer.initialize( )) {
-		Log::Print( "[gameInitializer] mapObjectsInitializer failed to initialize!" );
+	if(!_mapInitializer.initialize( )) {
+		Log::Print( "[gameInitializer] mapInitializer failed to initialize!" );
 		return false;
 	}
 	Log::Print( "[gameInitializer] map objects initialized!" );

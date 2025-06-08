@@ -6,17 +6,20 @@
 #include "updatePosition/updatePosition.h"
 #include "updateEntities/updateEntities.h"
 #include "enemiesController/enemiesController.h"
+#include "updateLevel/updateLevel.h"
 #include "../../Utils/Log/Log.h"
 
 
 updatePositionEvent _updatePositionEvent;
 updateEntities _updateEntities;
 enemiesController _enemiesController;
+updateLevel _updateLevel;
 
 std::vector<std::pair<CBaseThread * , std::string> > _gameThreads {
 	{  &_updatePositionEvent, "updatePosition" },
 	{ &_updateEntities, "updateEntities" },
-	{ &_enemiesController, "enemiesController" }
+	{ &_enemiesController, "enemiesController" },
+	{ &_updateLevel, "updateLevel" }
 };
 
 bool gameThreads::deploy( ) {

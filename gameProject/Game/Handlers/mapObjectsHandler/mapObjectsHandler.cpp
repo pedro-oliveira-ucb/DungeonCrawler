@@ -5,8 +5,18 @@ void mapObjectsHandler::addGameObject( mapType type , mapObjectType objectType, 
 	this->mapObjects[ type ][ objectType] = object;
 }
 
-void mapObjectsHandler::addTileSet( mapType type , const TileSet & tiles ){
-	this->mapTiles[ type ] = tiles;
+void mapObjectsHandler::addDungeonLayout( mapType type , DungeonLayout layout )
+{
+	this->dungeonLayout[ type ] = layout;
+}
+
+DungeonLayout * mapObjectsHandler::getDungeonLayout( mapType type )
+{
+	if( this->dungeonLayout.find(type  ) != this->dungeonLayout.end() ) {
+		return &this->dungeonLayout[ type ];
+	}
+
+	return nullptr;
 }
 
 std::shared_ptr<rMapObject> * mapObjectsHandler::getGameObject( mapType type , mapObjectType objectType ) {
@@ -21,15 +31,6 @@ std::shared_ptr<rMapObject> * mapObjectsHandler::getGameObject( mapType type , m
 	}
 
 	return &that->second;
-}
-
-TileSet * mapObjectsHandler::getTileSet( mapType type )
-{
-	if(this->mapTiles.find( type ) != this->mapTiles.end()) {
-		return &this->mapTiles[ type ];
-	}
-
-	return nullptr;
 }
 
 std::unordered_map<mapObjectType , std::shared_ptr<rMapObject>> * mapObjectsHandler::getAllMapObjects( mapType type )

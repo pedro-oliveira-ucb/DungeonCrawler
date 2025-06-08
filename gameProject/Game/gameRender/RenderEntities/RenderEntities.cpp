@@ -20,8 +20,6 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 		return;
 	}
 
-	DrawInfo = false;
-
 	CBaseEntityAnimation * entityAnimation = entity->getEntityAnimations( );
 
 	if ( entityAnimation == nullptr ) {
@@ -133,23 +131,16 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 
 		DrawText( entity->getEntityStateAsString( ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
+		GVector2D hitbox = entity->getHitbox( ).getHitboxSize();
+
 		DrawRectangleLines(
-			pos.x - size.x / 2 ,
-			pos.y - size.y / 2 ,
-			size.x ,
-			size.y ,
+			pos.x - hitbox.x / 2 ,
+			pos.y - hitbox.y / 2 ,
+			hitbox.x ,
+			hitbox.y ,
 			BLUE
 		);
 
-		DrawRectangleLines(
-			pos.x - size.x / 2 ,
-			pos.y - size.y / 2 ,
-			size.x ,
-			size.y ,
-			BLUE
-		);
-
-	
 		//Moving angle
 		DrawLine(
 			pos.x ,

@@ -4,7 +4,7 @@
 
 enum mapType;
 
-class mapObjectsInitializer
+class mapInitializer 
 {
 public:
 	bool initialize( );

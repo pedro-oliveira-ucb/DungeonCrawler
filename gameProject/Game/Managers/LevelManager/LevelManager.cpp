@@ -1,215 +1,219 @@
 #include "LevelManager.h"
-#include <cstdlib>
-#include <ctime>
 
-#include "../../../Utils/utils.h"
-#include "../../../Globals/Globals.h"
-
+#include "../../gameObjects/gameMap/gameMap.h"
+#include "../../Handlers/mapObjectsHandler/mapObjectsHandler.h"
 #include "../../Handlers/entitiesHandler/entitiesHandler.h"
-#include "../../Handlers/trapsHandler/trapsHandler.h"
-#include "../collisionManager/collisionManager.h"
 
-LevelManager::LevelManager( ) {
-	loadLevels( );
-}
+#include "../../Handlers/LevelHandler/LevelHandler.h"
 
 LevelManager levelManager;
 
+void LevelManager::generateFirstLevel( ) {
 
-void LevelManager::generateLevel1( ) {
+	mapType levelMap = firstMap;
 
-	std::lock_guard<std::mutex> lock( managerMutex );
-	//LEVEL 1
-	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+	DungeonLayout * dungeon = mapObjectsHandler::Get( ).getDungeonLayout( levelMap );
+	if ( dungeon == nullptr ) {
+		return;
+	}
 
-	LevelEnemySpawnerData basicMeleeEnemySpawner;
-	basicMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY;
-	basicMeleeEnemySpawner.SpawnCount = 10;
-	basicMeleeEnemySpawner.RespawnCount = 5;
-	basicMeleeEnemySpawner.RespawnTimer = 5;
-	basicMeleeEnemySpawner.lastRespawnTime = currentGameTime;
+	int numRooms = dungeon->numRooms;
 
-	LevelEnemySpawnerData mediumMeleeEnemySpawner;
-	mediumMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY_MEDIUM;
-	mediumMeleeEnemySpawner.SpawnCount = 5;
-	mediumMeleeEnemySpawner.RespawnCount = 5;
-	mediumMeleeEnemySpawner.RespawnTimer = 10;
-	mediumMeleeEnemySpawner.lastRespawnTime = currentGameTime;
+	for ( int i = 1; i <= numRooms; ++i ) {
 
-	LevelData level;
-	level.levelNumber = 1;
-	level.mapName = "Map1";
-	level.Traps = 10;
-	level.enemySpawners.push_back( basicMeleeEnemySpawner );
-	level.enemySpawners.push_back( mediumMeleeEnemySpawner );
-	levels.push_back( level );
-}
+		LevelEnemySpawnerData basicEnemySpawnerData = {
+			CEnemyType::MELEE_ENEMY , 5 , 3 , 10 , 0 , 0.0
+		};
+		LevelData levelData = {
+			1 , "firstMap_" + std::to_string( i ) , 0 , { { CEnemyType::MELEE_ENEMY , basicEnemySpawnerData } }
+		};
+		gameRoomLevel gameRoom( levelData , i );
 
-void LevelManager::generateLevel2( ) {
-	std::lock_guard<std::mutex> lock( managerMutex );
-	//LEVEL 1
-	//LEVEL 1
-	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
-
-	LevelEnemySpawnerData basicMeleeEnemySpawner;
-	basicMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY;
-	basicMeleeEnemySpawner.SpawnCount = 10;
-	basicMeleeEnemySpawner.RespawnCount = 5;
-	basicMeleeEnemySpawner.RespawnTimer = 5;
-	basicMeleeEnemySpawner.lastRespawnTime = currentGameTime;
-
-	LevelEnemySpawnerData mediumMeleeEnemySpawner;
-	mediumMeleeEnemySpawner.type = CEnemyType::MELEE_ENEMY_MEDIUM;
-	mediumMeleeEnemySpawner.SpawnCount = 5;
-	mediumMeleeEnemySpawner.RespawnCount = 5;
-	mediumMeleeEnemySpawner.RespawnTimer = 10;
-	mediumMeleeEnemySpawner.lastRespawnTime = currentGameTime;
-
-	LevelData level;
-	level.levelNumber = 1;
-	level.mapName = "Map2";
-	level.Traps = 10;
-	level.enemySpawners.push_back( basicMeleeEnemySpawner );
-	level.enemySpawners.push_back( mediumMeleeEnemySpawner );
-	levels.push_back( level );
-}
-
-
-void LevelManager::loadLevels( ) {
-	generateLevel1( );
-	generateLevel2( );
-}
-
-LevelData LevelManager::getCurrentLevel( ) {
-	return levels[ currentLevelIndex ];
-}
-
-void LevelManager::moveToNextLevel( ) {
-	if ( !isLastLevel( ) ) {
-		++currentLevelIndex;
-		spawnEnemiesForLevel( levels[ currentLevelIndex ] );
+		// Adiciona o LevelData ao LevelHandler
+		LevelHandler::Get( ).addLevel( levelMap , gameRoom );
 	}
 }
 
-void LevelManager::restartCurrentLevel( ) {
+void LevelManager::generateSecondLevel( ) {
+
+	mapType levelMap = secondMap;
+
+	DungeonLayout * dungeon = mapObjectsHandler::Get( ).getDungeonLayout( levelMap );
+	if ( dungeon == nullptr ) {
+		return;
+	}
+
+	int numRooms = dungeon->numRooms;
+
+	for ( int i = 1; i <= numRooms; ++i ) {
+
+		LevelEnemySpawnerData basicEnemySpawnerData = {
+			CEnemyType::MELEE_ENEMY , 5 , 3 , 10 , 0 , 0.0
+		};
+		LevelData levelData = {
+			1 , "secondMap_" + std::to_string( i ) , 0 , { { CEnemyType::MELEE_ENEMY , basicEnemySpawnerData } }
+		};
+		gameRoomLevel gameRoom( levelData , i );
+
+		// Adiciona o LevelData ao LevelHandler
+		LevelHandler::Get( ).addLevel( levelMap , gameRoom );
+	}
+}
+
+void LevelManager::generateThirdLevel( ) {
+
+	mapType levelMap = thirdMap;
+
+	DungeonLayout * dungeon = mapObjectsHandler::Get( ).getDungeonLayout( levelMap );
+	if ( dungeon == nullptr ) {
+		return;
+	}
+
+	int numRooms = dungeon->numRooms;
+
+	for ( int i = 1; i <= numRooms; ++i ) {
+
+		LevelEnemySpawnerData basicEnemySpawnerData = {
+			CEnemyType::MELEE_ENEMY , 5 , 3 , 10 , 0 , 0.0
+		};
+		LevelData levelData = {
+			1 , "secondMap_" + std::to_string( i ) , 0 , { { CEnemyType::MELEE_ENEMY , basicEnemySpawnerData } }
+		};
+		gameRoomLevel gameRoom( levelData , i );
+
+		// Adiciona o LevelData ao LevelHandler
+		LevelHandler::Get( ).addLevel( levelMap , gameRoom );
+	}
+}
+
+void LevelManager::generateBossLevel( ) {
+
+	mapType levelMap = bossMap;
+
+	DungeonLayout * dungeon = mapObjectsHandler::Get( ).getDungeonLayout( levelMap );
+	if ( dungeon == nullptr ) {
+		return;
+	}
+
+	int numRooms = dungeon->numRooms;
+
+	for ( int i = 1; i <= numRooms; ++i ) {
+
+		LevelEnemySpawnerData basicEnemySpawnerData = {
+			CEnemyType::MELEE_ENEMY , 5 , 3 , 10 , 0 , 0.0
+		};
+		LevelData levelData = {
+			1 , "secondMap_" + std::to_string( i ) , 0 , { { CEnemyType::MELEE_ENEMY , basicEnemySpawnerData } }
+		};
+		gameRoomLevel gameRoom( levelData , i );
+
+		// Adiciona o LevelData ao LevelHandler
+		LevelHandler::Get( ).addLevel( levelMap , gameRoom );
+	}
+}
+
+void LevelManager::generateLevels( )
+{
+	generateFirstLevel( );
+	generateSecondLevel( );
+	generateThirdLevel( );
+	generateBossLevel( );
+}
+void LevelManager::initializeLevels( ) {
+
+	for ( int i = 0; i <= mapType::bossMap; ++i ) {
+		mapType levelMap = static_cast<mapType>( i );
+		std::vector<gameRoomLevel> * roomLevels = LevelHandler::Get( ).getMapRoomLevels( levelMap );
+		if ( roomLevels == nullptr ) {
+			continue;
+		}
+		for( auto & room : *roomLevels ) {
+			this->mapLevels[ levelMap ].emplace( std::make_pair( room.getRoomID( ) , room ) );
+		}
+	}
+}
+
+void LevelManager::initialize( ) {
+	std::lock_guard<std::mutex> lock( this->m_mutex );
+	generateLevels( );
+	initializeLevels( );
+}
+
+void LevelManager::update( ) {
+	std::lock_guard<std::mutex> lock( this->m_mutex );
+	mapType map = static_cast< mapType >( this->currentLevel );
+
+	if ( this->mapLevels.find( map ) != this->mapLevels.end( ) ) {
+		for ( auto & map : this->mapLevels.at( map ) ) {
+			map.second.update();
+		}
+	}
+	else {
+		// Handle case where map is not found, e.g., log an error or throw an exception
+	}
+}
+
+void LevelManager::start( ) {
+	std::lock_guard<std::mutex> lock( this->m_mutex );
+
+	if ( !started ) {
+		this->currentLevel = 0;
+		started = true;
+	}
+
+	mapType map = static_cast< mapType >( this->currentLevel );
+
+	if(this->mapLevels.find(map ) != this->mapLevels.end( )) {
+		gameMap::Get( ).setMap( map );
+
+		for ( auto & map : this->mapLevels.at( map )) {
+			map.second.init( );
+		}		
+	} else {
+		// Handle case where map is not found, e.g., log an error or throw an exception
+	}
+}
+
+void LevelManager::moveToNextLevel( ) {
+	std::lock_guard<std::mutex> lock( this->m_mutex );
 	CPlayerEntity * player = entitiesHandler::Get( ).getLocalPlayer( );
 	if ( player == nullptr ) {
 		return;
 	}
 
-	if ( !player->isAlive( ) && player->deathAnimationFinished() ) {
-		player->Respawn( );
+	if ( this->currentLevel >= mapType::bossMap ) {
+		// Handle case where the player is already at the last level, e.g., end the game or show a message
+		return;
 	}
+	this->currentLevel++;
 
-	spawnEnemiesForLevel( levels[ currentLevelIndex ] );
-}
+	mapType map = static_cast< mapType >( this->currentLevel );
 
-bool LevelManager::hasEnemyAlive( ) {
-	bool foundAliveEnemy = false;
-	bool canRespawn = false;
-
-	for ( auto it = enemies.begin( ); it != enemies.end( );) {
-		for ( auto enemies : it->second ) {
-			if ( enemies->isAlive( ) ) {
-				foundAliveEnemy = true;
-			}
-			++enemies;
+	if(this->mapLevels.find(map ) != this->mapLevels.end( )) {
+		for ( auto & map : this->mapLevels.at( map ) ) {
+			map.second.init( );
 		}
-		if ( this->levels[ currentLevelIndex ].enemySpawners.at( it->first ).respawnedCount <
-			this->levels[ currentLevelIndex ].enemySpawners.at( it->first ).RespawnCount ) {
-			canRespawn = true;
-		}
-		++it; // Move to the next enemy
-	}
-
-	return foundAliveEnemy || canRespawn;
-}
-
-bool LevelManager::isLastLevel( ) {
-	return currentLevelIndex >= static_cast< int >( levels.size( ) ) - 1;
-}
-
-bool LevelManager::canRespawn( CEnemyType enemyType ) {
-	auto & currentLevel = levels[ currentLevelIndex ];
-	auto & enemySpawnHandler = currentLevel.enemySpawners.at( enemyType );
-
-	bool canRespawn = false;
-
-	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
-
-	if ( enemySpawnHandler.respawnedCount < enemySpawnHandler.RespawnCount ) {
-		double delta = currentGameTime - enemySpawnHandler.lastRespawnTime;
-		if ( delta >= enemySpawnHandler.RespawnTimer ) {
-			canRespawn = true;
-		}
-	}
-
-	return canRespawn;
-}
-
-
-void LevelManager::updateEnemies( ) {
-
-	// Calcula delta time em segundos
-	auto & currentLevel = levels[ currentLevelIndex ];
-	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
-
-	for ( auto it = enemies.begin( ); it != enemies.end( ); ++it ) {
-		auto & enemySpawnHandler = currentLevel.enemySpawners.at( it->first );
-		bool respawnEnemy = canRespawn( it->first );
-		if ( respawnEnemy ) {
-			for ( auto & enemy : it->second ) {
-				if ( !enemy->isAlive( ) && enemy->deathAnimationFinished( ) ) {
-					enemy->setEntityPosition( entitiesHandler::Get( ).getRandomPlaceAroundPlayer( 850 ) );
-					enemy->Respawn( );
-					enemySpawnHandler.respawnedCount++;
-					enemySpawnHandler.lastRespawnTime = currentGameTime;
-					break;
-				}
-			}
-		}
+		gameMap::Get( ).setMap( map );
 	}
 }
 
-void LevelManager::updateLevel( )
+bool LevelManager::hasAliveEnemyOnCurrentRoom(int roomID )
 {
-	std::lock_guard<std::mutex> lock( managerMutex );
-	if ( !started ) {
-		currentLevelIndex = 0;
-		spawnEnemiesForLevel( levels[ currentLevelIndex ] );
-		started = true;
-	}
+	std::lock_guard<std::mutex> lock( this->m_mutex );
 
-	if ( !hasEnemyAlive( ) ) {
-		moveToNextLevel( );
-	}
+	mapType map = static_cast< mapType >( this->currentLevel );
 
-	updateEnemies( );
-}
-
-void LevelManager::spawnEnemiesForLevel( const LevelData & data ) {
-
-	entitiesHandler::Get( ).clearSpawnedEntities( );
-	trapsHandler::Get( ).clearSpawnedTraps( );
-
-	auto enemyList = entitiesHandler::Get( ).getSpawnableEnemies( );
-	for ( auto it = data.enemySpawners.begin( ); it != data.enemySpawners.end( ); ++it ) {
-		for ( int i = 0; i < it->SpawnCount; i++ ) {
-			std::unique_ptr<CEnemyEntity> enemy = enemyList->at( it->type )->uniqueClone( );
-			enemies[ it->type ].push_back( enemy.get( ) );
-			entitiesHandler::Get( ).addSpawnedEnemy( &enemy );
+	if( this->mapLevels.find( map ) != this->mapLevels.end( ) ) {
+		if(this->mapLevels.at(map ).find( roomID) != this->mapLevels.at( map ).end( )) {
+			gameRoomLevel & room = this->mapLevels.at( map ).at( roomID );
+			return room.hasEnemyAlive( );
 		}
 	}
-
-	for ( int i = 0; i < data.Traps; i++ ) {
-		trapsHandler::Get( ).spawnTrap( TrapType::SPIKES );
-	}
-
-	// Inicialização das posições
-	for ( auto & e : enemies ) {
-		for ( auto & enemy : e.second ) {
-			enemy->setEntityPosition( entitiesHandler::Get( ).getRandomPlaceAroundPlayer( 850 ) );
-			enemy->Respawn( );
-		}
-	}
+	
+	return false;
 }
+
+
+
+
+

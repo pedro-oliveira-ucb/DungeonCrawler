@@ -51,7 +51,7 @@ void trapsHandler::addSpawnableTrap( std::unique_ptr<CBaseTrap> trap )
 	spawnableTraps.emplace( trap->getTrapType( ) , std::move( trap ) );
 }
 
-CBaseTrap * trapsHandler::spawnTrap( TrapType itemType ) {
+CBaseTrap * trapsHandler::spawnTrap( TrapType itemType, GVector2D position) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 
 	auto it = spawnableTraps.find( itemType );
@@ -61,7 +61,7 @@ CBaseTrap * trapsHandler::spawnTrap( TrapType itemType ) {
 	if ( it->second.get( ) != nullptr ) {
 		std::unique_ptr<CBaseTrap> trapClone = it->second->TrapClone( );
 		Log::Print( "Copy complete, trying to active item" );
-		trapClone->initialize( );
+		trapClone->initialize( position);
 		Log::Print( "Item activated, trying to push to vector" );
 		spawnedTraps.push_back( std::move( trapClone ) );
 	}

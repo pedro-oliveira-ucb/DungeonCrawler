@@ -36,6 +36,20 @@ public:
 	int dy;
 };
 
+
+class CBaseEntityHitbox {
+    GVector2D hitboxSize;
+public:
+	CBaseEntityHitbox( ) : hitboxSize( 0 , 0 ) { }
+    CBaseEntityHitbox( GVector2D size ) {
+        this->hitboxSize = size;
+    }
+
+    GVector2D getHitboxSize( ) {
+        return this->hitboxSize;
+    }
+};
+
 struct CBaseEntityConstructor {
 	std::string Name;
 
@@ -46,21 +60,10 @@ struct CBaseEntityConstructor {
 	CBaseEntityType entityType;
 	CBaseEntityMovementDirection entityMovementDirection = MOVEMENT_FORWARD;
 	CBaseEntityAnimationConstructor entityAnimations;
+    CBaseEntityHitbox entityHitbox;
 };
 
 
-class CBaseEntityHitbox {
-	GVector2D hitboxSize;
-public:
-	CBaseEntityHitbox( ) = default;
-	CBaseEntityHitbox( GVector2D size ) {
-		this->hitboxSize = size;
-	}
-
-	GVector2D getHitboxSize( ) {
-		return this->hitboxSize;
-	}
-};
 enum DIRECTION {
 	LEFT ,
 	RIGHT ,

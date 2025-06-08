@@ -2,6 +2,8 @@
 
 #include "../../gameControls/keybindHandler/keybindHandler.h"
 
+#include "../../gameObjects/gameMap/gameMap.h"
+
 #include "../../Managers/collisionManager/collisionManager.h"
 #include "../../Managers/LevelManager/LevelManager.h"
 
@@ -31,7 +33,6 @@ void updateEntities::threadFunction( ) {
 
 		entitiesHandler::Get( ).updateEnemiesCollision( );
 
-		levelManager.updateLevel( );
 		std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
 	}
 
