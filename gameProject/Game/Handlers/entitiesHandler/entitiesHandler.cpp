@@ -171,9 +171,10 @@ void entitiesHandler::updateLocalPlayer( ) {
 			localPlayer->addMoveRequest( move.movementDirection );
 		}
 	}
-
 	// Atualiza player
 	localPlayer->updateEntity( );
+
+	Globals::Get( ).getGame( )->setCurrentLocalPlayerPosition( localPos );
 }
 
 GVector2D entitiesHandler::getRandomPlaceAroundPlayer( float radius )

@@ -1,6 +1,10 @@
 #include "attackHandler.h"
 #include <mutex>
 
+#include "../../gameObjects/gameMap/gameMap.h"
+
+#include "../../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
+
 #include "../entitiesHandler/entitiesHandler.h"
 #include "../../Managers/collisionManager/collisionManager.h"
 
@@ -26,6 +30,14 @@ void attackHandler::updateAttacks( )
 		{
 			if ( attack->IsActive( ) ) {
 
+				GVector2D attackPosition = attack->getEntityPosition( );
+
+				if (!gameMap::Get( ).inInMap( attackPosition ) ) {
+					gameSoundsEventHandler::Get( ).addEventToQueue( attack->GetEntityName( ) + "_hitWall" );
+					it = runningAttacks.erase( it );
+					continue;
+				}
+
 				std::vector<CBaseEntity *> targets = CollisionManager::Get( ).GetAllEntities( );
 
 				if ( !targets.empty( ) ) {
@@ -47,7 +59,7 @@ void attackHandler::updateAttacks( )
 						if ( attack->hasAlreadyHit( targets.at( i ) ) )
 							continue;
 
-						if ( CollisionManager::Get( ).checkCollision( attack , targets.at( i ) , attack->getEntityPosition( ) ) ) {
+						if ( CollisionManager::Get( ).checkCollision( attack , targets.at( i ) , attackPosition ) ) {
 							targets.at( i )->Hit( ( int ) attack->getDamage( ) );
 							attack->registerHit( targets.at( i ) );
 						}

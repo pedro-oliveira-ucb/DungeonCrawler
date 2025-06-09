@@ -7,16 +7,18 @@ struct CBaseAttackConstructor;
 
 class AttacksInitializer : public CSingleton<AttacksInitializer>
 {
-	template <typename T>
-	T * generateAttack( std::string animationName , CBaseAttackConstructor attackBuilder );
-	template <typename T>
-	bool generateMobAttack( CBaseAttackConstructor , std::string mobName );
-	template <typename T>
-	bool generateLocalPlayerAttack( CBaseAttackConstructor );
+
 
 	bool generateEnemiesAttacks( );
 	bool generateLocalPlayerAttacks( );
 
 public:
+	template <typename T>
+	static T * generateAttack( std::string animationName , CBaseAttackConstructor attackBuilder );
+	template <typename T>
+	static bool generateMobAttack( CBaseAttackConstructor , std::string mobName );
+	template <typename T>
+	static bool generateLocalPlayerAttack( CBaseAttackConstructor );
+
 	bool initializeAttacks( );
 };

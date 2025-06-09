@@ -75,7 +75,7 @@ bool generateAttackEvents( std::string attackName ) {
 
 template <typename T>
 bool AttacksInitializer::generateMobAttack( CBaseAttackConstructor attackBuilder , std::string mobName ) {
-	std::string attackName = mobName + "_" + attackBuilder.Name;
+	std::string attackName = "enemies_" + mobName + "_" + attackBuilder.Name;
 	attackBuilder.Name = attackName;
 
 	T * raw = generateAttack<T>( attackName , attackBuilder );
@@ -119,6 +119,36 @@ bool AttacksInitializer::generateLocalPlayerAttack( CBaseAttackConstructor attac
 	return true;
 }
 
+bool generateMeleeAttack( CBaseAttackConstructor builder , std::string enemyName , GVector2D attackArea ) {
+
+	builder.Name = "MeleeAttack";
+	builder.area = attackArea;
+	builder.type = CBaseAttackType_Melee;
+
+	if ( !AttacksInitializer::generateMobAttack<CMeleeAttack>( builder , enemyName ) )
+	{
+		Log::Print( "[generateEnemiesAttacks] Failed to generate %s" , enemyName.c_str( ) );
+		return false;
+	}
+
+	return true;
+}
+
+bool generateRangeAttack( CBaseAttackConstructor builder , std::string enemyName , GVector2D attackArea ) {
+
+	builder.Name = "RangeAttack";
+	builder.area = attackArea;
+	builder.type = CBaseAttackType_Ranged;
+
+	if ( !AttacksInitializer::generateMobAttack<CRangedAttack>( builder , enemyName ) )
+	{
+		Log::Print( "[generateEnemiesAttacks] Failed to generate %s" , enemyName.c_str( ) );
+		return false;
+	}
+
+	return true;
+}
+
 
 bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 
@@ -126,7 +156,7 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 	{
 		attackBuilder.damage = 100;
 		attackBuilder.delay = .5f;
-		attackBuilder.cooldown = 1.0f;
+		attackBuilder.cooldown = .5f;
 		attackBuilder.range = 30.f;
 		attackBuilder.speed = 30.f;
 		attackBuilder.type = CBaseAttackType_Melee;
@@ -161,59 +191,79 @@ bool AttacksInitializer::generateLocalPlayerAttacks( ) {
 	return true;
 }
 
+
+
 bool AttacksInitializer::generateEnemiesAttacks( ) {
 
 	CBaseAttackConstructor attackBuilder;
 	{
-		attackBuilder.damage = 10;
+		attackBuilder.damage = 15;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 1.0f;
 		attackBuilder.range = 30.f;
 		attackBuilder.speed = 10;
-		attackBuilder.type = CBaseAttackType_Melee;
-		attackBuilder.Name = "MeleeAttack";
-		//attack damage area
-		attackBuilder.area = GVector2D( 50 , 20 );
-
-		if ( !generateMobAttack<CMeleeAttack>(  attackBuilder, "BasicEnemy" ) )
-		{
-			Log::Print( "[generateEnemiesAttacks] Failed to generate MeleeAttack" );
+		if ( !generateMeleeAttack( attackBuilder , "basicMeleeEnemy" , GVector2D( 50 , 20 ) ) ){
 			return false;
 		}
 	}
 
 	{
-		attackBuilder.damage = 30;
+		attackBuilder.damage = 25;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 1.0f;
 		attackBuilder.range = 60.f;
 		attackBuilder.speed = 20;
-		attackBuilder.type = CBaseAttackType_Melee;
-		attackBuilder.Name = "MeleeAttack";
-		//attack damage area
-		attackBuilder.area = GVector2D( 50 , 20 );
-
-		if ( !generateMobAttack<CMeleeAttack>( attackBuilder , "MeleeEnemy1" ) )
-		{
-			Log::Print( "[generateEnemiesAttacks] Failed to generate MeleeAttack of MeleeEnemy1" );
+		if ( !generateMeleeAttack( attackBuilder , "mediumMeleeEnemy" , GVector2D( 50 , 20 ) ) ) {
 			return false;
 		}
 	}
 
 	{
-		attackBuilder.damage = 30;
+		attackBuilder.damage = 35;
+		attackBuilder.delay = .5f;
+		attackBuilder.cooldown = 1.0f;
+		attackBuilder.range = 60.f;
+		attackBuilder.speed = 20;
+		if ( !generateMeleeAttack( attackBuilder , "advancedMeleeEnemy" , GVector2D( 50 , 20 ) ) ) {
+			return false;
+		}
+	}
+
+
+	{
+		attackBuilder.damage = 10;
 		attackBuilder.delay = .5f;
 		attackBuilder.cooldown = 1.5f;
 		attackBuilder.range = 300.f;
 		attackBuilder.speed = 100;
 		attackBuilder.type = CBaseAttackType_Ranged;
-		attackBuilder.Name = "RangeAttack";
-		//attack damage area
-		attackBuilder.area = GVector2D( 10 , 10 );
 
-		if ( !generateMobAttack<CRangedAttack>( attackBuilder , "RangedEnemy1" ) )
-		{
-			Log::Print( "[generateEnemiesAttacks] Failed to generate RangeAttack of RangedEnemy1" );
+		if ( !generateRangeAttack( attackBuilder , "basicRangeEnemy" , GVector2D( 10 , 10 ) ) ) {
+			return false;
+		}
+	}
+
+	{
+		attackBuilder.damage = 20;
+		attackBuilder.delay = .5f;
+		attackBuilder.cooldown = 1.5f;
+		attackBuilder.range = 300.f;
+		attackBuilder.speed = 100;
+		attackBuilder.type = CBaseAttackType_Ranged;
+
+		if ( !generateRangeAttack( attackBuilder , "mediumRangeEnemy" , GVector2D( 10 , 10 ) ) ) {
+			return false;
+		}
+	}
+	{
+		attackBuilder.damage = 20;
+		attackBuilder.delay = .5f;
+		attackBuilder.cooldown = 1.5f;
+		attackBuilder.range = 300.f;
+		attackBuilder.speed = 100;
+		attackBuilder.type = CBaseAttackType_Ranged;
+
+		if ( !generateRangeAttack( attackBuilder , "advancedRangeEnemy" , GVector2D( 10 , 10 ) ) ) {
 			return false;
 		}
 	}

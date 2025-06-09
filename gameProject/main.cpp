@@ -33,7 +33,11 @@ void getWindowSize( ) {
 }
 
 int main( void ) {
+#if _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#else
+
+#endif
 	Log::Print( "[Render] Initialized window!" );
 
 
@@ -44,10 +48,8 @@ int main( void ) {
 	DisableCursor( );
 
 	gameStateManager gameStateManager_;
-	// Define o estado inicial
-   // gameStateManager.ChangeState(std::make_unique<MainMenuState>());
-   // OU se MainMenuState não precisar de argumentos no construtor:
 
+	// 
 	BeginDrawing( );
 	ClearBackground( BLACK );
 	DrawText( "Loading" , Globals::Get( ).screenWidth / 2 - MeasureText( "Loading" , 20 ) / 2 , Globals::Get( ).screenHeight / 2 - 10 , 20 , WHITE );

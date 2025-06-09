@@ -144,6 +144,7 @@ void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
 	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::HURT_BACKWARD ) ) {
 		state |= CBaseEntityState::HURT;
 		this->loopAnimation = false;
+		this->inAttackLoadingAnimation = false;
 		this->getEntityAnimations( )->resetAnimation( );
 		return;
 	}
@@ -162,54 +163,52 @@ void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
 }
 
 bool CPlayerEntity::handleAttackState( std::uint32_t & state ) {
-
-	bool sentAttack = false;
-
+	state |= CBaseEntityState::ATTACKING;
+	loopAnimation = false; // Animação de ataque nunca deve ser em loop
 	reverseAnimation = false;
 
+	// Se a animação de ataque acabou de ser selecionada, reseta ela
 	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::ATTACKING_FORWARD ) ) {
-		state |= CBaseEntityState::ATTACKING;
-		this->loopAnimation = false;
-		EventManager::Get( ).Trigger( this->attacks.at( this->currentLoadingAttack )->GetEntityName( ) + "_attackLoad" );
 		this->getEntityAnimations( )->resetAnimation( );
-		return sentAttack;
+		EventManager::Get( ).Trigger( this->attacks.at( this->currentLoadingAttack )->GetEntityName( ) + "_attackLoad" );
+		return false;
 	}
 
-	bool attackAnimationEnded = this->getEntityAnimations( )->isAnimationFinished( );
+	bool animationJustFinished = this->getEntityAnimations( )->isAnimationFinished( );
 
-
+	// Lança o ataque em um ponto específico da animação (ex: meio do caminho)
+	// Para simplificar aqui, vamos usar a lógica original, mas aprimorada.
+	// Para ataques Ranged, esperamos o fim. Para Melee, pode ser antes.
+	bool shouldThrowAttack = false;
 	switch ( this->attacks.at( this->currentLoadingAttack )->getAttackType( ) ) {
 	case CBaseAttackType_Melee:
-		// Para ataques corpo-a-corpo, lança o ataque imediatamente
+		// Dispara o ataque melee na primeira vez que entramos aqui, para dar a sensação de imediatismo
 		if ( !this->alreadyThrowedAttack ) {
-			attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
-			sentAttack = true;
-			this->alreadyThrowedAttack = true;
+			shouldThrowAttack = true;
 		}
 		break;
-
 	case CBaseAttackType_Ranged:
-		// Para ataques à distância, lança o ataque quando a animação termina
-		if ( attackAnimationEnded && !this->alreadyThrowedAttack ) {
-			attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
-			sentAttack = true;
-			this->alreadyThrowedAttack = true;
+		// Dispara o ataque ranged quando a animação termina
+		if ( animationJustFinished && !this->alreadyThrowedAttack ) {
+			shouldThrowAttack = true;
 		}
 		break;
 	}
 
-	// Finaliza o estado de ataque quando a animação termina
-	if ( !attackAnimationEnded ) {
-		state |= CBaseEntityState::ATTACKING;
+	if ( shouldThrowAttack ) {
+		attackHandler::Get( ).throwNewAttack( this , this->attacks.at( this->currentLoadingAttack ).get( ) );
+		this->alreadyThrowedAttack = true;
 	}
-	else {
+
+	// Se a animação terminou, limpa o estado de ataque
+	if ( animationJustFinished ) {
 		this->inAttackLoadingAnimation = false;
 		this->alreadyThrowedAttack = false;
 		this->attackUseTime.at( this->currentLoadingAttack ) = Globals::Get( ).getGame( )->getCurrentGameTime( );
+		// O estado de ATTACKING será removido no próximo ciclo de updateEntity, pois inAttackLoadingAnimation é false
 	}
 
-	loopAnimation = false;
-	return sentAttack;
+	return shouldThrowAttack;
 }
 
 std::uint32_t CPlayerEntity::determineEntityState( float lookingAngle , DIRECTION localDirection ) {
@@ -269,6 +268,8 @@ void CPlayerEntity::updateEntity( ) {
 	previousAnimationType = this->getEntityAnimations( )->getCurrentAnimationType( );
 
 	if ( this->isAlive( ) ) {
+
+		this->setDeathAnimationFinished( false );
 
 		// Atualiza os ciclos de animação e estados iniciais
 		updateAnimationCycles( );

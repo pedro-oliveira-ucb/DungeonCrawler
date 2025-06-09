@@ -31,7 +31,7 @@ inGameState::~inGameState( ) {
 
 void inGameState::OnEnter( gameStateManager * manager ) {
 	Log::Print( "[inGameState]: OnEnter" );
-	
+
 	levelManager.initialize( );
 	Log::Print( "[inGameState]: levelManager initialized" );
 	levelManager.start( );
@@ -47,23 +47,19 @@ void inGameState::OnExit( gameStateManager * manager ) {
 }
 
 void inGameState::setCameraPosition( ) {
-	CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
-	GVector2D localPos = local->getEntityPosition( );
+	GVector2D localPos = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
 	static GVector2D oldLocalPos;
-	if ( local != nullptr ) {
 
-		GVector2D localPos = local->getEntityPosition( );
-		// Define o ponto no mundo a ser seguido
-		camera.target = { localPos.x, localPos.y };
-		// Centraliza a câmera no meio da tela
-		camera.offset = { GetScreenWidth( ) / 2.0f, GetScreenHeight( ) / 2.0f };
+	// Define o ponto no mundo a ser seguido
+	camera.target = { localPos.x, localPos.y };
+	// Centraliza a câmera no meio da tela
+	camera.offset = { GetScreenWidth( ) / 2.0f, GetScreenHeight( ) / 2.0f };
 
-		// Converte mouse para coordenadas do mundo
-		Vector2 mouseWorld = GetScreenToWorld2D( GetMousePosition( ) , camera );
-		GVector2D mousePosWorld( mouseWorld.x , mouseWorld.y );
-		Globals::Get( ).mousePosWorldX = mousePosWorld.x;
-		Globals::Get( ).mousePosWorldY = mousePosWorld.y;
-	}
+	// Converte mouse para coordenadas do mundo
+	Vector2 mouseWorld = GetScreenToWorld2D( GetMousePosition( ) , camera );
+	GVector2D mousePosWorld( mouseWorld.x , mouseWorld.y );
+	Globals::Get( ).mousePosWorldX = mousePosWorld.x;
+	Globals::Get( ).mousePosWorldY = mousePosWorld.y;
 }
 
 void inGameState::HandleInput( gameStateManager * manager ) {
@@ -72,21 +68,23 @@ void inGameState::HandleInput( gameStateManager * manager ) {
 		currentGameState newState = state == currentGameState::GAME_STATE_PAUSED ? currentGameState::GAME_STATE_PLAYING : currentGameState::GAME_STATE_PAUSED;
 		Globals::Get( ).getGame( )->setCurrentGameState( newState );
 	}
-	if ( IsKeyPressed( KEY_E ) ) {
-		CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
-		if ( local != nullptr ) {
-			GVector2D localPos = local->getEntityPosition( );
-			std::map<GVector2D , DoorInstanceData> doors = gameMap::Get( ).getDoorInstancesCopy( );
-			if ( !doors.empty( ) ) {
-				for ( const auto & door : doors ) {
-					if ( door.second.unlocked )
-						continue;
 
-					if ( door.first.distTo( localPos ) <= 100 ) {
-						gameMap::Get( ).getDoorInstanceData( door.first )->unlocked = true;
-						gameSoundsEventHandler::Get( ).addEventToQueue( "door_open" );
-					}
-				}
+	GVector2D localPos = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
+	std::map<GVector2D , DoorInstanceData> doors = gameMap::Get( ).getDoorInstancesCopy( );
+	if ( !doors.empty( ) ) {
+		for ( const auto & door : doors ) {
+			if ( door.first.y > localPos.y ) {
+				// Se a porta estiver abaixo do jogador, não faz nada
+				if(door.second.unlocked )
+					gameSoundsEventHandler::Get( ).addEventToQueue( "door_close" );
+
+				gameMap::Get( ).getDoorInstanceData( door.first )->unlocked = false;
+				continue;
+			}
+
+			if ( door.first.distTo( localPos ) <= 100 && IsKeyPressed( KEY_E ) ) {
+				gameMap::Get( ).getDoorInstanceData( door.first )->unlocked = true;
+				gameSoundsEventHandler::Get( ).addEventToQueue( "door_open" );
 			}
 		}
 	}

@@ -35,11 +35,14 @@ void updateLevel::threadFunction( ) {
 			continue;
 		}
 
-		GVector2D localPos = local->getEntityPosition( );
+		GVector2D localPos = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
+
+		int localRoom = gameMap::Get( ).getRoomIdAtPosition( localPos );
+
+		Globals::Get( ).getGame( )->setCurrentGameRoom( localRoom );
 
 		bool inCorridor = gameMap::Get( ).isCorridor( localPos );
 		if ( !inCorridor ) {
-			int localRoom = gameMap::Get( ).getRoomIdAtPosition( localPos );
 			if ( localRoom ) {
 				if ( currentPlayerRoom == -1 ) {
 					if ( local != nullptr ) {
@@ -48,8 +51,15 @@ void updateLevel::threadFunction( ) {
 				}
 
 				if ( !levelManager.hasAliveEnemyOnCurrentRoom( localRoom ) ) {
-					// Se não houver inimigos vivos, dropa a chave
-					Log::Print( "[updateLevel] No enemies alive in room %s, dropping key", std::to_string( localRoom ).c_str() );
+					int roomsAmount = levelManager.roomsInCurrentLevel( );
+					if ( localRoom >= roomsAmount  ) {
+						Log::Print( "[updateLevel] Finished level" , std::to_string( localRoom ).c_str( ) );
+						levelManager.moveToNextLevel( );
+					}
+					else {
+						// Se não houver inimigos vivos, dropa a chave
+						Log::Print( "[updateLevel] No enemies alive in room %s, dropping key" , std::to_string( localRoom ).c_str( ) );
+					}
 				}
 			}
 		}

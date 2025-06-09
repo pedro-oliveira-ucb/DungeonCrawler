@@ -8,6 +8,7 @@
 std::mutex logMutex;
 
 void Log::Print( const char * format , ... ) {
+#if _DEBUG
     //One log at time
     std::lock_guard<std::mutex> lock( logMutex );
 
@@ -19,6 +20,7 @@ void Log::Print( const char * format , ... ) {
     std::printf( "\n" );
 
     va_end( args );
+#endif
 }
 
 void Log::Error( const char * format , va_list args ) {

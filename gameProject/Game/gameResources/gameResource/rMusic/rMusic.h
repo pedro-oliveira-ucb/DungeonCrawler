@@ -45,7 +45,7 @@ public:
 	void stop( float fadeOutTime = 0.0f );
 	void pause( );
 	void resume( );
-	void update( float deltaTime );
+	bool update( float deltaTime );
 
 	float getBaseVolume( );
 	void setVolume( float volume );

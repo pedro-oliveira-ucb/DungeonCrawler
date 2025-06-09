@@ -7,9 +7,10 @@ class CEnemyEntity;
 class EnemiesInitializer : public CSingleton<EnemiesInitializer>
 {
 private:
-    bool initializeEvents(std::string enemyName);
+   
 
 public:
+    static bool initializeEvents( std::string enemyName );
     bool initialize();
 };
 

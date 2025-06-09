@@ -1,6 +1,8 @@
 #include "renderMap.h"
 #include <unordered_map>
 
+#include "../../../Globals/Globals.h"
+
 #include "../../Handlers/entitiesHandler/entitiesHandler.h"
 
 #include "../../gameObjects/gameMap/gameMap.h"
@@ -9,30 +11,44 @@
 #include <raylib/raylib.h>
 
 
-void renderTilesetEmGrid( const TileSet & tileSet , std::unordered_map<mapObjectType ,
-	std::shared_ptr<rMapObject>> *tileObjects ,
-	const GVector2D & mapScreenPosition
+void renderTilesetEmGrid( const TileSet & tileSet ,
+	std::unordered_map<mapObjectType , std::shared_ptr<rMapObject>> * tileObjects ,
+	const GVector2D & mapScreenPosition 
 ) {
+	const float TILE_WIDTH = gameMap::Get( ).getTileDimensions( ).x;
+	const float TILE_HEIGHT = gameMap::Get( ).getTileDimensions( ).y;
 
-	size_t maxCols = 0;
-	for ( const auto & row : tileSet ) {
-		if ( row.size( ) > maxCols ) {
-			maxCols = row.size( );
-		}
+	// Se o tileset ou os tiles estiverem vazios, não há nada a fazer.
+	if ( tileSet.empty( ) || TILE_WIDTH <= 0 || TILE_HEIGHT <= 0 ) {
+		return;
 	}
 
-	float columnHeight = 0.0f;
-	float rowWidth = 0.0f;
-	float currentScreenX = mapScreenPosition.x; // ou outra lógica
+	// Obtenha as informações globais UMA VEZ para evitar chamadas repetidas.
+	const auto & globals = Globals::Get( );
+	const float screenWidth = globals.screenWidth;
+	const float screenHeight = globals.screenHeight;
 
-	// 2. Iterar por colunas, depois por linhas
-	for ( size_t col = 0; col < maxCols; ++col ) {
-		float currentScreenY = mapScreenPosition.y;
+	// Achar o número máximo de colunas.
+	// previamente corrigido no map generator, todos tem a mesma quantidade de colunas.
+	size_t maxCols = tileSet.at( 0 ).size( );
 
-		for ( size_t row = 0; row < tileSet.size( ); ++row ) {
-			const auto & currentRow = tileSet[ row ];
+	GVector2D localPosition = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
+	localPosition.x -= screenWidth / 2.0f; // Centraliza a câmera na tela
+	localPosition.y -= screenHeight / 2.0f; // Centraliza a câmera na tela
 
-			// Verifica se essa linha tem essa coluna
+	// Calcule quais colunas (tiles na horizontal) estão visíveis na tela.
+	size_t startCol = std::max( 0 , static_cast< int >( localPosition.x / TILE_WIDTH ) );
+	size_t endCol = std::min( maxCols , static_cast< size_t >( ( localPosition.x + screenWidth ) / TILE_WIDTH ) + 2 ); // +2 de margem
+
+	// Calcule quais linhas (tiles na vertical) estão visíveis na tela.
+	size_t startRow = std::max( 0 , static_cast< int >( localPosition.y / TILE_HEIGHT ) );
+	size_t endRow = std::min( tileSet.size( ) , static_cast< size_t >( ( localPosition.y + screenHeight * 2 ) / TILE_HEIGHT ) + 2 ); // +2 de margem
+
+	for ( size_t row = startRow; row < endRow; ++row ) {
+		const auto & currentRow = tileSet[ row ];
+
+		for ( size_t col = startCol; col < endCol; ++col ) {
+			// Verifica se a coluna existe nesta linha (para mapas com linhas de tamanhos diferentes)
 			if ( col >= currentRow.size( ) ) {
 				continue;
 			}
@@ -41,67 +57,65 @@ void renderTilesetEmGrid( const TileSet & tileSet , std::unordered_map<mapObject
 
 			switch ( tileType ) {
 			case mapObjectType::mapObjectNone:
-				currentScreenY += columnHeight; // empilha verticalmente os tiles da coluna
-				continue; // Ignora tiles que não são objetos ou portas
+				continue; // Pula tiles vazios
 			case mapObjectType::door:
 			case mapObjectType::unlocked_door:
-				// renderiza o chao embaixo da porta
+				// Se encontrar uma porta, renderiza o chão embaixo primeiro.
+				// (Esta lógica pode ser ajustada conforme a necessidade do seu jogo)
 				tileType = mapObjectType::ground;
 				break;
 			}
 
-			if ( tileObjects->find( tileType ) == tileObjects->end( ) || !( *tileObjects )[ tileType ] )
+			// Acesso otimizado ao mapa: procure uma vez e reutilize o resultado.
+			auto it = tileObjects->find( tileType );
+			if ( it == tileObjects->end( ) || !it->second ) {
 				continue;
+			}
 
-			std::shared_ptr<rSprite> * spriteWrapper = ( *tileObjects )[ tileType ]->getSprite( );
-
-			if ( !spriteWrapper || !spriteWrapper->get( ) )
+			// O resto da lógica para obter a textura.
+			std::shared_ptr<rSprite> * spriteWrapper = it->second->getSprite( );
+			if ( !spriteWrapper || !spriteWrapper->get( ) ) {
 				continue;
+			}
 
 			void * textureAddress = spriteWrapper->get( )->getTexture( );
-			if ( !textureAddress )
+			if ( !textureAddress ) {
 				continue;
+			}
 
-			GVector2D tileSize = spriteWrapper->get( )->getSpriteSize( );
 			Texture2D * tileTexture = reinterpret_cast< Texture2D * >( textureAddress );
 
+			// --- 4. CÁLCULO DE POSIÇÃO E DESENHO ---
+			// A posição do tile na tela é calculada de forma direta e simples.
+			const float currentScreenX = col * TILE_WIDTH + mapScreenPosition.x;
+			const float currentScreenY = row * TILE_HEIGHT + mapScreenPosition.y;
 
-			if ( !columnHeight && ( tileSize.x > 0 && tileSize.y > 0 ) ) {
-				columnHeight = tileSize.y; // Define a largura da coluna com base no primeiro tile	
-				currentScreenY += (columnHeight * col); // Ajusta a posição Y inicial para o primeiro tile
-			}
-
-			if ( !rowWidth && ( tileSize.x > 0 && tileSize.y > 0 ) ) {
-				rowWidth = tileSize.x; // Define a altura da linha com base no primeiro tile
-			}
-
-			// Verifica se a largura da coluna é maior que a largura do tile
-			if ( tileSize.x < rowWidth ) {
+			if ( tileTexture->width < TILE_WIDTH ) {
 				float tempWidth = 0.0f;
 				do {
-					float tempHeight = 0.0f; // Posição Y atual para empilhar os tiles
+					float tempHeight = 0.0f;
 					do {
+						// Desenha a textura do tile na posição correta.
 						DrawTexture( *tileTexture , static_cast< int >( currentScreenX + tempWidth ) , static_cast< int >( currentScreenY + tempHeight ) , WHITE );
-						tempHeight += tileSize.y; // empilha verticalmente os tiles da coluna
-					} while ( tempHeight < columnHeight );
-					tempWidth += tileSize.x; // Ajusta a posição X para alinhar com a largura da coluna
+						tempHeight += tileTexture->height;
+					} while( tempHeight < TILE_HEIGHT );
 
-				} while ( tempWidth < rowWidth );
+					tempWidth += tileTexture->width;
+				} while ( tempWidth < TILE_WIDTH );
 			}
 			else {
+				// Desenha a textura do tile na posição correta.
 				DrawTexture( *tileTexture , static_cast< int >( currentScreenX ) , static_cast< int >( currentScreenY ) , WHITE );
 			}
 
-			std::string id = std::to_string( gameMap::Get( ).getRoomIdAtPosition( GVector2D( currentScreenX , currentScreenY ) ) );
-			DrawText( id.c_str( ) , static_cast< int >( currentScreenX ) , static_cast< int >( currentScreenY ) , 10 , WHITE );
-
-			currentScreenY += columnHeight; // empilha verticalmente os tiles da coluna
+#if _DEBUG
+			// Lógica de debug para ver os índices, se necessário.
+			std::string id = std::to_string( row ) + "," + std::to_string( col );
+			DrawText( id.c_str( ) , static_cast< int >( currentScreenX ) , static_cast< int >( currentScreenY ) , 8 , WHITE );
+#endif
 		}
-
-		currentScreenX += rowWidth;
 	}
 }
-
 void renderMap::render( ) {
 	auto tileSet = gameMap::Get( ).getCurrentTileSet( ); // Use referência
 	if ( tileSet.empty( ) )
@@ -117,8 +131,6 @@ void renderMap::render( ) {
 }
 
 void renderMap::renderDoors( ) {
-
-
 	mapType type = gameMap::Get( ).getCurrentMapType( );
 
 	std::map<GVector2D , DoorInstanceData > doors = gameMap::Get( ).getDoorInstancesCopy( );
@@ -131,7 +143,11 @@ void renderMap::renderDoors( ) {
 
 	GVector2D playerPosition = player ? player->getEntityPosition( ) : GVector2D( 0.0f , 0.0f );
 
+	float currentTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+
 	for ( auto it = doors.begin( ); it != doors.end( ); ++it ) {
+		GVector2D position = it->first;
+
 		// Verifica se a porta está desbloqueada
 		mapObjectType doorType = it->second.unlocked ? mapObjectType::unlocked_door : mapObjectType::door;
 
@@ -150,16 +166,13 @@ void renderMap::renderDoors( ) {
 		if ( texture == nullptr )
 			continue;
 
-		GVector2D position = it->first;
-
 		DrawTexture( *texture , static_cast< int >( position.x ) , static_cast< int >( position.y ) , WHITE );
 
-		if ( position.distTo( playerPosition ) <= 100 && doorType != mapObjectType::unlocked_door ) {
-			// 1. Aura Pulsante ao Redor da Porta
-			// Cria um brilho suave e convidativo que pulsa gentilmente.
+		if ( position.y > playerPosition.y ) {
+			continue;
+		}
 
-			// Obter o tempo atual (assumindo uma função GetTime() que retorna segundos)
-			float currentTime = GetTime( ); // Adapte para a sua engine/biblioteca
+		if ( position.distTo( playerPosition ) <= 100 && doorType != mapObjectType::unlocked_door ) {
 			float pulseSpeed = 2.5f;   // Velocidade da pulsação (ciclos por segundo)
 			float minAlphaPulse = 0.3f;  // Opacidade mínima da pulsação (0.0 a 1.0)
 			float maxAlphaPulse = 0.7f;  // Opacidade máxima da pulsação (0.0 a 1.0)
@@ -168,11 +181,7 @@ void renderMap::renderDoors( ) {
 			float alphaNormalized = ( sin( currentTime * PI * pulseSpeed ) + 1.0f ) / 2.0f; // Normalizado entre 0.0 e 1.0
 			float auraAlpha = minAlphaPulse + ( maxAlphaPulse - minAlphaPulse ) * alphaNormalized;
 
-			// Cor para a aura (ex: um azul místico ou um dourado acolhedor)
-			// Usando uma estrutura Color similar à da Raylib: {R, G, B, A} onde A é 0-255.
-			// Convertendo o auraAlpha (0-1) para a faixa 0-255.
 			Color auraColor = { 173, 216, 230, static_cast< unsigned char >( auraAlpha * 255 ) }; // Azul Claro (LightBlue)
-			// Alternativa: Color auraColor = { 255, 223, 100, static_cast<unsigned char>(auraAlpha * 255) }; // Dourado Quente
 
 			// Calcula o centro e o raio para a aura.
 			// A aura pode ser um círculo ou um retângulo ligeiramente maior que a porta.
@@ -183,7 +192,6 @@ void renderMap::renderDoors( ) {
 			float auraRadius = baseRadius + 10.0f * alphaNormalized; // Raio também pode pulsar um pouco
 
 			// Desenha a aura. Usando DrawCircleGradient para uma borda mais suave.
-			// Se DrawCircleGradient não estiver disponível, um DrawCircle com a auraColor também funcionaria.
 			// O gradiente vai de uma cor mais opaca no centro para transparente na borda.
 			DrawCircleGradient(
 				static_cast< int >( doorCenter.x ) ,
@@ -192,14 +200,11 @@ void renderMap::renderDoors( ) {
 				auraColor ,                                  // Cor interna (parte mais opaca do gradiente)
 				Fade( auraColor , 0.0f )                       // Cor externa (totalmente transparente)
 			);
-			// Alternativas mais simples:
-			// DrawCircle(static_cast<int>(doorCenter.x), static_cast<int>(doorCenter.y), auraRadius, auraColor);
-			// DrawRectangle(static_cast<int>(position.x - 5), static_cast<int>(position.y - 5), texture->width + 10, texture->height + 10, auraColor);
 
-			// 2. Texto de "Desbloquear"
-			// Texto claro e elegante indicando a ação e a tecla.
-			const char * unlockText = "Desbloquear [E]"; // Ou "Abrir [Espaço]", "Interagir [F]", etc.
-			int fontSize = 18; // Escolha um tamanho de fonte apropriado
+			//Texto de "Desbloquear"
+			//Texto claro e elegante indicando a ação e a tecla.
+			const char * unlockText = "Desbloquear [E]";
+			int fontSize = 18; 
 			Color textColor = { 245, 245, 245, 240 }; // Um branco levemente acinzentado (WhiteSmoke), quase opaco
 
 			// Calcula as dimensões do texto para posicionamento
@@ -210,14 +215,10 @@ void renderMap::renderDoors( ) {
 			int textPosX = static_cast< int >( doorCenter.x - textWidth / 2.0f );
 			int textPosY = static_cast< int >( position.y + texture->height + 12 ); // 12 pixels abaixo da textura da porta
 
-			// Opcional: Adicionar uma sombra sutil ou fundo ao texto para melhor legibilidade
-			// DrawText(unlockText, textPosX + 1, textPosY + 1, fontSize, Fade(BLACK, 0.6f)); // Sombra simples
-
+			// Adicionar uma sombra sutil ou fundo ao texto para melhor legibilidade
+			DrawText(unlockText, textPosX + 1, textPosY + 1, fontSize, Fade(BLACK, 0.6f)); // Sombra simples
 			// Desenha o texto principal
 			DrawText( unlockText , textPosX , textPosY , fontSize , textColor );
-
-			// Opcional: Adicionar um pequeno ícone de chave ao lado do texto ou da porta, se você tiver um.
-			// Exemplo: if (texturaIconeChave) DrawTexture(*texturaIconeChave, textPosX - texturaIconeChave->width - 5, textPosY, WHITE);
 		}
 	}
 }

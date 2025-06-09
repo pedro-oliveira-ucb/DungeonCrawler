@@ -45,7 +45,6 @@ bool initializeMapObjects( mapType map , std::string mapName )
 		mapObjectsHandler::Get( ).addGameObject( map , objectType , mapObject );
 	}
 
-
 	return true;
 }
 
@@ -138,38 +137,32 @@ DungeonLayout generateDungeonTileSet(
 
 	// Calcular Posição de Spawn (centro da última sala)
 
-	GVector2D spawnPos = { -1, -1 }; // Padrão inválido
-	if ( numRooms > 0 ) {
-		int firstRoomW = room_dimensions[ 0 ].first;
-		int firstRoomH = room_dimensions[ 0 ].second;
+	//GVector2D spawnPos = { -1, -1 }; // Padrão inválido
+	//if ( numRooms > 0 ) {
+	//	int firstRoomW = room_dimensions[ 0 ].first;
+	//	int firstRoomH = room_dimensions[ 0 ].second;
 
-		// A primeira sala começa na coluna `room_start_x` e linha 0 do mapa.
-		int first_room_door_offset_in_wall = ( firstRoomW - 1 ) / 2;
-		int first_room_start_x_on_map = universal_door_map_x - first_room_door_offset_in_wall;
+	//	// A primeira sala começa na coluna `room_start_x` e linha 0 do mapa.
+	//	int first_room_door_offset_in_wall = ( firstRoomW - 1 ) / 2;
+	//	int first_room_start_x_on_map = universal_door_map_x - first_room_door_offset_in_wall;
 
-		// Posição de spawn relativa ao mapa geral
-		spawnPos.x = first_room_start_x_on_map + ( firstRoomW / 2 ); // Centro X da primeira sala
-		spawnPos.y = firstRoomH / 2; // Centro Y da primeira sala (offset Y da primeira sala é 0)
+	//	// Posição de spawn relativa ao mapa geral
+	//	spawnPos.x = first_room_start_x_on_map + ( firstRoomW / 2 ); // Centro X da primeira sala
+	//	spawnPos.y = firstRoomH / 2; // Centro Y da primeira sala (offset Y da primeira sala é 0)
 
-		// Verificação de limites (embora o spawn deva estar dentro da sala, que estará no mapa)
-		spawnPos.x = std::max( 0 , std::min( (int)spawnPos.x , overall_max_width - 1 ) );
-		spawnPos.y = std::max( 0 , std::min( ( int ) spawnPos.y , room_dimensions[ 0 ].second - 1 ) ); // Y relativo ao início do mapa
-	}
+	//	// Verificação de limites (embora o spawn deva estar dentro da sala, que estará no mapa)
+	//	spawnPos.x = std::max( 0 , std::min( (int)spawnPos.x , overall_max_width - 1 ) );
+	//	spawnPos.y = std::max( 0 , std::min( ( int ) spawnPos.y , room_dimensions[ 0 ].second - 1 ) ); // Y relativo ao início do mapa
+	//}
 
-	// 2. Inicializar o TileSet final com 'mapObjectNone'
-	TileSet finalTileSet( total_map_height , std::vector<mapObjectType>( overall_max_width , n ) );
+	//// 2. Inicializar o TileSet final com 'mapObjectNone'
+	//TileSet finalTileSet( total_map_height , std::vector<mapObjectType>( overall_max_width , n ) );
 
-	// SPAWN NA ULTIMA SALA
-	/*
-	overall_max_width = std::max( 3 , overall_max_width );
-	if ( overall_max_width % 2 == 0 ) {
-		overall_max_width++;
-	}
 
-	int universal_door_map_x = ( overall_max_width - 1 ) / 2;
+
 
 	// Calcular Posição de Spawn (centro da última sala)
-	SpawnPosition spawnPos = { -1, -1 }; // Padrão inválido
+	GVector2D spawnPos = { -1, -1 }; // Padrão inválido
 	if ( numRooms > 0 ) {
 		int idxLastRoom = numRooms - 1;
 		int lastRoomW = room_dimensions[ idxLastRoom ].first;
@@ -190,22 +183,22 @@ DungeonLayout generateDungeonTileSet(
 		}
 
 		// Posição de spawn relativa ao mapa geral (centro da última sala)
-		spawnPos.first = last_room_start_x_on_map + ( lastRoomW / 2 );
-		spawnPos.second = y_start_on_map_of_last_room + ( lastRoomH / 2 );
+		spawnPos.x = last_room_start_x_on_map + ( lastRoomW / 2 );
+		spawnPos.y = y_start_on_map_of_last_room + ( lastRoomH / 2 );
 
 		// Verificação de limites para a posição de spawn
 		// Garante que o spawn X esteja dentro dos limites do mapa
-		spawnPos.first = std::max( 0 , std::min( spawnPos.first , overall_max_width - 1 ) );
+		spawnPos.x = std::max( 0 , std::min( (int)spawnPos.x , overall_max_width - 1 ) );
 
 		// Garante que o spawn Y esteja dentro dos limites verticais da última sala.
 		// A última sala começa em y_start_on_map_of_last_room e tem altura lastRoomH.
 		// O spawn Y deve estar entre y_start_on_map_of_last_room e y_start_on_map_of_last_room + lastRoomH - 1.
-		spawnPos.second = std::max( y_start_on_map_of_last_room , std::min( spawnPos.second , y_start_on_map_of_last_room + lastRoomH - 1 ) );
+		spawnPos.y = std::max( y_start_on_map_of_last_room , std::min( (int)spawnPos.y , y_start_on_map_of_last_room + lastRoomH - 1 ) );
 	}
 
 	// 2. Inicializar o TileSet final com 'mapObjectNone'
 	TileSet finalTileSet( total_map_height , std::vector<mapObjectType>( overall_max_width , n ) );
-	*/
+	
 
 	int current_y_offset = 0;
 
@@ -357,13 +350,13 @@ bool mapInitializer::initialize( ) {
 			return false;
 		}
 
-		int numRooms = 3;
+		int numRooms = 10;
 		int minRoomW = 10 , maxRoomW = 15; // Larguras devem ser ímpares e >= 3
 		int minRoomH = 10 , maxRoomH = 15; // Alturas devem ser >= 3
-		int corridorLen = 5;
+		int corridorLen = 10;
 
 		DungeonLayout layout = generateDungeonTileSet( numRooms , minRoomW , maxRoomW , minRoomH , maxRoomH , corridorLen );
-		printTileSet( layout.tiles , layout.spawnPos );
+		//printTileSet( layout.tiles , layout.spawnPos );
 
 		mapObjectsHandler::Get( ).addDungeonLayout( map.first , layout );
 	}

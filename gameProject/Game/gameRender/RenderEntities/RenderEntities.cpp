@@ -15,7 +15,7 @@
 
 #include <raylib/raylib.h>
 
-void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFactor = 1.0f ) {
+void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 	if ( entity == nullptr ) {
 		return;
 	}
@@ -35,6 +35,9 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 
 	GVector2D size = entityAnimation->getCurrentTextureSize( ) * sizeFactor;
 	GVector2D pos = entity->getEntityPosition( );
+
+	Vector2 position = { pos.x, pos.y };
+	Vector2 origin = { size.x / 2.0f, size.y / 2.0f };
 
 	GAngle entityLookingAngle = entity->getLookingAngle( );
 	GAngle entityMovingAngle = entity->getMovementAngle( );
@@ -101,8 +104,7 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 	}
 
 
-	Vector2 position = { pos.x, pos.y };
-	Vector2 origin = { size.x / 2.0f, size.y / 2.0f };
+	
 
 	DrawTexturePro(
 		*texture ,
@@ -113,7 +115,7 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 		WHITE
 	);
 
-	if ( DrawInfo ) {
+#if _DEBUG 
 		int offset = 0;
 
 		DrawText( entity->GetEntityName( ).c_str( ) , pos.x - size.x / 2 , pos.y - size.y / 2 - 20 + offset , 10 , BLACK );
@@ -157,7 +159,7 @@ void renderEntity( CBaseEntity * entity , bool DrawInfo = false , float sizeFact
 			pos.y + sinf( entityLookingAngle.getRadians( ) ) * 50 ,
 			GREEN
 		);
-	}
+#endif
 }
 
 void renderAttacks( ) {
@@ -179,7 +181,7 @@ void renderAttacks( ) {
 		if ( !attackPtr->IsActive( ) )
 			continue;
 
-		renderEntity( attackPtr , true );
+		renderEntity( attackPtr );
 	}
 }
 
@@ -197,7 +199,7 @@ void renderEnemies( ) {
 		if ( !enemy->isAlive( ) && enemy->deathAnimationFinished( ) )
 			continue;
 
-		renderEntity( enemy , true );
+		renderEntity( enemy  );
 	}
 }
 
@@ -213,7 +215,7 @@ void renderItems( ) {
 		if ( item->getEntityAnimations( ) == nullptr )
 			continue;
 
-		renderEntity( item , true );
+		renderEntity( item  );
 	}
 }
 
@@ -228,15 +230,14 @@ void renderTraps( ) {
 		if ( trap->getEntityAnimations( ) == nullptr )
 			continue;
 
-		renderEntity( trap , true );
+		renderEntity( trap );
 	}
 }
 
 
 void renderEntities::render( ) {
-	
 	renderTraps( );
-	renderEntity( entitiesHandler::Get( ).getLocalPlayer( ) , true );
+	renderEntity( entitiesHandler::Get( ).getLocalPlayer( ) );
 	renderAttacks( );
 	renderEnemies( );
 	renderItems( );

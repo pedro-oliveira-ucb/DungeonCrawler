@@ -8,7 +8,10 @@
 enum CEnemyType {
 	MELEE_ENEMY , // Inimigo corpo a corpo com ataque fraco
 	MELEE_ENEMY_MEDIUM , // Inimigo corpo a corpo com ataque médio
+	MELEE_ENEMY_ADVANCED , // Inimigo corpo a corpo com ataque forte
     RANGED_ENEMY ,
+	RANGED_ENEMY_MEDIUM ,
+	RANGED_ENEMY_ADVANCED,
     MAGIC_ENEMY ,
     BOSS_ENEMY ,            // Inimigo com muita vida e ataques variados
     SUICIDE_ENEMY ,         // Corre até o jogador e explode

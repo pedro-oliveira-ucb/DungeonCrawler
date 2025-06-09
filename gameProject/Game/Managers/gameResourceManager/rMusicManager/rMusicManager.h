@@ -35,6 +35,7 @@ class rMusicManager : public rBaseResource
 
 	rMusic * currentSound = nullptr;
 	rMusic * nextSound = nullptr;
+	int currentSoundIndex = -1; 
 
 public:
 	rMusicManager( std::string path ) :rBaseResource( path ) { }

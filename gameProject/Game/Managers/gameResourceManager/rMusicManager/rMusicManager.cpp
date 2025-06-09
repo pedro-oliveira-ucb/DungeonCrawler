@@ -172,8 +172,12 @@ bool rMusicManager::initialize( )
 
 bool rMusicManager::playMusic( musicType newType , float speed ) {
 	std::lock_guard<std::mutex> lock( this->musicMutex );
-	if ( onMusicTransition || newType == currentMusicType )
+	if ( onMusicTransition )
 		return false;
+
+	if ( newType != currentMusicType ) {
+		currentSoundIndex = -1;
+	}
 
 	auto it = musics.find( newType );
 	if ( it == musics.end( ) || it->second.empty( ) ) {
@@ -184,7 +188,12 @@ bool rMusicManager::playMusic( musicType newType , float speed ) {
 	oldMusicType = currentMusicType;
 	currentMusicType = newType;
 
-	nextSound = it->second.front( ).second.get( ); // Pega a primeira música do tipo
+	currentSoundIndex++;
+	if ( currentSoundIndex > it->second.size( ) - 1 ) {
+		currentSoundIndex = 0; // Reseta o índice se ultrapassar o tamanho do vetor
+	}
+
+	nextSound = it->second.at( currentSoundIndex ).second.get( ); // Pega a primeira música do tipo
 	isFadingOut = true;
 	isFadingIn = false;
 	onMusicTransition = true;
@@ -215,15 +224,25 @@ bool rMusicManager::playMusic( musicType newType , float speed ) {
 }
 
 void rMusicManager::updateMusic( ) {
-	std::lock_guard<std::mutex> lock( this->musicMutex );
 	float delta = GetFrameTime( );
 
 	float currentSoundBaseVolume = 1.0f;
 
 	if ( currentSound ) {
-		currentSound->update( delta );
+		bool musicUpdate = false;
+		{
+			std::lock_guard<std::mutex> lock( this->musicMutex );
+			musicUpdate = currentSound->update( delta );
+		}
+
+		if ( musicUpdate ) {
+			playMusic( currentMusicType , 5.0f ); // Reproduz uma musica do mesmo tipo se a atual terminar
+		}
+
 		currentSoundBaseVolume = currentSound->getBaseVolume( );
 	}
+
+	std::lock_guard<std::mutex> lock( this->musicMutex );
 
 	if ( onMusicTransition ) {
 		if ( isFadingOut ) {

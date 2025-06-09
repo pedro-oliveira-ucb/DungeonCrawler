@@ -20,7 +20,7 @@ std::optional<CBaseEntityAnimationConstructor> createEntityAnimationConstructor(
 	std::vector<CBaseEntityAnimationType> requiredAnimations
 );
 
-std::unique_ptr<CEnemyEntity> generateEnemy( CBaseEntityConstructor & builder , const std::string & animationName , CEnemyType enemyType )
+std::unique_ptr<CEnemyEntity> generateEnemy( CBaseEntityConstructor & builder , std::string animationName , CEnemyType enemyType )
 {
 	// Exemplo de lista de animações para o inimigo
 	std::vector<CBaseEntityAnimationType> requiredAnimations = {
@@ -46,6 +46,10 @@ std::unique_ptr<CEnemyEntity> generateEnemy( CBaseEntityConstructor & builder , 
 		 CBaseEntityAnimationType::DEAD_RIGHT
 	};
 
+	std::string entityName = builder.Name;
+	animationName = std::string("enemies_") + animationName;
+
+
 	// Apenas exemplificado, reutilize a mesma lógica de criação utilizada em LocalPlayerInitializer.
 	// Caso use 'createEntityAnimationConstructor', aplique o mesmo padrão:
 	auto animation = createEntityAnimationConstructor( animationName , requiredAnimations );
@@ -55,10 +59,10 @@ std::unique_ptr<CEnemyEntity> generateEnemy( CBaseEntityConstructor & builder , 
 	}
 
 	builder.entityAnimations = animation.value( );
-	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks = attackHandler::Get( ).getAvailableEnemyAttack( animationName );
+	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks = attackHandler::Get( ).getAvailableEnemyAttack( entityName );
 
 	if ( attacks.empty( ) ) {
-		Log::Print( "[Enemy Initializer] not attacks found for %s, generation failed!" , animationName.c_str( ) );
+		Log::Print( "[Enemy Initializer] not attacks found for %s, generation failed!" , entityName.c_str( ) );
 		return nullptr;
 	}
 
@@ -97,6 +101,26 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 	return true;
 }
 
+bool createEnemy( CBaseEntityConstructor builder, std::string name , CEnemyType type ) {
+
+	builder.Name = name;
+
+	auto BasicEnemy = generateEnemy( builder , name , type );
+	if ( !BasicEnemy ) {
+		Log::Print( "[Enemies Initializer] Failed to create enemy %s!", name.c_str() );
+		return false;
+	}
+
+	if ( !EnemiesInitializer::initializeEvents( name ) ) {
+		Log::Print( "[Enemies Initializer] Failed to initialize enemy %s events!" , name.c_str( ) );
+		return false;
+	}
+
+	entitiesHandler::Get( ).addSpawnableEnemy( type , std::move( BasicEnemy ) );
+
+	return true;
+}
+
 bool EnemiesInitializer::initialize( )
 {
 	CBaseEntityConstructor builder;
@@ -106,21 +130,9 @@ bool EnemiesInitializer::initialize( )
 		builder.health = 100;
 		builder.movementSpeed = 30;
 		builder.entityHitbox = GVector2D( 25 , 25 );
-		builder.Name = "BasicEnemy";
-		auto BasicEnemy = generateEnemy( builder , "BasicEnemy" , CEnemyType::MELEE_ENEMY );
-		if ( !BasicEnemy ) {
-			Log::Print( "[Enemies Initializer] Failed to create enemy BasicEnemy!" );
+		if ( !createEnemy( builder , "basicMeleeEnemy" , CEnemyType::MELEE_ENEMY ) )
 			return false;
-		}
-
-		if ( !initializeEvents( "BasicEnemy" ) ) {
-			Log::Print( "[Enemies Initializer] Failed to initialize enemy BasicEnemy events!" );
-			return false;
-		}
-
-		entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::MELEE_ENEMY , std::move( BasicEnemy ) );
 	}
-
 	
 	{
 		builder.entityPosition = GVector2D( 0 , 0 );
@@ -128,19 +140,18 @@ bool EnemiesInitializer::initialize( )
 		builder.health = 100;
 		builder.entityHitbox = GVector2D( 25 , 25 );
 		builder.movementSpeed = 50;
-		builder.Name = "MeleeEnemy1";
-		auto MeleeEnemy1 = generateEnemy( builder , "MeleeEnemy1" , CEnemyType::MELEE_ENEMY );
-		if ( !MeleeEnemy1 ) {
-			Log::Print( "[Enemies Initializer] Failed to create enemy MeleeEnemy1!" );
+		if ( !createEnemy( builder , "mediumMeleeEnemy" , CEnemyType::MELEE_ENEMY_MEDIUM ) )
 			return false;
-		}
+	}
 
-		if ( !initializeEvents( "MeleeEnemy1" ) ) {
-			Log::Print( "[Enemies Initializer] Failed to initialize enemy MeleeEnemy1 events!" );
+	{
+		builder.entityPosition = GVector2D( 0 , 0 );
+		builder.entityType = CBaseEntityType::MOB;
+		builder.health = 100;
+		builder.entityHitbox = GVector2D( 25 , 25 );
+		builder.movementSpeed = 50;
+		if ( !createEnemy( builder , "advancedMeleeEnemy" , CEnemyType::MELEE_ENEMY_ADVANCED ) )
 			return false;
-		}
-
-		entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::MELEE_ENEMY_MEDIUM , std::move( MeleeEnemy1 ) );
 	}
 
 
@@ -151,21 +162,29 @@ bool EnemiesInitializer::initialize( )
 		builder.health = 100;
 		builder.entityHitbox = GVector2D( 25 , 25 );
 		builder.movementSpeed = 50;
-		builder.Name = "RangedEnemy1";
-		auto RangedEnemy1 = generateEnemy( builder , "RangedEnemy1" , CEnemyType::RANGED_ENEMY );
-		if ( !RangedEnemy1 ) {
-			Log::Print( "[Enemies Initializer] Failed to create enemy RangedEnemy1!" );
+		if ( !createEnemy( builder , "basicRangeEnemy" , CEnemyType::RANGED_ENEMY ) )
 			return false;
-		}
-
-		if ( !initializeEvents( "RangedEnemy1" ) ) {
-			Log::Print( "[Enemies Initializer] Failed to initialize enemy RangedEnemy1 events!" );
-			return false;
-		}
-		entitiesHandler::Get( ).addSpawnableEnemy( CEnemyType::RANGED_ENEMY , std::move( RangedEnemy1 ) );
 	}
 
+	{
+		builder.entityPosition = GVector2D( 0 , 0 );
+		builder.entityType = CBaseEntityType::MOB;
+		builder.health = 100;
+		builder.entityHitbox = GVector2D( 25 , 25 );
+		builder.movementSpeed = 50;
+		if ( !createEnemy( builder , "mediumRangeEnemy" , CEnemyType::RANGED_ENEMY_MEDIUM ) )
+			return false;
+	}
 
+	{
+		builder.entityPosition = GVector2D( 0 , 0 );
+		builder.entityType = CBaseEntityType::MOB;
+		builder.health = 100;
+		builder.entityHitbox = GVector2D( 25 , 25 );
+		builder.movementSpeed = 50;
+		if ( !createEnemy( builder , "advancedRangeEnemy" , CEnemyType::RANGED_ENEMY_ADVANCED ) )
+			return false;
+	}
 
 
 	return true;

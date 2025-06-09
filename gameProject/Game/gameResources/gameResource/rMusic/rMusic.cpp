@@ -91,12 +91,17 @@ bool rMusic::isPaused( ) const {
 	return this->paused;
 }
 
-void rMusic::update( float deltaTime ) {
-	if ( !initialized || !isPlaying( ) ) return;
+bool rMusic::update( float deltaTime ) {
+	if ( !initialized || !isPlaying( ) ) 
+		return true;
 
 	std::lock_guard<std::mutex> lock( mtx );
 
 	UpdateMusicStream( *music );
+
+	if ( GetMusicTimePlayed( *music ) >= GetMusicTimeLength( *music ) ) {
+		return true; // Music has finished playing
+	}
 
 	if ( transitionState == MusicTransitionState::FadeIn ) {
 		fadeTimer += deltaTime;
@@ -120,6 +125,7 @@ void rMusic::update( float deltaTime ) {
 	else {
 		SetMusicVolume( *music , config.volume );
 	}
+	return false;
 }
 
 void rMusic::setVolume( float volume ) {

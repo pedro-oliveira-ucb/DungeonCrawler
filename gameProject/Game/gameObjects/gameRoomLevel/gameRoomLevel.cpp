@@ -67,17 +67,15 @@ void gameRoomLevel::updateEntities( ) {
 		return;
 	}
 
-	CPlayerEntity * player = entitiesHandler::Get( ).getLocalPlayer( );
-	if ( player == nullptr ) {
-		return;
-	}
-
-	GVector2D localPosition = player->getEntityPosition( );
+	GVector2D localPosition = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
 
 
 	int currentPlayerID = gameMap::Get( ).getRoomIdAtPosition( localPosition );
 
 	bool followPlayer = this->RoomID == currentPlayerID;
+
+	if ( std::fabs( this->RoomID - currentPlayerID ) > 1 )
+		return;
 
 	for ( auto & enemyType : this->enemies ) {
 
@@ -89,6 +87,9 @@ void gameRoomLevel::updateEntities( ) {
 
 		for ( auto it = this->enemies.begin( ); it != this->enemies.end( ); ++it ) {
 			for ( auto enemy = it->second.begin( ); enemy != it->second.end( ); ++enemy ) {
+			/*	if ( enemy->second->getEntityPosition( ).distTo( localPosition ) > 150 )
+					continue;*/
+
 				if ( !enemy->second->isAlive( ) && enemy->second->deathAnimationFinished( ) ) {
 					if ( canRespawn( enemyType.first ) ) {
 						GVector2D spawnPosition = getValidPositionOnCurrentRoom( );
@@ -97,6 +98,7 @@ void gameRoomLevel::updateEntities( ) {
 						enemySpawner->second.respawnedCount++;
 						Log::Print( "Respawning enemy of roomID %d" , this->RoomID );
 					}
+					continue; // Skip to the next enemy if this one is dead and respawned
 				}
 
 				entitiesHandler::Get( ).updateSpawnedEnemies( enemy->first , followPlayer );
