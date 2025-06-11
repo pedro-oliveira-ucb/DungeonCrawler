@@ -65,3 +65,39 @@ void currentGame::setCurrentLocalPlayerPosition( const GVector2D & position )
 	std::lock_guard<std::mutex> lock( currentGameStateMutex );
 	this->currentLocalPlayerPosition = position;
 }
+
+void currentGame::addKey( int quantity )
+{
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	this->numKeys += quantity;
+}
+
+void currentGame::removeKey( int quantity )
+{
+	this->numKeys -= quantity;
+	// Ensure numKeys does not go below zero
+	this->numKeys = std::max( 0 , this->numKeys );
+}
+
+int currentGame::getNumKeys( ) const
+{
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	return this->numKeys;
+}
+
+void currentGame::addMana( int quantity ) {
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	this->numMana += quantity;
+}
+
+void currentGame::removeMana( int quantity ) {
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	this->numMana -= quantity;
+	// Ensure numMana does not go below zero
+	this->numMana = std::max( 0 , this->numMana );
+}
+
+int currentGame::getNumMana( ) const {
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	return this->numMana;
+}

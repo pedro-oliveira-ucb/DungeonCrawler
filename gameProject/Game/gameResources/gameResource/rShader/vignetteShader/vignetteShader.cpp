@@ -2,8 +2,12 @@
 
 #include "../../../../Handlers/shadersHandler/shadersHandler.h"
 
+#include "../../../../Handlers/entitiesHandler/entitiesHandler.h"
+
 #include "../../../../../Utils/Log/Log.h"
 #include "../../../../../Globals/Globals.h"
+
+#include <raylib/raymath.h>
 
 vignetteShader::vignetteShader( rShaderConfig shaderConfig , vignetteShaderConfig vignetteShaderConfig ) :
 	rShader( shaderConfig ) {
@@ -20,7 +24,7 @@ vignetteShader::vignetteShader( std::shared_ptr<rShader> shader , vignetteShader
 }
 
 vignetteShader::~vignetteShader( ) {
-	
+
 }
 
 void vignetteShader::getResourcesLocation( ) {
@@ -39,6 +43,37 @@ void vignetteShader::updateResourcesValues( ) {
 
 	if ( shader == nullptr )
 		return;
+
+	CPlayerEntity * player = entitiesHandler::Get( ).getLocalPlayer( );
+
+	if ( player == nullptr ) {
+		Log::Print( "vignetteShader::updateResourcesValues: Player entity is null." );
+		return;
+	}
+
+	const float playerHealth = player->getHealth( );
+	const float playerMaxHealth = player->getMaxHealth( );
+
+	// If player health is 0, set radius to a very low value to avoid division by zero.
+	if ( playerHealth <= 0 ) {
+		this->vignetteRadius = -0.65f; // Set radius to a very low value to avoid division by zero.
+	}
+	else {
+		// Calculate the vignette color based on player health.
+		// The color will be more intense as the player health decreases.
+		// The color will be a shade of red, with the intensity based on the health percentage.
+		Vector3 currentShaderColor = this->vignetteColor;
+		currentShaderColor.x = 1.0f - std::max( ( playerHealth / playerMaxHealth ) , 0.0f ); // Red channel
+		currentShaderColor.x = Clamp( currentShaderColor.x , 0.0f , 0.2f );
+		currentShaderColor.y = 0.0f; // Green channel
+		currentShaderColor.z = 0.0f; // Blue channel
+		this->vignetteColor = currentShaderColor;
+
+		// Calculate the vignette radius based on player health.
+		float currentShaderRadius = this->vignetteRadius;
+		currentShaderRadius = ( -0.29f * playerMaxHealth ) / playerHealth;
+		this->vignetteRadius = std::max( currentShaderRadius , -0.65f );
+	}
 
 	SetShaderValue( *shader , this->resourceRadiusLoc , &this->vignetteRadius , SHADER_UNIFORM_FLOAT );
 	SetShaderValue( *shader , this->resourceBlurLoc , &this->vignetteBlur , SHADER_UNIFORM_FLOAT );

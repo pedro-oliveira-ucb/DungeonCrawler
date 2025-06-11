@@ -21,6 +21,8 @@ class currentGame
 	int currentGameLevel = 0;
 	GVector2D currentLocalPlayerPosition = GVector2D( 0.0f , 0.0f );
 
+	int numKeys = 0;
+	int numMana = 0.f;
 public:
 	void setCurrentGameState( currentGameState newState );
 	bool isGameinState( currentGameState state ) const;
@@ -34,5 +36,13 @@ public:
 
 	GVector2D getCurrentLocalPlayerPosition( ) const;
 	void setCurrentLocalPlayerPosition( const GVector2D & position );
+
+	void addKey( int quantity );
+	void removeKey( int quantity );
+	int getNumKeys( ) const;	
+
+	void addMana( int quantity );
+	void removeMana( int quantity );
+	int getNumMana( ) const;	
 };
 

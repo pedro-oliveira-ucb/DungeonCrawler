@@ -12,6 +12,8 @@
 #include "../../../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
 #include "../../../../Utils/utils.h"
 
+#include "../../../../Globals/Globals.h"
+
 std::optional<std::pair<CBaseEntityAnimationType , rSpriteAnimation *>>
 generateAnimationPair( CBaseEntityAnimationType type , std::string Name );
 
@@ -77,7 +79,7 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 	};
 
 	for ( std::string event : eventsNames ) {
-		std::string eventName = enemyName + "_" + event;
+		std::string eventName = "enemies_" + enemyName + "_" + event;
 		EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 			eventName ,
 			[ eventName ] ( ) {
@@ -90,10 +92,17 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 		eventName ,
 		[ eventName ] ( ) {		
-			if ( utils::Get().onProbability( 20 ) ) {
-				// 20% de chance de spawnar um item de vida
+			float HealthDropChance = Globals::Get().getPlayerStats()->getHealthDropProbability();
+
+			if ( utils::Get().onProbability( HealthDropChance ) ) {
 				itemsHandler::Get( ).spawnItem( ItemType::HEALTH_ITEM );
 			}
+
+			float ManaDropChance = Globals::Get( ).getPlayerStats( )->getManaDropProbability( );
+			if ( utils::Get( ).onProbability( ManaDropChance ) ) {
+				itemsHandler::Get( ).spawnItem( ItemType::MANA_ITEM );
+			}
+
 			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
 		}
 	) );

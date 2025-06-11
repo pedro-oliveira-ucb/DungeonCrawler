@@ -2,6 +2,7 @@
 #include <chrono>
 #include "gameSettings/gameSettings.h"
 #include "currentGame/currentGame.h"
+#include "playerStats/playerStats.h"
 
 #include "../Utils/singleton.h"
 
@@ -10,7 +11,7 @@ class Globals : public CSingleton<Globals>
 {
 	gameSettings settings;
 	currentGame game;
-
+	playerStats stats;
 public:
 
 	int screenWidth = 1920;
@@ -18,6 +19,7 @@ public:
 
 	gameSettings * getGameSettings( );
 	currentGame * getGame( );
+	playerStats * getPlayerStats( );
 
 	bool updateWindow = false;
 	bool windowInitialized = false;

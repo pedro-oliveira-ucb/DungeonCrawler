@@ -23,6 +23,8 @@ void updateLevel::threadFunction( ) {
 	CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
 	int currentPlayerRoom = -1;
 
+	bool spawnedKey = false;
+
 	while ( true ) {
 		currentGameState gameState = Globals::Get( ).getGame( )->getCurrentGameState( );
 
@@ -52,14 +54,19 @@ void updateLevel::threadFunction( ) {
 
 				if ( !levelManager.hasAliveEnemyOnCurrentRoom( localRoom ) ) {
 					int roomsAmount = levelManager.roomsInCurrentLevel( );
-					if ( localRoom >= roomsAmount  ) {
+					if ( localRoom >= roomsAmount ) {
 						Log::Print( "[updateLevel] Finished level" , std::to_string( localRoom ).c_str( ) );
 						levelManager.moveToNextLevel( );
 					}
-					else {
+					else if ( !spawnedKey ) {
+						spawnedKey = true;
+						itemsHandler::Get( ).spawnItem( ItemType::KEY_ITEM );
 						// Se não houver inimigos vivos, dropa a chave
 						Log::Print( "[updateLevel] No enemies alive in room %s, dropping key" , std::to_string( localRoom ).c_str( ) );
 					}
+				}
+				else {
+					spawnedKey = false;
 				}
 			}
 		}

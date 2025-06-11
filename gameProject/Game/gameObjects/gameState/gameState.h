@@ -8,7 +8,6 @@ enum class gameStateType {
 	IN_GAME ,
 	CUTSCENE ,
 	PAUSE_MENU
-	// Adicione mais estados conforme necessário
 };
 enum class gameStateTransitionState{ 
 	NO_TRANSITION,

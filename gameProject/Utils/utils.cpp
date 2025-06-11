@@ -1,7 +1,11 @@
+#include <Windows.h>
+
 #include "utils.h"
 #include <random>
 #include <sstream>
 #include <fstream>
+
+
 
 int utils::randomNumber( int min , int max ) const
 {
@@ -14,6 +18,13 @@ int utils::randomNumber( int min , int max ) const
 bool utils::onProbability( int probability ) const {
 	probability = std::clamp( probability , 0 , 100 );
 	return randomNumber( 1 , 100 ) > ( 100 - probability );
+}
+
+std::pair<int , int> utils::getScreenSize( ) const {
+	RECT desktop;
+	const HWND hDesktop = GetDesktopWindow( );
+	GetWindowRect( hDesktop , &desktop );
+	return std::make_pair( desktop.right , desktop.bottom );
 }
 
 std::string utils::readFileAsString( const std::string & filename ) const

@@ -9,3 +9,9 @@ currentGame * Globals::getGame( )
 {
 	return &this->game;
 }
+
+playerStats * Globals::getPlayerStats( )
+{
+	return &this->stats;
+}
+

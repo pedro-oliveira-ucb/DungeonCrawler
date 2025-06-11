@@ -255,6 +255,18 @@
     <ClCompile Include="Game\gameThreads\updateLevel\updateLevel.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Game\SDK\Entities\Items\CManaItem\CManaItem.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\SDK\Entities\Items\CKeyItem\CKeyItem.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals\playerStats\playerStats.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameObjects\gameState\upgradeScreenState\UpgradeScreenState.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h">
@@ -501,6 +513,18 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameThreads\updateLevel\updateLevel.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Entities\Items\CManaItem\CManaItem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\Entities\Items\CKeyItem\CKeyItem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals\playerStats\playerStats.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameObjects\gameState\upgradeScreenState\UpgradeScreenState.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,9 @@
 #include "../../CBaseEntity/CBaseEntity.h"
 
 enum ItemType {
-	HEALTH_ITEM
+	HEALTH_ITEM,
+	KEY_ITEM,
+	MANA_ITEM
 };
 
 class CBaseItem : public CBaseEntity
