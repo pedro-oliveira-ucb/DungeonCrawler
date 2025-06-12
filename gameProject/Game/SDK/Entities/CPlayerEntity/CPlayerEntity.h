@@ -14,6 +14,10 @@ class CPlayerEntity : public CBaseEntity {
     std::unordered_map<CBaseAttackType, std::shared_ptr<CBaseAttack>> attacks; // Lista de ataques do jogador
 	std::unordered_map<CBaseAttackType , double> attackUseTime; // Lista de ciclos de animação dos ataques do jogador
 
+    float deltaTime = 0.0f;
+    float currentTime = 0.0f;
+    float lastWalkingTime = 0.0f;
+
     bool inAttackLoadingAnimation = false;
     bool alreadyThrowedAttack = false;
 
@@ -23,7 +27,6 @@ class CPlayerEntity : public CBaseEntity {
     double lastStepSoundTime = -1;
 
     double AnimationCycleSinceLastStep = 0;
-
 
     DIRECTION localDirection;
     bool blockMovement = false;
@@ -58,8 +61,7 @@ private:
 public:
     std::mutex localPlayerMutex;
 
-   
-
+ 
     void initializePlayerAttacks( );
 
 	CPlayerEntity( CBaseEntityConstructor builder , std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks );

@@ -1,5 +1,7 @@
 #include "playerStats.h"
 
+#include "../../Game/Handlers/entitiesHandler/entitiesHandler.h"
+
 // Getters
 float playerStats::getHealthDropProbability() {
     std::lock_guard<std::mutex> lock(playerStatsMutex);
@@ -120,4 +122,16 @@ void playerStats::setAttackSpeedFactor(float factor) {
 void playerStats::setDefense(float defense) {
     std::lock_guard<std::mutex> lock(playerStatsMutex);
     Defense = defense;
+}
+
+void playerStats::updatePlayer( ){
+    CPlayerEntity * localPlayer = entitiesHandler::Get( ).getLocalPlayer( );
+    if ( localPlayer == nullptr ) {
+        return;
+    }
+
+    localPlayer->setEntityMaxStamina( this->MaxStamina );
+    localPlayer->setStaminaLossRate( this->StaminaLossFactor );
+    localPlayer->setStaminaRegenRate( this->StaminaRegenFactor );
+    localPlayer->setMovementSpeed( this->MovementSpeed );
 }

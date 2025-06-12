@@ -6,6 +6,7 @@
 #include "renderCustomCursor/renderCustomCursor.h"
 #include "renderGameOver/renderGameOver.h"
 #include "renderMap/renderMap.h"
+#include "renderShopMenu/renderShopMenu.h"
 
 #include "../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
 #include "../Managers/gameResourceManager/gameResourceManager.h"
@@ -18,6 +19,7 @@ renderPauseMenu pauseMenuRender;
 renderCustomCursor customCursorRender;
 renderGameOver gameOverRender;
 renderMap mapRender;
+renderShopMenu shopMenuRender;
 
 void gameRender::processSoundEvents( ) {
 	std::string soundEvent = gameSoundsEventHandler::Get( ).getLatestOnQueue( );
@@ -58,4 +60,8 @@ void gameRender::renderMap( ) {
 
 void gameRender::renderMapDoors( ) {
 	mapRender.renderDoors( );
+}
+
+void gameRender::renderShopMenu( ) {
+	shopMenuRender.render( );
 }

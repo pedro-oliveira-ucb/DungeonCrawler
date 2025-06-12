@@ -60,6 +60,15 @@ public:
 	GVector2D getInitialPosition( ) const;
 	std::string getName( ) const;
 
+	void setRange( float range );
+	void setDamage( float damage );
+	void setCooldown( float cooldown );
+	void setDelay( float delay );
+	void setSpeed( float speed );
+	void setArea( GVector2D area );
+
+
+
 	CBaseAttackType getAttackType( ) const;
 
 	bool hasAlreadyHit( CBaseEntity * entity );

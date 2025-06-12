@@ -15,4 +15,5 @@ public:
 	void renderGameOver( );
 	void renderMap( );
 	void renderMapDoors( );
+	void renderShopMenu( );
 };

@@ -65,10 +65,11 @@ struct CBaseEntityConstructor {
 
 
 enum DIRECTION {
+    FORWARD ,
+    BACKWARD ,
 	LEFT ,
 	RIGHT ,
-	FORWARD ,
-	BACKWARD
+    DIRECTION_COUNT
 };
 
 class CBaseEntity {
@@ -91,8 +92,13 @@ class CBaseEntity {
     bool beingHit = false;
     bool finishedDeathAnimation = false;
     bool sprinting = false;
-    double lastMoveTime;
 
+    float currentStamina = 100.f;
+	float maxStamina = 100.f;
+	float staminaRegenRate = 20.0f;
+    float staminaLossRate = 20.0f;
+
+    double lastMoveTime;
 public:
 
     // Construtores e operadores
@@ -118,7 +124,7 @@ public:
     // Ângulos e velocidade
     float getMovementAngle( ) const;
     GAngle getLookingAngle( ) const;
-    int getMovementSpeed( ) const { return movementSpeed; }
+    int getMovementSpeed( ) const;
 
     // Getters
     std::string GetEntityName( ) const;
@@ -130,6 +136,11 @@ public:
     CBaseEntityHitbox getHitbox( ) const;
     int getMaxHealth( ) const;
     DIRECTION getEntityLookingDirection( ) const;
+    float getCurrentStamina( ) const;
+	float getMaxStamina( ) const;
+	float getStaminaRegenRate( ) const;
+	float getStaminaLossRate( ) const;
+
 
     // Setters
     void setEntityLookingDirection( DIRECTION direction );
@@ -137,6 +148,12 @@ public:
     void setEntityMovementDirection( CBaseEntityMovementDirection move );
     void setHealth( int health );
     void setEntityPosition( GVector2D pos );
+    void setCurrentStamina( float stamina );
+	void setEntityMaxStamina( float stamina );
+	void setStaminaRegenRate( float rate );
+	void setStaminaLossRate( float rate );
+    void setMovementSpeed( float speed );
+
 
     // Sprint
     bool isSprinting( ) const;

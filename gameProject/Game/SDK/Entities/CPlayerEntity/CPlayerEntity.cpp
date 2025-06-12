@@ -1,6 +1,7 @@
 #include "CPlayerEntity.h"
 
 #include <mutex>
+#include <algorithm>
 
 #include "../../../../Globals/Globals.h"
 
@@ -102,7 +103,7 @@ void CPlayerEntity::UseAttack( CBaseAttackType attack ) {
 }
 
 void CPlayerEntity::updateAnimationCycles( ) {
-	
+
 }
 
 void CPlayerEntity::updateMovementSounds( ) {
@@ -130,13 +131,38 @@ void CPlayerEntity::handleDeadState( std::uint32_t & state ) {
 void CPlayerEntity::handleMovementState( std::uint32_t & state ) {
 	float delta = math::AngleDiff( lookingAngle , this->getMovementAngle( ) );
 
+	bool sprinting = this->isSprinting( );
+	float maxStamina = this->getMaxStamina( );
+	float currentStamina = this->getCurrentStamina( );
+	float staminaLossRate = this->getStaminaLossRate( );
+	float staminaRegenRate = this->getStaminaRegenRate( );
+
 	if ( this->hasMovementRequest( ) ) {
-		state |= this->isSprinting( ) ? CBaseEntityState::RUNNING : CBaseEntityState::MOVING;
+		if ( sprinting ) {
+			if ( currentStamina > staminaLossRate * this->deltaTime ) {
+				currentStamina -= staminaLossRate * this->deltaTime;
+				lastWalkingTime = currentTime;
+			}
+			else {
+				sprinting = false; // Cancela o sprint se não houver estamina suficiente
+			}	
+		}
+
 		// reverseAnimation = ( fabsf( delta ) > 90.0f );
+		state |= sprinting ? CBaseEntityState::RUNNING : CBaseEntityState::MOVING;
 	}
 	else {
 		state |= CBaseEntityState::STOPPED;
 	}
+
+	if ( !sprinting && ( currentTime - lastWalkingTime ) > 3.0f ) {
+		currentStamina += staminaRegenRate * this->deltaTime;
+	}
+
+	currentStamina = std::clamp( currentStamina , 0.0f , maxStamina );
+
+	setSprinting( sprinting );
+	setCurrentStamina( currentStamina );
 }
 
 void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
@@ -266,6 +292,16 @@ void CPlayerEntity::updateEntity( ) {
 	this->localDirection = this->getEntityLookingDirection( );
 	previousEntityState = this->getEntityStates( );
 	previousAnimationType = this->getEntityAnimations( )->getCurrentAnimationType( );
+
+	// Calcula o deltaTime para animações e atualizações de estado
+	static float lastTime = 0.0f;
+	this->deltaTime = 0.0f;
+	this->currentTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+	if ( lastTime != 0.0f ) {
+		this->deltaTime = currentTime - lastTime;
+	}
+	lastTime = currentTime;
+
 
 	if ( this->isAlive( ) ) {
 

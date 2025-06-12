@@ -1,6 +1,20 @@
 #pragma once
 #include <mutex>
 
+// Enum para identificar os stats de forma única para o switch-case
+enum class PlayerStatIndex {
+	MaxHealth ,
+	MaxStamina ,
+	StaminaRegen ,
+	StaminaLoss ,
+	AttackDamageFactor ,
+	AttackSpeedFactor ,
+	AttackRangeFactor ,
+	AttackAreaFactor ,
+	Defense ,
+	MovementSpeed ,
+};
+
 class playerStats
 {
 	std::mutex playerStatsMutex;
@@ -11,8 +25,8 @@ class playerStats
 	float MaxHealth = 100.f;
 
 	float MaxStamina = 100.f;
-	float StaminaLossFactor = 1.0f;
-	float StaminaRegenFactor = 1.0f;
+	float StaminaLossFactor = 50.0f;
+	float StaminaRegenFactor = 30.0f;
 
 	// Novos stats impactantes
 	float MaxMana = 50.f;
@@ -50,5 +64,7 @@ public:
 	void setAttackDamageFactor(float factor);
 	void setAttackSpeedFactor(float factor);
 	void setDefense(float defense);
+
+	void updatePlayer( );
 };
 

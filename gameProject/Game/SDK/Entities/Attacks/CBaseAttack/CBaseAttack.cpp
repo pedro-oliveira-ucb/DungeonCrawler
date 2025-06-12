@@ -43,8 +43,10 @@ bool CBaseAttack::hasAlreadyHit( CBaseEntity * entity )
 }
 
 void CBaseAttack::registerHit( CBaseEntity * entity ) {
-	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
-	hitEntities.insert( entity );
+	{
+		std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+		hitEntities.insert( entity );
+	}
 	EventManager::Get( ).Trigger( this->getName( ) + "_attackHit" );
 }
 
@@ -85,39 +87,84 @@ void CBaseAttack::Deactive( ) {
 }
 
 bool CBaseAttack::IsActive( ) const {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->active;
 }
 
 float CBaseAttack::getDamage( ) const {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->damage;
 }
 
 float CBaseAttack::getRange( ) const {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->range;
 }
 
 float CBaseAttack::getDelay( ) const {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->delay;
 }
 
 float CBaseAttack::getCooldown( ) const {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->cooldown;
 }
 
 float CBaseAttack::getSpeed( ) const {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->speed;
 }
 
 GVector2D CBaseAttack::getArea( ) const {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->area;
 }
 
 CBaseAttackType CBaseAttack::getAttackType( ) const{
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->type;
 }
 
 std::string CBaseAttack::getName( ) const {
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
 	return this->Name;
+}
+
+void CBaseAttack::setRange( float range )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	this->range = range;
+}
+
+void CBaseAttack::setDamage( float damage )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	this->damage = damage;
+}
+
+void CBaseAttack::setCooldown( float cooldown )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	this->cooldown = cooldown;
+}
+
+void CBaseAttack::setDelay( float delay )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	this->delay = delay;
+}
+
+void CBaseAttack::setSpeed( float speed )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	this->speed = speed;
+}
+
+void CBaseAttack::setArea( GVector2D area )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseAttackMutex );
+	this->area = area;
 }
 
 GVector2D CBaseAttack::getInitialPosition( ) const {

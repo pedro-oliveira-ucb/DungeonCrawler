@@ -31,6 +31,8 @@ void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 		return;
 	}
 
+	
+
 	Texture2D * texture = static_cast< Texture2D * >( entityAnimation->getCurrentTexture( ) );
 
 	GVector2D size = entityAnimation->getCurrentTextureSize( ) * sizeFactor;
@@ -77,6 +79,7 @@ void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 		rotationAngle = 0;
 		break;
 	case CBaseEntityType::MOB:
+	case CBaseEntityType::PLAYER:
 
 		// desenha a parte “cheia” com a cor interpolada
 		DrawRectangle(
@@ -124,7 +127,6 @@ void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 
 		DrawText( CBaseEntityAnimation::getAnimationTypeName( entity->getEntityAnimations( )->getCurrentAnimationType( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
-
 		offset -= 12;
 
 		DrawText( std::to_string( entity->getEntityAnimations( )->getCurrentAnimationStep( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
@@ -132,6 +134,13 @@ void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 		offset -= 12;
 
 		DrawText( entity->getEntityStateAsString( ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
+
+		if ( entity->getEntityType( ) == CBaseEntityType::PLAYER ) {
+			offset -= 12;
+			float currentStamina = entity->getCurrentStamina( );
+
+			DrawText( std::to_string( currentStamina ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
+		}
 
 		GVector2D hitbox = entity->getHitbox( ).getHitboxSize();
 
