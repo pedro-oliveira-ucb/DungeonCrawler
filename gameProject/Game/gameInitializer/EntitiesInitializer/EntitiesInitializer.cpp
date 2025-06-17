@@ -6,6 +6,7 @@
 #include "EnemiesInitializer/EnemiesInitializer.h"
 #include "ItemsInitializer/ItemsInitializer.h"
 #include "TrapsInitializer/TrapsInitializer.h"
+#include "ShopInitializer/ShopInitializer.h" // ADICIONAR ESTA LINHA
 
 #include "../../Handlers/entitiesHandler/entitiesHandler.h"
 
@@ -100,6 +101,13 @@ bool EntitiesInitializer::initialize( ) {
 	}
 
 	Log::Print( "[EntitiesInitializer] traps initialized" );
+
+	if ( !ShopInitializer::Get( ).initialize( ) ) {
+		Log::Print( "[EntitiesInitializer] Failed to initialize shop system" );
+		return false;
+	}
+
+	Log::Print( "[EntitiesInitializer] shop system initialized" );
 
 	return true;
 }

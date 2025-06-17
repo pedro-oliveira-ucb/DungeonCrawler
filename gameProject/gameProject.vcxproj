@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -141,6 +141,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\gameInitializer\EntitiesInitializer\ShopInitializer\ShopInitializer.cpp" />
+    <ClCompile Include="Game\Handlers\shopHandler\shopHandler.cpp" />
     <ClCompile Include="Game\SDK\Entities\Items\CManaItem\CManaItem.cpp" />
     <ClCompile Include="Game\SDK\Entities\Items\CKeyItem\CKeyItem.cpp" />
     <ClCompile Include="Game\gameObjects\gameRoomLevel\gameRoomLevel.cpp" />
@@ -157,7 +159,6 @@
     <ClCompile Include="Game\gameRender\renderDialogs\renderDialogs.cpp" />
     <ClCompile Include="Game\Handlers\gamdDialogHandler\gameDialogHandler.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rShader\rShader.cpp" />
-    <ClCompile Include="Game\gameThreads\enemiesController\enemiesController.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EnemiesInitializer\EnemiesInitializer.cpp" />
     <ClCompile Include="Game\Managers\collisionManager\collisionManager.cpp" />
     <ClCompile Include="Game\Handlers\gameSoundEventsHandler\gameSoundsEventHandler.cpp" />
@@ -172,7 +173,6 @@
     <ClCompile Include="Game\SDK\Entities\Attacks\CBaseAttack\CBaseAttack.cpp" />
     <ClCompile Include="Game\gameRender\gameRender.cpp" />
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.cpp" />
-    <ClCompile Include="Game\gameWindow\gameWindow.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\gameInitializer\gameInitializer.cpp" />
     <ClCompile Include="Game\Managers\gameResourceManager\gameResourceManager.cpp" />
@@ -216,18 +216,21 @@
     <ClCompile Include="Game\gameThreads\updateLevel\updateLevel.cpp" />
     <ClCompile Include="Globals\playerStats\playerStats.cpp" />
     <ClCompile Include="Game\gameRender\renderShopMenu\renderShopMenu.cpp" />
+    <ClCompile Include="Game\gameObjects\gameState\inGameOverState\inGameOverState.cpp" />
     <ClCompile Include="Utils\utils.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Process\Thread.cpp" />
     <ClCompile Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.cpp" />
     <ClCompile Include="Game\SDK\Entities\CBaseEntity\CBaseEntity.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Game\gameThreads\updatePosition\updatePosition.cpp" />
+    <ClCompile Include="Game\gameThreads\updateLocalPlayer\updateLocalPlayer.cpp" />
     <ClCompile Include="Game\SDK\math\Vector2D\GVector2D.cpp" />
     <ClCompile Include="Game\gameResources\gameResource\rShader\vignetteShader\vignetteShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\gameInitializer\EntitiesInitializer\ShopInitializer\ShopInitializer.h" />
     <ClInclude Include="Game\gameObjects\gameState\upgradeScreenState\UpgradeScreenState.h" />
+    <ClInclude Include="Game\Handlers\shopHandler\shopHandler.h" />
     <ClInclude Include="Game\SDK\Entities\Items\CManaItem\CManaItem.h" />
     <ClInclude Include="Game\SDK\Entities\Items\CKeyItem\CKeyItem.h" />
     <ClInclude Include="Game\gameObjects\gameRoomLevel\gameRoomLevel.h" />
@@ -244,7 +247,6 @@
     <ClInclude Include="Game\gameRender\renderDialogs\renderDialogs.h" />
     <ClInclude Include="Game\Handlers\gamdDialogHandler\gameDialogHandler.h" />
     <ClInclude Include="Game\gameResources\gameResource\rShader\rShader.h" />
-    <ClInclude Include="Game\gameThreads\enemiesController\enemiesController.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EnemiesInitializer\EnemiesInitializer.h" />
     <ClInclude Include="Game\Managers\collisionManager\collisionManager.h" />
     <ClInclude Include="Game\Handlers\gameSoundEventsHandler\gameSoundsEventHandler.h" />
@@ -262,7 +264,6 @@
     <ClInclude Include="Game\SDK\Entities\Attacks\CBaseAttack\CBaseAttack.h" />
     <ClInclude Include="Game\gameRender\gameRender.h" />
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.h" />
-    <ClInclude Include="Game\gameWindow\gameWindow.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\gameInitializer\gameInitializer.h" />
     <ClInclude Include="Game\Managers\gameResourceManager\gameResourceManager.h" />
@@ -305,12 +306,13 @@
     <ClInclude Include="Game\gameThreads\updateLevel\updateLevel.h" />
     <ClInclude Include="Globals\playerStats\playerStats.h" />
     <ClInclude Include="Game\gameRender\renderShopMenu\renderShopMenu.h" />
+    <ClInclude Include="Game\gameObjects\gameState\inGameOverState\inGameOverState.h" />
     <ClInclude Include="Utils\utils.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Process\Thread.hpp" />
     <ClInclude Include="Game\SDK\Entities\CPlayerEntity\CPlayerEntity.h" />
     <ClInclude Include="Game\SDK\Entities\CBaseEntity\CBaseEntity.h" />
-    <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h" />
+    <ClInclude Include="Game\gameThreads\updateLocalPlayer\updateLocalPlayer.h" />
     <ClInclude Include="Game\SDK\math\Vector2D\GVector2D.h" />
     <ClInclude Include="Utils\singleton.h" />
     <ClInclude Include="Game\gameResources\gameResource\rShader\vignetteShader\vignetteShader.h" />

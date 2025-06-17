@@ -32,7 +32,7 @@ void attackHandler::updateAttacks( )
 
 				GVector2D attackPosition = attack->getEntityPosition( );
 
-				if (!gameMap::Get( ).inInMap( attackPosition ) ) {
+				if ( !gameMap::Get( ).inInMap( attackPosition ) ) {
 					gameSoundsEventHandler::Get( ).addEventToQueue( attack->GetEntityName( ) + "_hitWall" );
 					it = runningAttacks.erase( it );
 					continue;
@@ -107,7 +107,7 @@ void attackHandler::throwNewAttack( CBaseEntity * sender , CBaseAttack * attack 
 
 void attackHandler::addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> attack ) {
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );
-	this->availableLocalPlayerAttacks.emplace_back( availableAttackHolder( attack->getAttackType( ) , attack ) );
+	this->availableLocalPlayerAttacks.emplace( attack->getAttackType( ) , std::move( attack ) );
 }
 
 void attackHandler::addAvailableEnemyAttack( std::string enemyName , std::shared_ptr<CBaseAttack> attack ) {
@@ -115,16 +115,10 @@ void attackHandler::addAvailableEnemyAttack( std::string enemyName , std::shared
 	this->availableEnemiesAttacks[ enemyName ].emplace_back( availableAttackHolder( attack->getAttackType( ) , attack ) );
 }
 
-std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>>  attackHandler::getAvailableLocalPlayerAttack( ) {
+std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> * attackHandler::getAvailableLocalPlayerAttack( ) {
 	//run this once, and store it
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );
-	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> result;
-	for ( int i = 0; i < this->availableLocalPlayerAttacks.size( ); i++ ) {
-		availableAttackHolder * attack = &this->availableLocalPlayerAttacks.at( i );
-		result.emplace( std::make_pair( attack->attack->getAttackType( ) , attack->attack ) );
-	}
-
-	return result;
+	return &this->availableLocalPlayerAttacks;
 }
 
 std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>>  attackHandler::getAvailableEnemyAttack( std::string enemyName ) {

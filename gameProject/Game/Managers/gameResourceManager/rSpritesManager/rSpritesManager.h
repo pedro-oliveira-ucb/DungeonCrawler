@@ -15,7 +15,8 @@ public:
 	rSpritesManager( std::string path ) :rBaseResource( path ) { }
 	bool initialize( ) override;
 
-	std::vector<std::shared_ptr<rSprite>> * getSprite( const std::string & name ) ;
+	std::vector<std::shared_ptr<rSprite>> * getSprite( const std::string & name );
+
 	std::shared_ptr<rSpriteAnimation> getClip( const std::string & name ) const;
 };
 

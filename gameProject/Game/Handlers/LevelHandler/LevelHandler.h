@@ -14,6 +14,7 @@ class LevelHandler : public CSingleton<LevelHandler>
 
 public:
 	void addLevel( mapType type , gameRoomLevel level );
+	void clearLevels( );
 	std::vector<gameRoomLevel> * getMapRoomLevels( mapType type );
 };
 

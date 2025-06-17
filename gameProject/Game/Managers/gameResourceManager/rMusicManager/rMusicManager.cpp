@@ -6,6 +6,8 @@
 #include <sstream>
 #include <string>
 
+#include "./../../../../Globals/Globals.h"
+
 #include "./../../../../Utils/Log/Log.h"
 #include "./../../../../Utils/utils.h"
 
@@ -124,6 +126,13 @@ bool rMusicManager::initialize( )
 		return false;
 	}
 
+	static const std::unordered_map<std::string , musicType> musicTypeMap = {
+	{ "dungeon", musicType::DungeonMusic },
+	{ "boss", musicType::BossMusic },
+	{ "menu", musicType::MainMenuMusic },
+	{ "gameover", musicType::gameOverMusic }
+	};
+
 	for ( auto & files : FilesOnFolder ) {
 		std::vector<std::pair<int , std::string>> orderedFiles; // Para ordenar os arquivos por nome (0.png, 1.png, ...)
 
@@ -137,24 +146,23 @@ bool rMusicManager::initialize( )
 				return false;
 			}
 
-			musicType type = musicType::MainMenuMusic; // Default type, can be set later if needed
+			musicType type = musicType::MainMenuMusic;
+			bool foundType = false;
 
-			if ( file.rawRecursivePath.find( "dungeon" ) != std::string::npos ) {
-				type = musicType::DungeonMusic;
+			for ( const auto & [keyword , mType] : musicTypeMap ) {
+				if ( file.recursiveFileName.find( keyword ) != std::string::npos ) {
+					type = mType;
+					foundType = true;
+					break;
+				}
 			}
-			else if ( file.rawRecursivePath.find( "boss" ) != std::string::npos ) {
-				type = musicType::BossMusic;
-			}
-			else if ( file.rawRecursivePath.find( "menu" ) != std::string::npos ) {
-				type = musicType::MainMenuMusic;
-			}
-			else {
-				Log::Print( "[rMusicManager] Unknown music type for %s!" , file.rawRecursivePath.c_str( ) );
+
+			if ( !foundType ) {
+				Log::Print( "[rMusicManager] Unknown music type for %s!" , file.recursiveFileName.c_str( ) );
 				return false;
 			}
 
-			musics[ type ].emplace_back( std::make_pair( file.rawRecursivePath , std::make_unique<rMusic>( file.filePath , musicConfig ) ) );
-			break;
+			musics[ type ].emplace_back( std::make_pair( file.recursiveFileName , std::make_unique<rMusic>( file.filePath , musicConfig ) ) );
 		}
 	}
 
@@ -224,7 +232,7 @@ bool rMusicManager::playMusic( musicType newType , float speed ) {
 }
 
 void rMusicManager::updateMusic( ) {
-	float delta = GetFrameTime( );
+	float delta = Globals::Get( ).getFrameTime( );
 
 	float currentSoundBaseVolume = 1.0f;
 

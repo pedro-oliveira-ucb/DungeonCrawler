@@ -145,30 +145,46 @@ void entitiesHandler::updateLocalPlayer( ) {
 
 	std::lock_guard<std::mutex> lock( handlerMutex );
 
-	if ( keybindHandler::Get( ).isPressed( keybind_identifier::SPRINT ) ) {
-		localPlayer->setSprinting( true );
+	if ( !localPlayer ) {
+		Log::Print( "Local player is not set." );
+		return;
 	}
-	else
-		localPlayer->setSprinting( false );
 
 	GVector2D localPos = localPlayer->getEntityPosition( );
-	GVector2D mouseWorldPos = { Globals::Get( ).mousePosWorldX, Globals::Get( ).mousePosWorldY };
-	// Calcula ângulo com base nas posições no mundo
-	float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , mouseWorldPos ) );
 
-	// Ataques do jogador
-	if ( keybindHandler::Get( ).isPressed( keybind_identifier::ATTACK_SIMPLE ) ) {
-		localPlayer->UseAttack( CBaseAttackType_Melee );
-	}
-	if ( keybindHandler::Get( ).isPressed( keybind_identifier::ATTACK_HEAVY ) ) {
-		localPlayer->UseAttack( CBaseAttackType_Ranged );
-	}
-	localPlayer->setLookingAngle( newLookingAngle );
+	if ( !localPlayer->isAlive( ) ) {
+		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_GAME_OVER );
 
-	// Movimento do player
-	for ( auto move : data ) {
-		if ( keybindHandler::Get( ).isPressed( move.key ) ) {
-			localPlayer->addMoveRequest( move.movementDirection );
+		if ( localPlayer->deathAnimationFinished( ) ) {
+			return;
+		}
+	}
+	else {
+		if ( keybindHandler::Get( ).isPressed( keybind_identifier::SPRINT ) ) {
+			localPlayer->setSprinting( true );
+		}
+		else
+			localPlayer->setSprinting( false );
+
+	
+		GVector2D mouseWorldPos = { Globals::Get( ).mousePosWorldX, Globals::Get( ).mousePosWorldY };
+		// Calcula ângulo com base nas posições no mundo
+		float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , mouseWorldPos ) );
+
+		// Ataques do jogador
+		if ( keybindHandler::Get( ).isPressed( keybind_identifier::ATTACK_SIMPLE ) ) {
+			localPlayer->UseAttack( CBaseAttackType_Melee );
+		}
+		if ( keybindHandler::Get( ).isPressed( keybind_identifier::ATTACK_HEAVY ) ) {
+			localPlayer->UseAttack( CBaseAttackType_Ranged );
+		}
+		localPlayer->setLookingAngle( newLookingAngle );
+
+		// Movimento do player
+		for ( auto move : data ) {
+			if ( keybindHandler::Get( ).isPressed( move.key ) ) {
+				localPlayer->addMoveRequest( move.movementDirection );
+			}
 		}
 	}
 	// Atualiza player

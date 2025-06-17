@@ -97,6 +97,8 @@ class CBaseEntity {
 	float maxStamina = 100.f;
 	float staminaRegenRate = 20.0f;
     float staminaLossRate = 20.0f;
+    
+    float defense = 0.0f;
 
     double lastMoveTime;
 public:
@@ -140,6 +142,7 @@ public:
 	float getMaxStamina( ) const;
 	float getStaminaRegenRate( ) const;
 	float getStaminaLossRate( ) const;
+	float getEntityDefense( ) const;
 
 
     // Setters
@@ -150,9 +153,11 @@ public:
     void setEntityPosition( GVector2D pos );
     void setCurrentStamina( float stamina );
 	void setEntityMaxStamina( float stamina );
+	void setEntityMaxHealth( int health );
 	void setStaminaRegenRate( float rate );
 	void setStaminaLossRate( float rate );
     void setMovementSpeed( float speed );
+    void setEntityDefense( float defense );
 
 
     // Sprint

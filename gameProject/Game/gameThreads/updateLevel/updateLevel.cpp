@@ -44,6 +44,7 @@ void updateLevel::threadFunction( ) {
 		Globals::Get( ).getGame( )->setCurrentGameRoom( localRoom );
 
 		bool inCorridor = gameMap::Get( ).isCorridor( localPos );
+		Globals::Get( ).getGame( )->setInCorridor( inCorridor );
 		if ( !inCorridor ) {
 			if ( localRoom ) {
 				if ( currentPlayerRoom == -1 ) {

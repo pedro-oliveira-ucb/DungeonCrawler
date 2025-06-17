@@ -137,15 +137,25 @@ void CPlayerEntity::handleMovementState( std::uint32_t & state ) {
 	float staminaLossRate = this->getStaminaLossRate( );
 	float staminaRegenRate = this->getStaminaRegenRate( );
 
+	double currentRegenFactor = staminaRegenRate * this->deltaTime;
+	double currentLossFactor = staminaLossRate * this->deltaTime;
+
+	if ( !sprinting && ( currentTime - lastWalkingTime ) > 3.0f ) {
+		currentStamina += currentRegenFactor;
+	}
+
 	if ( this->hasMovementRequest( ) ) {
 		if ( sprinting ) {
-			if ( currentStamina > staminaLossRate * this->deltaTime ) {
-				currentStamina -= staminaLossRate * this->deltaTime;
+			if ( currentStamina > 1.0f ) {
+				currentStamina -= currentLossFactor;	
 				lastWalkingTime = currentTime;
 			}
-			else {
-				sprinting = false; // Cancela o sprint se não houver estamina suficiente
-			}	
+		}
+
+		currentStamina = std::clamp( currentStamina , 0.0f , maxStamina );
+
+		if ( currentStamina < 1.0f ) {
+			sprinting = false; // Se a stamina acabar, não pode mais correr
 		}
 
 		// reverseAnimation = ( fabsf( delta ) > 90.0f );
@@ -155,11 +165,8 @@ void CPlayerEntity::handleMovementState( std::uint32_t & state ) {
 		state |= CBaseEntityState::STOPPED;
 	}
 
-	if ( !sprinting && ( currentTime - lastWalkingTime ) > 3.0f ) {
-		currentStamina += staminaRegenRate * this->deltaTime;
-	}
-
 	currentStamina = std::clamp( currentStamina , 0.0f , maxStamina );
+
 
 	setSprinting( sprinting );
 	setCurrentStamina( currentStamina );

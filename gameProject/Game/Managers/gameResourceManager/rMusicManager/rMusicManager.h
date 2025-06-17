@@ -14,6 +14,7 @@ enum musicType
 	MainMenuMusic = 0 ,
 	DungeonMusic = 1 ,
 	BossMusic = 2 ,
+	gameOverMusic = 3,
 };
 
 class rMusicManager : public rBaseResource

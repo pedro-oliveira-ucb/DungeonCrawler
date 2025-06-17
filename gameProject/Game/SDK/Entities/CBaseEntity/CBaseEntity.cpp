@@ -21,7 +21,7 @@
 // Construtor de cópia.
 CBaseEntity::CBaseEntity( const CBaseEntity & other ) :
 	entityAnimations( other.entityAnimations ) // Inicializa as animações da entidade com as da outra entidade.
-{	
+{
 	// Copia as propriedades da outra entidade para esta entidade.
 	this->Name = other.Name;
 	this->entityPosition = other.entityPosition;
@@ -179,6 +179,11 @@ void CBaseEntity::setEntityMaxStamina( float stamina )
 	this->maxStamina = stamina;
 }
 
+void CBaseEntity::setEntityMaxHealth( int health ) {
+	std::lock_guard<std::mutex> lock( this->cBaseMutex ); // Garante exclusão mútua.
+	this->maxHealth = health;
+}
+
 // Define a taxa de regeneração de estamina da entidade.
 void CBaseEntity::setStaminaRegenRate( float rate )
 {
@@ -199,10 +204,18 @@ void CBaseEntity::setMovementSpeed( float speed )
 	this->movementSpeed = speed;
 }
 
+void CBaseEntity::setEntityDefense( float defense )
+{
+	std::lock_guard<std::mutex> lock( this->cBaseMutex ); // Garante exclusão mútua.
+	this->defense = defense; // Define a defesa da entidade.
+}
+
 // Aplica dano à entidade.
 void CBaseEntity::Hit( int damage ) {
 	{
 		std::lock_guard<std::mutex> lock( this->cBaseMutex ); // Garante exclusão mútua para modificar 'health' e 'beingHit'.
+		damage -= static_cast< int >( floor( ( float ) ( damage ) * ( this->defense / 100.f ) ) );
+		damage = std::max( 0 , damage ); // Garante que o dano não seja negativo.
 		this->health -= damage; // Reduz a vida.
 		this->beingHit = true;  // Define que a entidade está sendo atingida.
 	}
@@ -271,15 +284,15 @@ void CBaseEntity::move( ) {
 	this->lastMoveTime = currentGameTime; // Atualiza o tempo do último movimento.
 
 	// Se não houver requisições de movimento, retorna.
-	if ( this->movementsRequest.empty( )  ) {
+	if ( this->movementsRequest.empty( ) ) {
 		return;
 	}
-	
+
 	// Define a velocidade final do movimento.
 	float finalMoveSpeed = this->movementSpeed;
 
 	// Dobra a velocidade se a entidade estiver correndo.
-	if ( this->sprinting ) {
+	if ( this->entityState & CBaseEntityState::RUNNING ) {
 		finalMoveSpeed *= 2.0f;
 	}
 
@@ -302,7 +315,7 @@ void CBaseEntity::move( ) {
 	if ( moveFlags[ DIRECTION::RIGHT ] ) finalMovement += directionVectors[ DIRECTION::RIGHT ];
 
 	// Calcula o comprimento do vetor de movimento.
-	float movementLength = finalMovement.length( ); 
+	float movementLength = finalMovement.length( );
 
 	// Se houver movimento (comprimento > 0).
 	if ( movementLength > 0.0f ) {
@@ -479,6 +492,12 @@ float CBaseEntity::getStaminaLossRate( ) const
 {
 	std::lock_guard<std::mutex> lock( this->cBaseMutex ); // Garante exclusão mútua.
 	return this->staminaLossRate;
+}
+
+float CBaseEntity::getEntityDefense( ) const
+{
+	std::lock_guard<std::mutex> lock( this->cBaseMutex ); // Garante exclusão mútua.
+	return this->defense;
 }
 
 // Define a direção de visão da entidade.

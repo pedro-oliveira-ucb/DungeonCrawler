@@ -1,4 +1,4 @@
-#include "updatePosition.h"
+#include "updateLocalPlayer.h"
 
 #include <cmath>
 
@@ -11,8 +11,8 @@
 
 
 
-void updatePositionEvent::threadFunction( ) {
-	Log::Print( "[updatePositionEvent] Hello world!" );
+void updateLocalPlayer::threadFunction( ) {
+	Log::Print( "[updateLocalPlayer] Hello world!" );
 	keybindHandler::Get( ).initializeKeybinds( );
 
 	while ( true ) {
@@ -28,5 +28,5 @@ void updatePositionEvent::threadFunction( ) {
 		std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
 	}
 
-	Log::Print( "[updatePositionEvent] bye!" );
+	Log::Print( "[updateLocalPlayer] bye!" );
 }

@@ -163,9 +163,22 @@ void LevelManager::generateLevels( ) {
     generateBossLevel( );
 }
 
-// --- Funções restantes da classe (sem alterações significativas) ---
+void LevelManager::restartLevels( ) {
+
+    this->currentLevel = 0;
+    started = false;
+    // Limpa os níveis atuais
+    this->mapLevels.clear( );
+    LevelHandler::Get( ).clearLevels( );
+}
 
 void LevelManager::initializeLevels( ) {
+	CPlayerEntity * localPlayer = entitiesHandler::Get( ).getLocalPlayer( );
+
+    if ( localPlayer != nullptr ) {
+		localPlayer->Respawn(  );
+    }
+
     for ( int i = 0; i <= mapType::bossMap; ++i ) {
         mapType levelMap = static_cast< mapType >( i );
         std::vector<gameRoomLevel> * roomLevels = LevelHandler::Get( ).getMapRoomLevels( levelMap );
@@ -180,8 +193,10 @@ void LevelManager::initializeLevels( ) {
 
 void LevelManager::initialize( ) {
     std::lock_guard<std::mutex> lock( this->m_mutex );
-    if ( started ) return; // Evitar reinicialização
-
+    if ( started ) {
+		restartLevels( ); // Reinicializa os níveis se já estiverem iniciados
+    }
+       
     generateLevels( );
     initializeLevels( );
 }

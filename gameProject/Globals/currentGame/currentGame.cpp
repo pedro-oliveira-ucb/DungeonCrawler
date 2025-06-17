@@ -12,6 +12,12 @@ bool currentGame::isGameinState( currentGameState state ) const
 	return this->gameState == state;
 }
 
+bool currentGame::isInCorridor( ) const
+{
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	return this->inCorridor;
+}
+
 currentGameState currentGame::getCurrentGameState( ) const
 {
 	std::lock_guard<std::mutex> lock( currentGameStateMutex );
@@ -46,6 +52,12 @@ void currentGame::setCurrentGameLevel( int level )
 {
 	std::lock_guard<std::mutex> lock( currentGameStateMutex );
 	this->currentGameLevel = level;
+}
+
+void currentGame::setInCorridor( bool inCorridor )
+{
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	this->inCorridor = inCorridor;
 }
 
 int currentGame::getCurrentGameLevel( ) const

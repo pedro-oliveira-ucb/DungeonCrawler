@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameThreads\updatePosition\updatePosition.cpp">
+    <ClCompile Include="Game\gameThreads\updateLocalPlayer\updateLocalPlayer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\SDK\Entities\CBaseEntity\CBaseEntity.cpp">
@@ -133,9 +133,6 @@
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\Managers\collisionManager\collisionManager.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\gameThreads\enemiesController\enemiesController.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Game\Managers\gameResourceManager\rMusicManager\rMusicManager.cpp">
@@ -264,12 +261,18 @@
     <ClCompile Include="Globals\playerStats\playerStats.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameObjects\gameState\upgradeScreenState\UpgradeScreenState.cpp">
+    <ClCompile Include="Game\gameRender\renderShopMenu\renderShopMenu.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Handlers\shopHandler\shopHandler.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameInitializer\EntitiesInitializer\ShopInitializer\ShopInitializer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game\gameThreads\updatePosition\updatePosition.h">
+    <ClInclude Include="Game\gameThreads\updateLocalPlayer\updateLocalPlayer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\SDK\Entities\CBaseEntity\CBaseEntity.h">
@@ -393,9 +396,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\Managers\collisionManager\collisionManager.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\gameThreads\enemiesController\enemiesController.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\Managers\gameResourceManager\rMusicManager\rMusicManager.h">
@@ -525,6 +525,15 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameObjects\gameState\upgradeScreenState\UpgradeScreenState.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Handlers\shopHandler\shopHandler.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameRender\renderShopMenu\renderShopMenu.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameInitializer\EntitiesInitializer\ShopInitializer\ShopInitializer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

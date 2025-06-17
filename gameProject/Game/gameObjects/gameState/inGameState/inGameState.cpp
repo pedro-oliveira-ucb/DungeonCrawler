@@ -1,6 +1,7 @@
 #include "inGameState.h"
 
 #include "../mainMenuState/mainMenuState.h"
+#include "../inGameOverState/inGameOverState.h"
 
 #include "../../../gameObjects/gameMap/gameMap.h"
 
@@ -22,9 +23,6 @@
 
 #include <raylib/raylib.h>
 #include <raylib/raymath.h>
-
-
-
 
 
 inGameState::inGameState( ) {
@@ -65,11 +63,11 @@ void inGameState::setCameraPosition( ) {
 
 void inGameState::HandleInput( gameStateManager * manager ) {
 	if ( showUpgradeScreen ) {
+		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PAUSED );
 		if ( IsKeyPressed( KEY_U ) || IsKeyPressed( KEY_ESCAPE ) ) {
 			showUpgradeScreen = false;
 			Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PLAYING );
 		}
-
 	}
 	else {
 		if ( IsKeyPressed( KEY_ESCAPE ) ) {
@@ -78,11 +76,12 @@ void inGameState::HandleInput( gameStateManager * manager ) {
 			Globals::Get( ).getGame( )->setCurrentGameState( newState );
 		}
 
-		if ( IsKeyPressed( KEY_U ) ) {
+		// Check if the player is in a corridor and if the upgrade screen should be shown
+		if ( IsKeyPressed( KEY_U ) && Globals::Get( ).getGame( )->isInCorridor( ) ) {
 			showUpgradeScreen = true;
 			Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PAUSED );
-
 			gameSoundsEventHandler::Get( ).addEventToQueue( "upgrade_screen_open" );
+			return;
 		}
 
 		if ( Globals::Get( ).getGame( )->getCurrentGameState( ) == currentGameState::GAME_STATE_PAUSED && !showUpgradeScreen ) {
@@ -103,7 +102,7 @@ void inGameState::HandleInput( gameStateManager * manager ) {
 					continue;
 				}
 
-				if ( door.first.distTo( localPos ) <= 100 && IsKeyPressed( KEY_E ) ) {
+				if ( IsKeyPressed( KEY_E ) && door.first.distTo( localPos ) <= 100 ) {
 					if ( Globals::Get( ).getGame( )->getNumKeys( ) >= 1 ) {
 						Globals::Get( ).getGame( )->removeKey( 1 );
 						gameMap::Get( ).getDoorInstanceData( door.first )->unlocked = true;
@@ -147,6 +146,9 @@ void inGameState::Update( gameStateManager * manager , float deltaTime ) {
 
 		this->setExiting( true );
 		break;
+	case currentGameState::GAME_STATE_GAME_OVER:
+		this->setExiting( true );
+		break;
 	default:
 		break;
 	}
@@ -156,12 +158,16 @@ void inGameState::Update( gameStateManager * manager , float deltaTime ) {
 
 	switch ( stateTransition ) {
 	case gameStateTransitionState::EXIT_FINISHED:
-		manager->ChangeState( std::make_unique<mainMenuState>( ) );
+
+		if ( state == currentGameState::GAME_STATE_EXIT )
+			manager->ChangeState( std::make_unique<mainMenuState>( ) );
+		else if ( state == currentGameState::GAME_STATE_GAME_OVER )
+			manager->ChangeState( std::make_unique<inGameOverState>( ) );
+
 		break;
 	}
 
 	shaderHandler::Get( ).updateAll( );
-	Globals::Get( ).getPlayerStats( )->updatePlayer( );
 }
 
 void inGameState::Render( gameStateManager * manager ) {
@@ -191,7 +197,6 @@ void inGameState::Render( gameStateManager * manager ) {
 	if ( showUpgradeScreen ) {
 		gameRender::Get( ).renderShopMenu( );
 	}
-
 
 	this->renderTransition( manager );
 }

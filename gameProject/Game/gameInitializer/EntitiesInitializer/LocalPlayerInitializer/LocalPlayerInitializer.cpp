@@ -80,9 +80,9 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 	builder.entityHitbox = GVector2D( 25 , 25 );
 	builder.Name = animationName;
 
-	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> attacks = attackHandler::Get( ).getAvailableLocalPlayerAttack( );
+	std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> * attacks = attackHandler::Get( ).getAvailableLocalPlayerAttack( );
 
-	return new CPlayerEntity( builder, attacks );
+	return new CPlayerEntity( builder, *attacks );
 }
 
 bool LocalPlayerInitializer::initializeEvents( ) {

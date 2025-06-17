@@ -4,7 +4,6 @@
 #include "../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
 
 #include "../SDK/Events/EventManager.h"
-#include "../gameWindow/gameWindow.h"
 #include "../gameThreads/gameThreads.h"
 
 #include "../../../../Utils/Log/Log.h"
@@ -15,7 +14,6 @@
 
 
 gameResourceManager _gameResourceManager;
-gameWindow _gameWindow;
 gameThreads _gameThreads;
 
 EntitiesInitializer _entitiesInitializer;

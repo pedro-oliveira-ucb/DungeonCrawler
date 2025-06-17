@@ -19,14 +19,14 @@ class attackHandler : public CSingleton<attackHandler>
     std::vector<std::pair<CBaseEntity * , std::shared_ptr<CBaseAttack>>> runningAttacks;
 
     std::unordered_map<std::string, std::vector<availableAttackHolder>> availableEnemiesAttacks;
-    std::vector<availableAttackHolder> availableLocalPlayerAttacks;
+    std::unordered_map<CBaseAttackType, std::shared_ptr<CBaseAttack>> availableLocalPlayerAttacks;
 
 public:
     int runningAttacksSize( );
     std::shared_ptr<CBaseAttack> getRunningAttack( int index );
 
     // Retorna todos os ataques que o Player pode usar
-    std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> getAvailableLocalPlayerAttack( );
+    std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> * getAvailableLocalPlayerAttack( );
 
     // Retorna um ataque que o inimigo pode usar (aqui só 1 por exemplo)
     std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> getAvailableEnemyAttack( std::string enemyName );

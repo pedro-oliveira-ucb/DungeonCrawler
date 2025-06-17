@@ -2,17 +2,21 @@
 #include <mutex>
 
 // Enum para identificar os stats de forma única para o switch-case
-enum class PlayerStatIndex {
+enum PlayerStatIndex {
 	MaxHealth ,
 	MaxStamina ,
 	StaminaRegen ,
 	StaminaLoss ,
-	AttackDamageFactor ,
-	AttackSpeedFactor ,
-	AttackRangeFactor ,
-	AttackAreaFactor ,
+	MeleeAttackDamageFactor ,
+	MeleeAttackSpeedFactor ,
+	MeleeAttackRangeFactor ,
+	RangeAttackDamageFactor ,
+	RangeAttackSpeedFactor ,
+	RangeAttackRangeFactor ,
 	Defense ,
-	MovementSpeed ,
+	MovementSpeed,
+	ManaDropProbability ,
+	HealthDropProbability,
 };
 
 class playerStats
@@ -32,11 +36,22 @@ class playerStats
 	float MaxMana = 50.f;
 	float ManaRegenFactor = 0.5f; // Ex: 0.5 mana por segundo
 	float MovementSpeed = 100.f; // Ex: unidades por segundo
-	float AttackDamageFactor = 1.0f; // Multiplicador de dano
-	float AttackSpeedFactor = 1.0f; // Multiplicador de velocidade de ataque (valores menores -> mais rápido)
+
+	float rangeAttackDamageFactor = 1.0f; // Fator de dano para ataques à distância
+	float rangeAttackAreaFactor = 1.0f;
+	float rangeAttackSpeedFactor = 1.0f; // Fator de velocidade de ataque para ataques à distância
+	float rangeAttackRangeFactor = 1.0f;
+
+	float meleeAttackDamageFactor = 1.0f; // Fator de dano para ataques corpo a corpo
+	float meleeAttackAreaFactor = 1.0f; // Fator de área de ataque para ataques corpo a corpo
+	float meleeAttackSpeedFactor = 1.0f; // Fator de velocidade de ataque para ataques corpo a corpo
+	float meleeAttackRangeFactor = 1.0f; // Fator de alcance de ataque para ataques corpo a corpo
+
 	float Defense = 0.f; // Redução de dano flat ou percentual
 
 public:
+	playerStats( );
+	playerStats( const playerStats & other );
 	// Getters
 	float getHealthDropProbability();
 	float getManaDropProbability();
@@ -47,9 +62,15 @@ public:
 	float getMaxMana();
 	float getManaRegenFactor();
 	float getMovementSpeed();
-	float getAttackDamageFactor();
-	float getAttackSpeedFactor();
 	float getDefense();
+	float getRangeAttackDamageFactor( );
+	float getRangeAttackSpeedFactor( );
+	float getRangeAttackAreaFactor( );
+	float getRangeAttackRangeFactor( );
+	float getMeleeAttackDamageFactor( );
+	float getMeleeAttackSpeedFactor( );
+	float getMeleeAttackAreaFactor( );
+	float getMeleeAttackRangeFactor( );
 
 	// Setters
 	void setHealthDropProbability(float probability);
@@ -61,10 +82,16 @@ public:
 	void setMaxMana(float maxMana);
 	void setManaRegenFactor(float factor);
 	void setMovementSpeed(float speed);
-	void setAttackDamageFactor(float factor);
-	void setAttackSpeedFactor(float factor);
 	void setDefense(float defense);
-
+	void setRangeAttackDamageFactor( float factor );
+	void setRangeAttackSpeedFactor( float factor );
+	void setRangeAttackAreaFactor( float factor );
+	void setRangeAttackRangeFactor( float factor );
+	void setMeleeAttackDamageFactor( float factor );
+	void setMeleeAttackSpeedFactor( float factor );
+	void setMeleeAttackAreaFactor( float factor );
+	void setMeleeAttackRangeFactor( float factor );
+	
 	void updatePlayer( );
 };
 
