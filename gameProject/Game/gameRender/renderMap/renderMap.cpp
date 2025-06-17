@@ -89,8 +89,9 @@ void renderTilesetEmGrid( const TileSet & tileSet ,
 			// A posição do tile na tela é calculada de forma direta e simples.
 			const float currentScreenX = col * TILE_WIDTH + mapScreenPosition.x;
 			const float currentScreenY = row * TILE_HEIGHT + mapScreenPosition.y;
+			const int currentGameMapID = gameMap::Get( ).getRoomIdAtPosition( GVector2D( currentScreenX , currentScreenY ) );
 
-			if ( tileTexture->width < TILE_WIDTH ) {
+			if ( tileTexture->width < TILE_WIDTH || tileTexture->height < TILE_HEIGHT ) {
 				float tempWidth = 0.0f;
 				do {
 					float tempHeight = 0.0f;
@@ -110,7 +111,7 @@ void renderTilesetEmGrid( const TileSet & tileSet ,
 
 #if _DEBUG
 			// Lógica de debug para ver os índices, se necessário.
-			std::string id = std::to_string( row ) + "," + std::to_string( col );
+			std::string id = std::to_string( currentGameMapID );
 			DrawText( id.c_str( ) , static_cast< int >( currentScreenX ) , static_cast< int >( currentScreenY ) , 8 , WHITE );
 #endif
 		}

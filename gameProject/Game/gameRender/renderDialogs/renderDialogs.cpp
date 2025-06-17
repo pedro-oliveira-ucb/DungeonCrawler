@@ -43,11 +43,13 @@ void renderDialogs::render( ) {
 		this->currentDialog = gameDialogHandler::Get( ).getDialog( );
 	}
 	else {
+		float currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+
 		if ( !this->currentDialogTime ) {
-			this->dialogStartTime = GetTime( );
+			this->dialogStartTime = currentGameTime;
 		}
 
-		this->currentDialogTime += GetTime( ) - this->dialogStartTime;
+		this->currentDialogTime += currentGameTime - this->dialogStartTime;
 
 		for ( auto it = this->currentDialog.triggers.begin( ); it != this->currentDialog.triggers.end( ); ++it ) {
 			if ( this->currentDialogTime >= it->triggerTime && !it->throwed ) {
@@ -62,10 +64,10 @@ void renderDialogs::render( ) {
 		if ( lettersToShow > this->currentDialog.dialogText.size( ) ) {
 			lettersToShow = this->currentDialog.dialogText.size( );
 			if ( !this->dialogEndTime ) {
-				this->dialogEndTime = GetTime( );
+				this->dialogEndTime = currentGameTime;
 			}
 
-			float deltaEndTime = GetTime( ) - this->dialogEndTime;
+			float deltaEndTime = currentGameTime - this->dialogEndTime;
 			if ( deltaEndTime > this->currentDialog.dialogStayTime ) {
 				// Reset the dialog after it has been fully displayed
 				this->currentDialog.clear( );

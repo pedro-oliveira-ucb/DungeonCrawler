@@ -33,7 +33,7 @@ public:
 
     void addAvailableLocalPlayerAttack( std::shared_ptr<CBaseAttack> attack );
     void addAvailableEnemyAttack( std::string enemyName, std::shared_ptr<CBaseAttack> attack );
-
+    void clearAttacks( );
     void updateAttacks( );
     void throwNewAttack( CBaseEntity * sender , CBaseAttack * attack );
 };

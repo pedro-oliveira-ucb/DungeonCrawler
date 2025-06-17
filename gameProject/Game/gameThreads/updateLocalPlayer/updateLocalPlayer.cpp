@@ -12,7 +12,7 @@
 
 
 void updateLocalPlayer::threadFunction( ) {
-	Log::Print( "[updateLocalPlayer] Hello world!" );
+	Log::Print( "[updateLocalPlayer] Hello world, my id:%d " , ( int ) ( this->ThreadObject->GetId( ) ) );
 	keybindHandler::Get( ).initializeKeybinds( );
 
 	while ( true ) {

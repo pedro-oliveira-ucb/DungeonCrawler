@@ -27,28 +27,28 @@ bool MusicConfig::createBaseMusicConfig( std::string filename ) {
 
 	std::ofstream file( filename );
 	if ( !file.is_open( ) ) {
-		Log::Print( "[rSpritesManager] Failed to create config file: %s" , filename.c_str( ) );
+		Log::Print( "[rMusicManager] Failed to create config file: %s" , filename.c_str( ) );
 		return false;
 	}
 
 	file << config.dump( 4 );
 
 	file.close( );
-	Log::Print( "[rSpritesManager] Created base sound config file: %s" , filename.c_str( ) );
+	Log::Print( "[rMusicManager] Created base music config file: %s" , filename.c_str( ) );
 }
 
 bool MusicConfig::generateMusicConfig( std::string filename , MusicConfig * buffer ) {
 	if ( !fs::exists( filename ) ) {
-		Log::Print( "[rSpritesManager] Config file not found: %s" , filename.c_str( ) );
+		Log::Print( "[rMusicManager] Config file not found: %s" , filename.c_str( ) );
 		if ( !createBaseMusicConfig( filename ) ) {
-			Log::Print( "[rSpritesManager] Failed to create base sound config file: %s" , filename.c_str( ) );
+			Log::Print( "[rMusicManager] Failed to create base music config file: %s" , filename.c_str( ) );
 			return false;
 		}
 	}
 
 	std::string configString = utils::Get( ).readFileAsString( filename );
 	if ( configString.empty( ) ) {
-		Log::Print( "[rSpritesManager] Config file is empty: %s" , filename.c_str( ) );
+		Log::Print( "[rMusicManager] Config file is empty: %s" , filename.c_str( ) );
 		return false;
 	}
 
@@ -57,7 +57,7 @@ bool MusicConfig::generateMusicConfig( std::string filename , MusicConfig * buff
 		configJson = json::parse( configString );
 	}
 	catch ( const json::parse_error & e ) {
-		Log::Print( "[rSpritesManager] Failed to parse config file %s: %s" , filename.c_str( ) , e.what( ) );
+		Log::Print( "[rMusicManager] Failed to parse config file %s: %s" , filename.c_str( ) , e.what( ) );
 		return false;
 	}
 
@@ -65,7 +65,7 @@ bool MusicConfig::generateMusicConfig( std::string filename , MusicConfig * buff
 
 	for ( const auto & key : requiredKeys ) {
 		if ( configJson.find( key ) == configJson.end( ) ) {
-			Log::Print( "[rSpritesManager] Config file %s does not contain '%s' key!" , filename.c_str( ) , key.c_str( ) );
+			Log::Print( "[rMusicManager] Config file %s does not contain '%s' key!" , filename.c_str( ) , key.c_str( ) );
 			return false;
 		}
 	}
@@ -142,7 +142,7 @@ bool rMusicManager::initialize( )
 			MusicConfig musicConfig;
 
 			if ( !MusicConfig::generateMusicConfig( configPath.string( ) , &musicConfig ) ) {
-				Log::Print( "[rMusicManager] Failed to generate sound config for %s!" , file.fileName.c_str( ) );
+				Log::Print( "[rMusicManager] Failed to generate music config for %s!" , file.fileName.c_str( ) );
 				return false;
 			}
 
@@ -236,18 +236,19 @@ void rMusicManager::updateMusic( ) {
 
 	float currentSoundBaseVolume = 1.0f;
 
-	if ( currentSound ) {
-		bool musicUpdate = false;
-		{
-			std::lock_guard<std::mutex> lock( this->musicMutex );
-			musicUpdate = currentSound->update( delta );
-		}
+	this->musicMutex.lock( );
+	if ( currentSound != nullptr ) {
+		bool musicNearEnd = false;
+		musicNearEnd = currentSound->update( delta );
+		this->musicMutex.unlock( );
 
-		if ( musicUpdate ) {
-			playMusic( currentMusicType , 5.0f ); // Reproduz uma musica do mesmo tipo se a atual terminar
+		if ( musicNearEnd ) {
+			playMusic( currentMusicType , 5.0f ); // Reproduz uma musica do mesmo tipo se a atual estiver perto do fim
 		}
-
 		currentSoundBaseVolume = currentSound->getBaseVolume( );
+	}
+	else {
+		this->musicMutex.unlock( );
 	}
 
 	std::lock_guard<std::mutex> lock( this->musicMutex );
@@ -260,7 +261,7 @@ void rMusicManager::updateMusic( ) {
 				isFadingOut = false;
 
 				if ( currentSound )
-					currentSound->stop( ); // Presumido
+					currentSound->stop( );
 
 				currentSound = nextSound;
 				nextSound = nullptr;
@@ -270,7 +271,7 @@ void rMusicManager::updateMusic( ) {
 			}
 
 			if ( currentSound )
-				currentSound->setVolume( volume ); // Presumido
+				currentSound->setVolume( volume );
 		}
 		else if ( isFadingIn ) {
 			volume += fadeSpeed * delta;

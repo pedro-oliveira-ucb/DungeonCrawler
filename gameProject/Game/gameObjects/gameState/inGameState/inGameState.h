@@ -23,7 +23,8 @@ public:
 private:
     Camera2D camera = { 0 };
     void setCameraPosition( );
-    float zoomLevel = 1.0f; // Inicializado com um valor padrão
+    void updateCameraZoomLevel( );
+    float zoomLevel = 2.0f; // Inicializado com um valor padrão
     int currentPlayerRoom = -1;
 
     // Lógica da tela de Upgrades integrada

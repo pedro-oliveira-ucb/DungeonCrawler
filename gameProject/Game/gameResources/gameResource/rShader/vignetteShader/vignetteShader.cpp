@@ -48,31 +48,40 @@ void vignetteShader::updateResourcesValues( ) {
 
 	if ( player == nullptr ) {
 		Log::Print( "vignetteShader::updateResourcesValues: Player entity is null." );
-		return;
-	}
-
-	const float playerHealth = player->getHealth( );
-	const float playerMaxHealth = player->getMaxHealth( );
-
-	// If player health is 0, set radius to a very low value to avoid division by zero.
-	if ( playerHealth <= 0 ) {
-		this->vignetteRadius = -0.65f; // Set radius to a very low value to avoid division by zero.
 	}
 	else {
-		// Calculate the vignette color based on player health.
-		// The color will be more intense as the player health decreases.
-		// The color will be a shade of red, with the intensity based on the health percentage.
-		Vector3 currentShaderColor = this->vignetteColor;
-		currentShaderColor.x = 1.0f - std::max( ( playerHealth / playerMaxHealth ) , 0.0f ); // Red channel
-		currentShaderColor.x = Clamp( currentShaderColor.x , 0.0f , 0.2f );
-		currentShaderColor.y = 0.0f; // Green channel
-		currentShaderColor.z = 0.0f; // Blue channel
-		this->vignetteColor = currentShaderColor;
+		const float playerHealth = player->getHealth( );
+		const float playerMaxHealth = player->getMaxHealth( );
+		float healthPercentage = playerHealth / playerMaxHealth;
 
-		// Calculate the vignette radius based on player health.
-		float currentShaderRadius = this->vignetteRadius;
-		currentShaderRadius = ( -0.29f * playerMaxHealth ) / playerHealth;
-		this->vignetteRadius = std::max( currentShaderRadius , -0.65f );
+		// If player health is 0, set radius to a very low value to avoid division by zero.
+		if ( playerHealth <= 0 ) {
+			this->vignetteRadius = -0.65f; // Set radius to a very low value to avoid division by zero.
+		}
+		else {
+			// Calculate the vignette color based on player health.
+			// The color will be more intense as the player health decreases.
+			// The color will be a shade of red, with the intensity based on the health percentage.
+			Vector3 currentShaderColor = this->vignetteColor;
+
+
+			if ( healthPercentage < 0.3 ) {
+				currentShaderColor.x = 1.0f - std::max( ( playerHealth / playerMaxHealth ) , 0.0f ); // Red channel
+				currentShaderColor.x = Clamp( currentShaderColor.x , 0.0f , 0.2f );
+			}
+			else {
+				currentShaderColor.x = 0.0f;
+			}
+
+			currentShaderColor.y = 0.0f; // Green channel
+			currentShaderColor.z = 0.0f; // Blue channel
+			this->vignetteColor = currentShaderColor;
+
+			// Calculate the vignette radius based on player health.
+			float currentShaderRadius = this->vignetteRadius;
+			currentShaderRadius = ( -0.29f * playerMaxHealth ) / playerHealth;
+			this->vignetteRadius = std::max( currentShaderRadius , -0.65f );
+		}
 	}
 
 	SetShaderValue( *shader , this->resourceRadiusLoc , &this->vignetteRadius , SHADER_UNIFORM_FLOAT );

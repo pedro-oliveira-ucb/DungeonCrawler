@@ -78,6 +78,9 @@ bool CollisionManager::CanMoveTo( CBaseEntity * entity , GVector2D & newPos ) {
 	}
 
 	for ( auto * other : nearby ) {
+		if ( other == nullptr )
+			continue;
+
 		if ( other != entity && other->isAlive( ) ) {
 			if ( checkCollision( entity , other , newPos ) ) {
 				return false;
@@ -97,6 +100,9 @@ bool CollisionManager::isSpaceFree( GVector2D Position , GVector2D Size ) {
 	}
 
 	for ( auto * other : nearby ) {
+		if ( other == nullptr )
+			continue; 
+
 		if ( checkSpacialCollision( other , Position , Size ) ) {
 			return false;
 		}

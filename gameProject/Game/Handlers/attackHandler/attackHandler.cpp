@@ -115,6 +115,12 @@ void attackHandler::addAvailableEnemyAttack( std::string enemyName , std::shared
 	this->availableEnemiesAttacks[ enemyName ].emplace_back( availableAttackHolder( attack->getAttackType( ) , attack ) );
 }
 
+void attackHandler::clearAttacks( )
+{
+	std::lock_guard<std::mutex> lock( attackHandlerMutex );
+	runningAttacks.clear( );
+}
+
 std::unordered_map<CBaseAttackType , std::shared_ptr<CBaseAttack>> * attackHandler::getAvailableLocalPlayerAttack( ) {
 	//run this once, and store it
 	std::lock_guard<std::mutex> lock( attackHandlerMutex );

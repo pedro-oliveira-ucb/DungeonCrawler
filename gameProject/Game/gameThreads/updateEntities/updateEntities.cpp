@@ -17,7 +17,7 @@
 
 void updateEntities::threadFunction( ) {
 
-	Log::Print( "[updateEntities] Hello world!" );
+	Log::Print( "[updateEntities] Hello world, my id:%d ", (int)(this->ThreadObject->GetId()) );
 
 	while ( true ) {
 		currentGameState gameState = Globals::Get( ).getGame( )->getCurrentGameState( );

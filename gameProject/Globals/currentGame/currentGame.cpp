@@ -66,10 +66,22 @@ int currentGame::getCurrentGameLevel( ) const
 	return this->currentGameLevel;
 }
 
+float currentGame::getLocalPlayerHealthPercentage( ) const
+{
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	return this->localPlayerHealthPercentage;
+}
+
 GVector2D currentGame::getCurrentLocalPlayerPosition( ) const
 {
 	std::lock_guard<std::mutex> lock( currentGameStateMutex );
 	return this->currentLocalPlayerPosition;
+}
+
+void currentGame::setLocalPlayerHealthPercentage( float percentage )
+{
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	this->localPlayerHealthPercentage = percentage;
 }
 
 void currentGame::setCurrentLocalPlayerPosition( const GVector2D & position )

@@ -18,7 +18,7 @@
 
 void updateLevel::threadFunction( ) {
 
-	Log::Print( "[updateLevel] Hello world!" );
+	Log::Print( "[updateLevel] Hello world, my id:%d " , ( int ) ( this->ThreadObject->GetId( ) ) );
 
 	CPlayerEntity * local = entitiesHandler::Get( ).getLocalPlayer( );
 	int currentPlayerRoom = -1;

@@ -93,6 +93,8 @@ void inGameState::HandleInput( gameStateManager * manager ) {
 		GVector2D localPos = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
 		std::map<GVector2D , DoorInstanceData> doors = gameMap::Get( ).getDoorInstancesCopy( );
 		if ( !doors.empty( ) ) {
+
+			float gameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
 			for ( const auto & door : doors ) {
 				if ( door.first.y > localPos.y ) {
 					if ( door.second.unlocked )
@@ -109,13 +111,13 @@ void inGameState::HandleInput( gameStateManager * manager ) {
 						gameSoundsEventHandler::Get( ).addEventToQueue( "door_open" );
 					}
 					else {
-						if ( GetTime( ) - lastDialogThrowTime > 5.0f ) {
+						if ( gameTime - lastDialogThrowTime > 5.0f ) {
 							gameDialog lockedDialog;
 							lockedDialog.dialogText = "You need a key to open this door!";
 							lockedDialog.dialogDuration = 20;
 							lockedDialog.dialogStayTime = 1;
 							gameDialogHandler::Get( ).throwDialog( lockedDialog );
-							lastDialogThrowTime = GetTime( );
+							lastDialogThrowTime = gameTime;
 						}
 
 						gameSoundsEventHandler::Get( ).addEventToQueue( "door_locked" );
@@ -170,12 +172,20 @@ void inGameState::Update( gameStateManager * manager , float deltaTime ) {
 	shaderHandler::Get( ).updateAll( );
 }
 
+void inGameState::updateCameraZoomLevel( ) {
+
+	float healthPercentage = Globals::Get( ).getGame( )->getLocalPlayerHealthPercentage( );
+	float maxZoom = 2.0f;
+	float minZoom = maxZoom - healthPercentage;
+	zoomLevel += GetMouseWheelMove( ) * 0.1f;
+	zoomLevel = Clamp( zoomLevel , minZoom , maxZoom );
+	camera.zoom = zoomLevel;
+}
+
 void inGameState::Render( gameStateManager * manager ) {
 	ClearBackground( BLACK );
 
-	zoomLevel += GetMouseWheelMove( ) * 0.1f;
-	zoomLevel = Clamp( zoomLevel , 1.f , 2.0f );
-	camera.zoom = zoomLevel;
+	updateCameraZoomLevel( );
 	setCameraPosition( );
 	camera.rotation = 0.0f;
 

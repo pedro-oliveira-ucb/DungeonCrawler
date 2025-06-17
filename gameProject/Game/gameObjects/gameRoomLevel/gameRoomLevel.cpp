@@ -112,6 +112,8 @@ void gameRoomLevel::spawnEnemies( ) {
 	std::unordered_map<CEnemyType , std::unique_ptr<CEnemyEntity>> * availableSpawnableEnemies = entitiesHandler::Get( ).getSpawnableEnemies( );
 	std::vector<std::unique_ptr<CEnemyEntity>> * spawnedEntities = entitiesHandler::Get( ).getSpawnedEnemies( );
 	
+	entitiesHandler::Get( ).updateEnemiesCollision( );
+
 	for ( auto it = availableSpawnableEnemies->begin( ); it != availableSpawnableEnemies->end( ); ++it ) {
 
 		auto & spawner = this->levelData.enemySpawners[ it->first ];

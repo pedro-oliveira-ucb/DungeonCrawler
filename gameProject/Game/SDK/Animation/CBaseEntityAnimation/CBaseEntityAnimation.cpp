@@ -70,8 +70,8 @@ int CBaseEntityAnimation::getCurrentAnimationStep( ) {
 }
 
 void CBaseEntityAnimation::updateAnimationWithDeltaTime( float deltaTime , bool loop , bool reverse ) {
-	/*if ( animationState != AnimationState::PLAYING )
-		return;*/
+	if ( animationState != AnimationState::PLAYING )
+		return;
 
 	std::lock_guard<std::mutex> lock( animationMutex );
 
@@ -245,7 +245,7 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 
 	auto it = animations.find( animationType );
 	if ( it != animations.end( ) && it->second.get( ) != nullptr ) {
-		this->currentAnimationType = animationType;
+		
 		if ( this->isDifferentAnimationType( this->currentAnimationType , animationType ) ) {
 			this->currentAnimationStep = 0;
 			this->timeSinceLastFrame = 0.0f;
@@ -254,10 +254,11 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 		else if ( this->currentAnimation != nullptr && this->currentAnimation->size( ) != it->second->size( ) ) {
 			//update frame step on equal animations
 			float CurrentFramePercentage = ( this->currentAnimationStep / this->currentAnimation->size( ) );
-			int correctedFrameStep = static_cast< int >( CurrentFramePercentage * it->second->size( ) );
+			int correctedFrameStep = static_cast< int >( floor( CurrentFramePercentage * ( float ) ( it->second->size( ) ) ) );
 			this->currentAnimationStep = correctedFrameStep;
 		}
 
+		this->currentAnimationType = animationType;
 		this->currentAnimation = it->second;
 	}
 }

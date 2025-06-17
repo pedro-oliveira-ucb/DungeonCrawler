@@ -4,8 +4,8 @@
 #include <stdio.h>
 
 
-bool components::DrawButton( Rectangle bounds , const char * label , Color color , Color textColor ) {
-	DrawRectangleRec( bounds , color );
+bool components::DrawButton( Rectangle bounds , const char * label , Color color , Color textColor, Color borderColor) {
+
 
 	int fontSize = 20;
 	int textWidth = MeasureText( label , fontSize );
@@ -14,9 +14,19 @@ bool components::DrawButton( Rectangle bounds , const char * label , Color color
 	float textX = bounds.x + ( bounds.width - textWidth ) / 2.0f;
 	float textY = bounds.y + ( bounds.height - textHeight ) / 2.0f;
 
-	DrawText( label , textX , textY , fontSize , textColor );
+	bool hovered = CheckCollisionPointRec( GetMousePosition( ) , bounds );
+	bool pressed = hovered && IsMouseButtonPressed( MOUSE_LEFT_BUTTON );
 
-	return CheckCollisionPointRec( GetMousePosition( ) , bounds ) && IsMouseButtonPressed( MOUSE_LEFT_BUTTON );
+	if ( hovered || pressed ) {
+		DrawRectangleLinesEx( bounds , 1, color );
+		DrawText( label , textX , textY , fontSize , color );
+	}
+	else {
+		DrawRectangleRec( bounds , color );
+		DrawText( label , textX , textY , fontSize , textColor );
+	}
+
+	return pressed;
 }
 
 

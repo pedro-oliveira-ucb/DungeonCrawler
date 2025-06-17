@@ -20,6 +20,7 @@ class currentGame
 	int currentGameRoom = 0;
 	int currentGameLevel = 0;
 	bool inCorridor = false;	
+	float localPlayerHealthPercentage = 1.0f; 
 	GVector2D currentLocalPlayerPosition = GVector2D( 0.0f , 0.0f );
 
 	int numKeys = 0;
@@ -36,10 +37,13 @@ public:
 	void setCurrentGameLevel( int level );
 	void setInCorridor( bool inCorridor );
 	int getCurrentGameLevel( ) const;
+	float getLocalPlayerHealthPercentage( ) const;
+
 
 
 	GVector2D getCurrentLocalPlayerPosition( ) const;
 	void setCurrentLocalPlayerPosition( const GVector2D & position );
+	void setLocalPlayerHealthPercentage( float );
 
 	void addKey( int quantity );
 	void removeKey( int quantity );

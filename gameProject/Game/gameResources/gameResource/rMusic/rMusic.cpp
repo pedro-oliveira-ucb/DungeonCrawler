@@ -99,8 +99,9 @@ bool rMusic::update( float deltaTime ) {
 
 	UpdateMusicStream( *music );
 
-	if ( GetMusicTimePlayed( *music ) >= GetMusicTimeLength( *music ) ) {
-		return true; // Music has finished playing
+	// Check if the music is nearing the end
+	if ( GetMusicTimePlayed( *music ) >= GetMusicTimeLength( *music ) - 5.0f ) {
+		return true;
 	}
 
 	if ( transitionState == MusicTransitionState::FadeIn ) {

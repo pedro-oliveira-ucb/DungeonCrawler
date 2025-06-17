@@ -100,7 +100,7 @@ void GameLoop( ) {
 
 	Log::Print( "[main] Entrando no loop do jogo." );
 
-	// O loop principal continua enquanto o usuário não solicitar o fechamento da janela.
+	// O loop principal continua enquanto o usuário não apertar delete
 	while ( !IsKeyPressed( KEY_DELETE ) ) {
 		Update( gameStateManager_ );
 		Render( gameStateManager_ );

@@ -151,11 +151,11 @@ void entitiesHandler::updateLocalPlayer( ) {
 	}
 
 	GVector2D localPos = localPlayer->getEntityPosition( );
-
+	
 	if ( !localPlayer->isAlive( ) ) {
-		Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_GAME_OVER );
-
+		
 		if ( localPlayer->deathAnimationFinished( ) ) {
+			Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_GAME_OVER );
 			return;
 		}
 	}
@@ -190,6 +190,9 @@ void entitiesHandler::updateLocalPlayer( ) {
 	// Atualiza player
 	localPlayer->updateEntity( );
 
+	float playerHealthPercentage = (float)(localPlayer->getHealth( )) / (float)(localPlayer->getMaxHealth( ));
+
+	Globals::Get( ).getGame( )->setLocalPlayerHealthPercentage( playerHealthPercentage );
 	Globals::Get( ).getGame( )->setCurrentLocalPlayerPosition( localPos );
 }
 
@@ -221,9 +224,10 @@ void entitiesHandler::updateEnemiesCollision( )
 {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 
-	CPlayerEntity * localPlayer = this->localPlayer;
-
-	std::vector< CBaseEntity *> allEnemies { localPlayer };
+	std::vector< CBaseEntity *> allEnemies;
+	if ( this->localPlayer != nullptr ) {
+		allEnemies.push_back( this->localPlayer );
+	}
 
 	for ( int i = 0; i < spawnedEnemies.size( ); i++ ) {
 		CBaseEntity * entity = spawnedEnemies.at( i ).get( );

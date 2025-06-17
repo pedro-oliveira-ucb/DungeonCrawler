@@ -229,7 +229,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\ShopInitializer\ShopInitializer.h" />
-    <ClInclude Include="Game\gameObjects\gameState\upgradeScreenState\UpgradeScreenState.h" />
     <ClInclude Include="Game\Handlers\shopHandler\shopHandler.h" />
     <ClInclude Include="Game\SDK\Entities\Items\CManaItem\CManaItem.h" />
     <ClInclude Include="Game\SDK\Entities\Items\CKeyItem\CKeyItem.h" />
