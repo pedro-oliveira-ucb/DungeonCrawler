@@ -72,9 +72,6 @@
     <ClCompile Include="Game\Game.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Game\gameWindow\gameWindow.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -270,6 +267,15 @@
     <ClCompile Include="Game\gameInitializer\EntitiesInitializer\ShopInitializer\ShopInitializer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Game\gameObjects\gameState\inGameOverState\inGameOverState.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameRender\renderHUD\renderHUD.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\gameObjects\gameState\inPreGameState\inPreGameState.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\gameThreads\updateLocalPlayer\updateLocalPlayer.h">
@@ -327,9 +333,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\Game.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\gameWindow\gameWindow.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\EntitiesInitializer.h">
@@ -524,9 +527,6 @@
     <ClInclude Include="Globals\playerStats\playerStats.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameObjects\gameState\upgradeScreenState\UpgradeScreenState.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="Game\Handlers\shopHandler\shopHandler.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
@@ -534,6 +534,15 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameInitializer\EntitiesInitializer\ShopInitializer\ShopInitializer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameObjects\gameState\inGameOverState\inGameOverState.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameRender\renderHUD\renderHUD.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameObjects\gameState\inPreGameState\inPreGameState.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

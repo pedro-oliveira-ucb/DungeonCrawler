@@ -1,21 +1,23 @@
 #pragma once
 #include "../gameState.h"
-#include <raylib/raylib.h>
+#include <vector>
+#include <string>
+#include <functional>
 
-class mainMenuState : public gameState {
+// Forward declaration
+class gameStateManager;
+
+class inPreGameState : public gameState {
 public:
-    mainMenuState( );
-    ~mainMenuState( ) override;
+    inPreGameState( );
+    ~inPreGameState( ) override;
 
     void OnEnter( gameStateManager * manager ) override;
     void OnExit( gameStateManager * manager ) override;
     void HandleInput( gameStateManager * manager ) override;
     void Update( gameStateManager * manager , float deltaTime ) override;
     void Render( gameStateManager * manager ) override;
-    gameStateType GetType( ) const override { return gameStateType::MAIN_MENU; }
-
+    gameStateType GetType( ) const override { return gameStateType::IN_GAME; }
 private:
-	Texture2D* backgroundTexture = nullptr;
-	float lastTimeSinceBackgroundUpdate = 0.0f;
-	int currentBackgroundIndex = 0;
+
 };

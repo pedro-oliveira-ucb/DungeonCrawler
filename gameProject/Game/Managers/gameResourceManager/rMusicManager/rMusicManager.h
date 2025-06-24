@@ -25,15 +25,18 @@ class rMusicManager : public rBaseResource
 	int currentPlayingSound = -1;
 	musicType currentMusicType = NoMusic;
 	musicType oldMusicType = NoMusic;
+	musicType pendingType;
 
 	float originalBaseVolume = 1.0f;
 	float currentBaseVolume = 1.0f;
 	float volume = 1.0f;
 	float fadeSpeed = 1.0f; // Volume por segundo
+	float pendingSpeed = 0.0f;
 	bool onMusicTransition = false;
 	bool isFadingOut = false;
 	bool isFadingIn = false;
-
+	bool hasPendingTransition = false;
+	
 	rMusic * currentSound = nullptr;
 	rMusic * nextSound = nullptr;
 	int currentSoundIndex = -1; 

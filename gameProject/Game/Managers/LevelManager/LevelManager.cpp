@@ -21,21 +21,27 @@ struct EnemyProgression {
 };
 
 int getRandom( int min , int max ) {
+	// Garante que min não seja maior que max para evitar comportamento indefinido
+	if ( min > max ) {
+		std::swap( min , max );
+	}
 	static std::mt19937 engine( std::chrono::high_resolution_clock::now( ).time_since_epoch( ).count( ) );
 	std::uniform_int_distribution<int> dist( min , max );
-	return dist( engine ); // Corrigido para passar o gerador de números aleatórios 'engine' como argumento para 'dist'.  
+	return dist( engine );
 }
 
 /**
- * @brief Gera um nível proceduralmente, aumentando a dificuldade com base no progresso.
- * * @param type O tipo do mapa para este nível.
- * @param name O nome base para o mapa.
- * @param levelIndex O índice do nível atual (começando em 0 para o primeiro nível).
- * @param totalLevels O número total de níveis procedurais (excluindo o chefe).
- * @param baseSpawnCount A quantidade inicial de inimigos por sala.
- * @param maxSpawnCount A quantidade máxima de inimigos por sala no final da progressão.
- */
-void LevelManager::generateProceduralLevel( mapType type , std::string name , int levelIndex , int totalLevels , int baseSpawnCount , int maxSpawnCount ) {
+ * @brief Gera um nível proceduralmente, aumentando a dificuldade com base no progresso.
+ * @param type O tipo do mapa para este nível.
+ * @param name O nome base para o mapa.
+ * @param levelIndex O índice do nível atual (começando em 0 para o primeiro nível).
+ * @param totalLevels O número total de níveis procedurais (excluindo o chefe).
+ * @param baseSpawnCount A quantidade inicial de inimigos por sala.
+ * @param maxSpawnCount A quantidade máxima de inimigos por sala no final da progressão.
+ * @param baseTrapCount A quantidade inicial de armadilhas por sala.
+ * @param maxTrapCount A quantidade máxima de armadilhas por sala no final da progressão.
+ */
+void LevelManager::generateProceduralLevel( mapType type , std::string name , int levelIndex , int totalLevels , int baseSpawnCount , int maxSpawnCount , int baseTrapCount , int maxTrapCount ) {
 	DungeonLayout * dungeon = mapObjectsHandler::Get( ).getDungeonLayout( type );
 	if ( !dungeon ) {
 		// Log de erro ou tratamento para dungeon nulo
@@ -49,7 +55,7 @@ void LevelManager::generateProceduralLevel( mapType type , std::string name , in
 	EnemyProgression meleeProgression = { CEnemyType::MELEE_ENEMY, CEnemyType::MELEE_ENEMY_MEDIUM, CEnemyType::MELEE_ENEMY_ADVANCED };
 	EnemyProgression rangedProgression = { CEnemyType::RANGED_ENEMY, CEnemyType::RANGED_ENEMY_MEDIUM, CEnemyType::RANGED_ENEMY_ADVANCED };
 
-	// Itera sobre cada sala do nível para gerar inimigos específicos para ela
+	// Itera sobre cada sala do nível para gerar inimigos e armadilhas específicas para ela
 	for ( int roomIndex = 0; roomIndex < numRooms; ++roomIndex ) {
 
 		// Calcula o progresso geral do jogador através de todos os níveis (de 0.0 a 1.0)
@@ -59,19 +65,16 @@ void LevelManager::generateProceduralLevel( mapType type , std::string name , in
 		LevelData levelData;
 		levelData.levelNumber = roomIndex + 1;
 		levelData.mapName = name + "_" + std::to_string( roomIndex + 1 );
-		levelData.Traps = 0; // Pode ser expandido para gerar armadilhas também
 
 		std::vector<LevelEnemySpawnerData> spawners;
 
 		// --- Lógica para determinar o tipo de inimigo ---
-		// Thresholds para introdução de inimigos mais fortes
 		const float mediumThreshold = 0.33f;
 		const float advancedThreshold = 0.66f;
 
 		// Escolhe o tipo de inimigo Melee
 		CEnemyType meleeToSpawn = meleeProgression.base;
 		if ( overallProgress > advancedThreshold ) {
-			// Chance de spawnar inimigo avançado aumenta conforme o progresso
 			if ( getRandom( 0 , 100 ) < ( int ) ( ( ( overallProgress - advancedThreshold ) / ( 1.0f - advancedThreshold ) ) * 100.0f ) ) {
 				meleeToSpawn = meleeProgression.advanced;
 			}
@@ -80,7 +83,6 @@ void LevelManager::generateProceduralLevel( mapType type , std::string name , in
 			}
 		}
 		else if ( overallProgress > mediumThreshold ) {
-			// Chance de spawnar inimigo médio aumenta
 			if ( getRandom( 0 , 100 ) < ( int ) ( ( ( overallProgress - mediumThreshold ) / ( advancedThreshold - mediumThreshold ) ) * 100.0f ) ) {
 				meleeToSpawn = meleeProgression.medium;
 			}
@@ -117,10 +119,20 @@ void LevelManager::generateProceduralLevel( mapType type , std::string name , in
 
 		// Adiciona os spawners definidos aos dados do nível
 		for ( const auto & spawner : spawners ) {
-			if ( spawner.SpawnCount > 0 ) { // Só adiciona se houver inimigos para spawnar
+			if ( spawner.SpawnCount > 0 ) {
 				levelData.enemySpawners.emplace( spawner.type , spawner );
 			}
 		}
+
+		// --- Lógica para determinar a quantidade de armadilhas ---
+		// A quantidade máxima de armadilhas para a sala atual é calculada com base no progresso geral.
+		int maxCurrentTrapCount = baseTrapCount + ( int ) ( ( maxTrapCount - baseTrapCount ) * overallProgress );
+		int trapCount = 0;
+		// Gera um número aleatório de armadilhas dentro de um intervalo para variar a jogabilidade.
+		if ( maxCurrentTrapCount > 0 ) {
+			trapCount = getRandom( maxCurrentTrapCount / 2 , maxCurrentTrapCount );
+		}
+		levelData.Traps = trapCount;
 
 		// Cria o objeto da sala e o adiciona ao handler
 		gameRoomLevel gameRoom( levelData , roomIndex + 1 );
@@ -131,7 +143,6 @@ void LevelManager::generateProceduralLevel( mapType type , std::string name , in
 
 void LevelManager::generateBossLevel( ) {
 	// A geração do chefe pode permanecer mais estática, pois é uma sala única e especial.
-	// Pode incluir inimigos avançados como minions.
 	std::vector<LevelEnemySpawnerData> spawnData = {
 		{ CEnemyType::MELEE_ENEMY_ADVANCED, 5, 10, 8, 0, 0.0 },
 		{ CEnemyType::RANGED_ENEMY_ADVANCED, 5, 10, 8, 0, 0.0 },
@@ -149,17 +160,23 @@ void LevelManager::generateBossLevel( ) {
 		levelData.enemySpawners.emplace( spawner.type , spawner );
 	}
 
+	// Define um número fixo e alto de armadilhas para o nível do chefe, tornando-o mais desafiador.
+	levelData.Traps = 25;
+
 	gameRoomLevel gameRoom( levelData , 1 );
 	LevelHandler::Get( ).addLevel( bossMap , gameRoom );
 }
 
 
 void LevelManager::generateLevels( ) {
-	// Gera os 3 níveis com dificuldade progressiva
+	// Gera os 3 níveis com dificuldade progressiva para inimigos e armadilhas
 	const int totalProceduralLevels = 3;
-	generateProceduralLevel( firstMap , "firstMap" , 0 , totalProceduralLevels , 2 , 5 );
-	generateProceduralLevel( secondMap , "secondMap" , 1 , totalProceduralLevels , 3 , 7 );
-	generateProceduralLevel( thirdMap , "thirdMap" , 2 , totalProceduralLevels , 5 , 10 );
+	// Nível 1: Poucos inimigos e poucas armadilhas
+	generateProceduralLevel( firstMap , "firstMap" , 0 , totalProceduralLevels , 2 , 5 , 5 , 10 );
+	// Nível 2: Dificuldade intermediária para ambos
+	generateProceduralLevel( secondMap , "secondMap" , 1 , totalProceduralLevels , 3 , 7 , 10 , 15 );
+	// Nível 3: Muitos inimigos e muitas armadilhas
+	generateProceduralLevel( thirdMap , "thirdMap" , 2 , totalProceduralLevels , 5 , 10 , 15 , 20 );
 
 	// Gera o nível do chefe separadamente
 	generateBossLevel( );

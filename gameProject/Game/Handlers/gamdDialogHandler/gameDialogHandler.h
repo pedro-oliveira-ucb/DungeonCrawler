@@ -42,6 +42,9 @@ class gameDialogHandler : public CSingleton<gameDialogHandler>  // Singleton pat
 	std::mutex dialogMutex; // Mutex to protect access to the dialog queue
 	std::queue<gameDialog> dialogQueue; // Queue to hold dialogs that are waiting to be displayed
 public:
+	bool hasActiveDialog( );
+	void clearDialogs( );
+
 	gameDialog getDialog( ); // Function to retrieve the next dialog from the queue
 	void throwDialog( gameDialog dialog ); // Function to display a dialog with its associated triggers
 };

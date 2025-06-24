@@ -18,7 +18,7 @@ private:
 	void initializeLevels( );
 
 	bool started = false;
-	void generateProceduralLevel( mapType type , std::string name , int levelIndex , int totalLevels , int baseSpawnCount , int maxSpawnCount );
+	void generateProceduralLevel( mapType type , std::string name , int levelIndex , int totalLevels , int baseSpawnCount , int maxSpawnCount , int baseTrapCount , int maxTrapCount );
 	void restartLevels( );
 public:
     void initialize( ); // inicializa cada nivel

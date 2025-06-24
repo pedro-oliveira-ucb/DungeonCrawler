@@ -1,5 +1,7 @@
 #include "inGameState.h"
 
+#include "../../CameraController/CameraController.h"
+
 #include "../mainMenuState/mainMenuState.h"
 #include "../inGameOverState/inGameOverState.h"
 
@@ -43,6 +45,10 @@ void inGameState::OnEnter( gameStateManager * manager ) {
 	Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PLAYING );
 	_gameResourceManager.getMusicManager( )->playMusic( musicType::DungeonMusic , 10 );
 	showUpgradeScreen = false;
+	GVector2D localPos = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
+	Vector2 playerPos = { localPos.x , localPos.y };
+	CameraController::Get( ).initialize( playerPos , 5.0f );
+
 	this->setEntering( true );
 }
 
@@ -51,15 +57,6 @@ void inGameState::OnExit( gameStateManager * manager ) {
 	showUpgradeScreen = false;
 }
 
-void inGameState::setCameraPosition( ) {
-	GVector2D localPos = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
-	camera.target = { localPos.x, localPos.y };
-	camera.offset = { GetScreenWidth( ) / 2.0f, GetScreenHeight( ) / 2.0f };
-
-	Vector2 mouseWorld = GetScreenToWorld2D( GetMousePosition( ) , camera );
-	Globals::Get( ).mousePosWorldX = mouseWorld.x;
-	Globals::Get( ).mousePosWorldY = mouseWorld.y;
-}
 
 void inGameState::HandleInput( gameStateManager * manager ) {
 	if ( showUpgradeScreen ) {
@@ -114,7 +111,7 @@ void inGameState::HandleInput( gameStateManager * manager ) {
 						if ( gameTime - lastDialogThrowTime > 5.0f ) {
 							gameDialog lockedDialog;
 							lockedDialog.dialogText = "You need a key to open this door!";
-							lockedDialog.dialogDuration = 20;
+							lockedDialog.dialogDuration = 5;
 							lockedDialog.dialogStayTime = 1;
 							gameDialogHandler::Get( ).throwDialog( lockedDialog );
 							lastDialogThrowTime = gameTime;
@@ -170,32 +167,26 @@ void inGameState::Update( gameStateManager * manager , float deltaTime ) {
 	}
 
 	shaderHandler::Get( ).updateAll( );
+	CameraController::Get( ).Update( deltaTime );
 }
 
-void inGameState::updateCameraZoomLevel( ) {
 
-	float healthPercentage = Globals::Get( ).getGame( )->getLocalPlayerHealthPercentage( );
-	float maxZoom = 2.0f;
-	float minZoom = maxZoom - healthPercentage;
-	zoomLevel += GetMouseWheelMove( ) * 0.1f;
-	zoomLevel = Clamp( zoomLevel , minZoom , maxZoom );
-	camera.zoom = zoomLevel;
-}
 
 void inGameState::Render( gameStateManager * manager ) {
 	ClearBackground( BLACK );
 
-	updateCameraZoomLevel( );
-	setCameraPosition( );
-	camera.rotation = 0.0f;
+	Camera2D * cameraPointer = CameraController::Get( ).GetCamera( );
 
-	BeginMode2D( camera );
-	{
-		gameRender::Get( ).renderMap( );
-		gameRender::Get( ).renderEntities( );
-		gameRender::Get( ).renderMapDoors( );
+	if ( cameraPointer != nullptr ) {
+
+		BeginMode2D( *cameraPointer );
+		{
+			gameRender::Get( ).renderMap( );
+			gameRender::Get( ).renderEntities( );
+			gameRender::Get( ).renderMapDoors( );
+		}
+		EndMode2D( );	
 	}
-	EndMode2D( );
 
 	shaderHandler::Get( ).renderAll( );
 	gameRender::Get( ).renderDialogs( );

@@ -65,3 +65,11 @@ void gameState::setEntering( bool value ) {
 void gameState::setExiting( bool value ) {
 	exiting = value;
 }
+
+bool gameState::isEntering() const {
+	return entering;
+}
+
+bool gameState::isExiting() const {
+	return exiting;
+}	

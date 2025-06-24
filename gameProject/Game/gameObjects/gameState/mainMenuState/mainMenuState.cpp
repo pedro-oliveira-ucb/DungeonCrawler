@@ -2,7 +2,7 @@
 #include "mainMenuState.h"
 
 #include <raylib/raylib.h>
-#include "../inGameState/inGameState.h"
+#include "../inPreGameState/inPreGameState.h"
 
 #include "../../../../Globals/Globals.h"
 
@@ -34,7 +34,8 @@ void mainMenuState::OnEnter( gameStateManager * manager ) {
 	if ( _gameResourceManager.getMusicManager( )->getcurrentMusicType( ) != musicType::MainMenuMusic )
 		_gameResourceManager.getMusicManager( )->playMusic( musicType::MainMenuMusic , 1 );
 
-	
+
+
 	// Carregar recursos específicos do menu: fontes, texturas, sons
 	// Exemplo:
 	// font = LoadFont("resources/myfont.png");
@@ -70,17 +71,87 @@ void mainMenuState::Update( gameStateManager * manager , float deltaTime ) {
 
 	gameStateTransitionState transitionState = this->updateStateTransition( deltaTime );
 	switch ( transitionState ) {
-		case gameStateTransitionState::EXIT_FINISHED:
-			manager->ChangeState( std::make_unique<inGameState>( ) );
+	case gameStateTransitionState::EXIT_FINISHED:
+		manager->ChangeState( std::make_unique<inPreGameState>( ) );
 		break;
+	}
+
+	static auto backgroundsprites = _gameResourceManager.getSpritesManager( )->getClip( "mainMenu_background" );
+
+	if ( backgroundsprites != nullptr ) {
+		// initialize backgroundTexture if not already done
+		if ( this->backgroundTexture == nullptr ) {
+			this->backgroundTexture = reinterpret_cast< Texture2D * >( backgroundsprites->getFrame( currentBackgroundIndex )->getTexture( ) );
+			lastTimeSinceBackgroundUpdate = 0.0f;
+		}
+		else {
+
+			if ( lastTimeSinceBackgroundUpdate > 0.1 )
+			{
+				currentBackgroundIndex++;
+
+				if( currentBackgroundIndex >= backgroundsprites->size() ) {
+					currentBackgroundIndex = 0; // Reset to the first frame
+				}
+
+				if(backgroundsprites ->getFrame( currentBackgroundIndex ) == nullptr) 
+					Log::Print( "[mainMenuState]: Warning: Frame is null at index %d", currentBackgroundIndex  );				
+				else {
+					this->backgroundTexture = reinterpret_cast< Texture2D * >( backgroundsprites->getFrame( currentBackgroundIndex )->getTexture( ) );
+					lastTimeSinceBackgroundUpdate = 0.0f;
+				}
+			}
+
+			lastTimeSinceBackgroundUpdate += deltaTime;
+		}
 	}
 }
 
 void mainMenuState::Render( gameStateManager * manager ) {
-	ClearBackground( RAYWHITE );
+	ClearBackground( BLACK );
 	// Desenhar elementos do menu
 	// DrawTexture(titleTexture, SCREEN_WIDTH / 2 - titleTexture.width / 2, 100, WHITE);
-	DrawText( "MENU PRINCIPAL" , 190 , 200 , 20 , LIGHTGRAY );
-	DrawText( "Pressione ENTER para iniciar" , 200 , 250 , 20 , DARKGRAY );
+
+	float screenWidth = static_cast< float >( GetScreenWidth( ) );
+	float screenHeight = static_cast< float >( GetScreenHeight( ) );
+
+	if ( this->backgroundTexture != nullptr ) {
+		// Define o retângulo de origem (a imagem inteira)
+		Rectangle sourceRec = { 0.0f, 0.0f, ( float ) this->backgroundTexture->width, ( float ) this->backgroundTexture->height };
+
+		// Define o retângulo de destino (a tela inteira)
+		Rectangle destRec = { 0.0f, 0.0f,screenWidth, screenHeight };
+
+		// Define a origem da transformação (para rotação/escala, pode ser {0, 0} para este caso)
+		Vector2 origin = { 0, 0 };
+
+		// Desenha a textura esticando-a para preencher o retângulo de destino
+		DrawTexturePro(
+			*this->backgroundTexture , // A textura
+			sourceRec ,                 // Retângulo de origem
+			destRec ,                   // Retângulo de destino (aqui está a mágica!)
+			origin ,                    // Origem para transformações
+			0.0f ,                      // Rotação
+			WHITE                      // Cor (tint)
+		);
+	}
+
+	float textPadding = 0.1;
+	{
+		std::string Text = "Main Menu";
+		float textWidth = MeasureText( Text.c_str( ) , 20 ); // Medir a largura do texto
+		float textX = ( screenWidth - textWidth ) / 2; // Centralizar horizontalmente
+		float textY = 0 + screenHeight * textPadding;
+		DrawText( Text.c_str( ) , static_cast< int >( textX ) , textY , 20 , WHITE );
+	}
+
+	{
+		std::string Text = "Press ENTER to play";
+		float textWidth = MeasureText( Text.c_str( ) , 20 ); // Medir a largura do texto
+		float textX = ( screenWidth - textWidth ) / 2; // Centralizar horizontalmente
+		float textY = 0 + screenHeight * ( 1 - textPadding );
+		DrawText( Text.c_str( ) , static_cast< int >( textX ) , textY , 20 , WHITE );
+	}
+
 	this->renderTransition( manager );
 }

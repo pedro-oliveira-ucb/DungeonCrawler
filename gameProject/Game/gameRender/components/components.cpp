@@ -29,6 +29,23 @@ bool components::DrawButton( Rectangle bounds , const char * label , Color color
 	return pressed;
 }
 
+bool components::DrawTextButton( Vector2 position , const char * text ,int fontSize, Color color , Color hoveredColor )
+{
+	Rectangle bounds = { position.x , position.y , ( float ) MeasureText( text , 20 ) , 20 };
+
+	bool hovered = CheckCollisionPointRec( GetMousePosition( ) , bounds );
+	bool pressed = hovered && IsMouseButtonPressed( MOUSE_LEFT_BUTTON );
+
+	if ( pressed || hovered ) {
+		DrawText( text , position.x , position.y , fontSize, hoveredColor );
+	}
+	else {
+		DrawText( text , position.x , position.y , fontSize , color );
+	}
+
+	return pressed;
+}
+
 
 bool components::DrawSlider( Rectangle bounds , float * value , const char * label , float min , float max , Color backColor , Color frontColor ) {
 	bool changed = false;

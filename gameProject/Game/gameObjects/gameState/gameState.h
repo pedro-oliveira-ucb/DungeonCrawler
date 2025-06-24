@@ -35,6 +35,8 @@ public:
 	void renderTransition( gameStateManager * );
 	void setExiting( bool );
 	void setEntering( bool );
+	bool isExiting( ) const;
+	bool isEntering( ) const;
 
 	// Chamado quando o estado é iniciado
 	virtual void OnEnter( gameStateManager * manager ) = 0;

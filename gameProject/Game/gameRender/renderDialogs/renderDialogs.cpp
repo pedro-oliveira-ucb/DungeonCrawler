@@ -45,11 +45,11 @@ void renderDialogs::render( ) {
 	else {
 		float currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
 
-		if ( !this->currentDialogTime ) {
+		if ( !this->dialogStartTime ) {
 			this->dialogStartTime = currentGameTime;
 		}
 
-		this->currentDialogTime += currentGameTime - this->dialogStartTime;
+		this->currentDialogTime = currentGameTime - this->dialogStartTime;
 
 		for ( auto it = this->currentDialog.triggers.begin( ); it != this->currentDialog.triggers.end( ); ++it ) {
 			if ( this->currentDialogTime >= it->triggerTime && !it->throwed ) {

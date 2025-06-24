@@ -180,8 +180,14 @@ bool rMusicManager::initialize( )
 
 bool rMusicManager::playMusic( musicType newType , float speed ) {
 	std::lock_guard<std::mutex> lock( this->musicMutex );
-	if ( onMusicTransition )
-		return false;
+	// Se já estiver em transição, armazena a nova solicitação para depois
+	if ( onMusicTransition ) {
+		hasPendingTransition = true;
+		pendingType = newType;
+		pendingSpeed = speed;
+		return true;
+	}
+
 
 	if ( newType != currentMusicType ) {
 		currentSoundIndex = -1;
@@ -197,31 +203,32 @@ bool rMusicManager::playMusic( musicType newType , float speed ) {
 	currentMusicType = newType;
 
 	currentSoundIndex++;
-	if ( currentSoundIndex > it->second.size( ) - 1 ) {
-		currentSoundIndex = 0; // Reseta o índice se ultrapassar o tamanho do vetor
+	if ( currentSoundIndex >= ( int ) it->second.size( ) ) {
+		currentSoundIndex = 0;
 	}
 
-	nextSound = it->second.at( currentSoundIndex ).second.get( ); // Pega a primeira música do tipo
+	nextSound = it->second.at( currentSoundIndex ).second.get( );
 	isFadingOut = true;
 	isFadingIn = false;
 	onMusicTransition = true;
-	if ( currentBaseVolume > 0.0f && speed > 0.0f ) { // Verifica se há música antiga e speed é válido
+
+	if ( currentBaseVolume > 0.0f && speed > 0.0f ) {
 		fadeSpeed = ( currentBaseVolume + nextSound->getBaseVolume( ) ) / speed;
 	}
-	else if ( speed > 0.0f ) { // Nenhuma música antiga, apenas fade in
+	else if ( speed > 0.0f ) {
 		fadeSpeed = nextSound->getBaseVolume( ) / speed;
 	}
 	else {
 		if ( currentSound ) {
 			currentSound->stop( );
-			currentSound->setVolume( 0.0f ); // Garante que o som antigo pare e fique mudo
+			currentSound->setVolume( 0.0f );
 		}
 		currentSound = nextSound;
 		nextSound = nullptr;
 		if ( currentSound ) {
 			currentSound->play( );
-			this->volume = currentSound->getBaseVolume( ); // Ajusta o volume principal da classe
-			currentSound->setVolume( this->volume );      // Ajusta o volume do objeto de som
+			volume = currentSound->getBaseVolume( );
+			currentSound->setVolume( volume );
 		}
 		onMusicTransition = false;
 		isFadingIn = false;
@@ -233,56 +240,63 @@ bool rMusicManager::playMusic( musicType newType , float speed ) {
 
 void rMusicManager::updateMusic( ) {
 	float delta = Globals::Get( ).getFrameTime( );
-
 	float currentSoundBaseVolume = 1.0f;
+	bool needImmediateTransition = false;
+	musicType immediateType = currentMusicType;
+	float immediateSpeed = 5.0f;
 
-	this->musicMutex.lock( );
-	if ( currentSound != nullptr ) {
-		bool musicNearEnd = false;
-		musicNearEnd = currentSound->update( delta );
-		this->musicMutex.unlock( );
-
-		if ( musicNearEnd ) {
-			playMusic( currentMusicType , 5.0f ); // Reproduz uma musica do mesmo tipo se a atual estiver perto do fim
-		}
-		currentSoundBaseVolume = currentSound->getBaseVolume( );
-	}
-	else {
-		this->musicMutex.unlock( );
-	}
-
-	std::lock_guard<std::mutex> lock( this->musicMutex );
-
-	if ( onMusicTransition ) {
-		if ( isFadingOut ) {
-			volume -= fadeSpeed * delta;
-			if ( volume <= 0.0f ) {
-				volume = 0.0f;
-				isFadingOut = false;
-
-				if ( currentSound )
-					currentSound->stop( );
-
-				currentSound = nextSound;
-				nextSound = nullptr;
-
-				currentSound->play( );
-				isFadingIn = true;
+	{   // Primeiro bloco: update da faixa atual
+		std::lock_guard<std::mutex> guard( this->musicMutex );
+		if ( currentSound ) {
+			bool musicNearEnd = currentSound->update( delta );
+			if ( musicNearEnd ) {
+				needImmediateTransition = true;
+				immediateType = currentMusicType;
+				immediateSpeed = 5.0f;
 			}
-
-			if ( currentSound )
-				currentSound->setVolume( volume );
+			currentSoundBaseVolume = currentSound->getBaseVolume( );
 		}
-		else if ( isFadingIn ) {
-			volume += fadeSpeed * delta;
-			if ( volume > currentSoundBaseVolume ) {
-				volume = currentSoundBaseVolume;
-				isFadingIn = false;
-				onMusicTransition = false;
+	}
+
+	{   // Segundo bloco: gerencia fade-in / fade-out
+		std::lock_guard<std::mutex> lock( this->musicMutex );
+		if ( onMusicTransition ) {
+			if ( isFadingOut ) {
+				volume -= fadeSpeed * delta;
+				if ( volume <= 0.0f ) {
+					volume = 0.0f;
+					isFadingOut = false;
+					if ( currentSound ) currentSound->stop( );
+
+					currentSound = nextSound;
+					nextSound = nullptr;
+					if ( currentSound ) currentSound->play( );
+					isFadingIn = true;
+				}
+				if ( currentSound ) currentSound->setVolume( volume );
 			}
+			else if ( isFadingIn ) {
+				volume += fadeSpeed * delta;
+				if ( volume >= currentSoundBaseVolume ) {
+					volume = currentSoundBaseVolume;
+					isFadingIn = false;
+					onMusicTransition = false;
 
-			if ( currentSound )
-				currentSound->setVolume( volume );
+					// sinaliza que há transição pendente
+					if ( hasPendingTransition ) {
+						hasPendingTransition = false;
+						needImmediateTransition = true;
+						immediateType = pendingType;
+						immediateSpeed = pendingSpeed;
+					}
+				}
+				if ( currentSound ) currentSound->setVolume( volume );
+			}
 		}
+	}
+
+	// Só agora, **depois** de liberar o mutex, fazemos a transição
+	if ( needImmediateTransition ) {
+		playMusic( immediateType , immediateSpeed );
 	}
 }

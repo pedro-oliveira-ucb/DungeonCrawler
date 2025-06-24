@@ -1,6 +1,5 @@
 #pragma once
 #include "../gameState.h"
-#include <raylib/raylib.h>
 #include <vector>
 #include <string>
 #include <functional>
@@ -21,10 +20,7 @@ public:
     void Render( gameStateManager * manager ) override;
     gameStateType GetType( ) const override { return gameStateType::IN_GAME; }
 private:
-    Camera2D camera = { 0 };
-    void setCameraPosition( );
-    void updateCameraZoomLevel( );
-    float zoomLevel = 2.0f; // Inicializado com um valor padrão
+   
     int currentPlayerRoom = -1;
 
     // Lógica da tela de Upgrades integrada
