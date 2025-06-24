@@ -52,6 +52,26 @@ CPlayerEntity * LocalPlayerInitializer::generate( std::string animationName ) {
 		CBaseEntityAnimationType::ATTACKING_RUNNING_LEFT ,
 		CBaseEntityAnimationType::ATTACKING_RUNNING_RIGHT ,
 
+
+		// Attacking (stationary)
+		CBaseEntityAnimationType::MAGICSPELLING_FORWARD ,
+		CBaseEntityAnimationType::MAGICSPELLING_BACKWARD ,
+		CBaseEntityAnimationType::MAGICSPELLING_LEFT ,
+		CBaseEntityAnimationType::MAGICSPELLING_RIGHT ,
+
+		// Attacking while walking
+		CBaseEntityAnimationType::MAGICSPELLING_WALKING_FORWARD ,
+		CBaseEntityAnimationType::MAGICSPELLING_WALKING_BACKWARD ,
+		CBaseEntityAnimationType::MAGICSPELLING_WALKING_LEFT ,
+		CBaseEntityAnimationType::MAGICSPELLING_WALKING_RIGHT ,
+
+		// Attacking while running
+		CBaseEntityAnimationType::MAGICSPELLING_RUNNING_FORWARD ,
+		CBaseEntityAnimationType::MAGICSPELLING_RUNNING_BACKWARD ,
+		CBaseEntityAnimationType::MAGICSPELLING_RUNNING_LEFT ,
+		CBaseEntityAnimationType::MAGICSPELLING_RUNNING_RIGHT ,
+
+
 		// Hurt
 		CBaseEntityAnimationType::HURT_FORWARD ,
 		CBaseEntityAnimationType::HURT_BACKWARD ,

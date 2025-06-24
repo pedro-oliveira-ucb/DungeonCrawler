@@ -245,7 +245,7 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 
 	auto it = animations.find( animationType );
 	if ( it != animations.end( ) && it->second.get( ) != nullptr ) {
-		
+
 		if ( this->isDifferentAnimationType( this->currentAnimationType , animationType ) ) {
 			this->currentAnimationStep = 0;
 			this->timeSinceLastFrame = 0.0f;
@@ -295,6 +295,24 @@ std::unordered_map<CBaseEntityAnimationType , std::string> animationPaths = {
 	{ ATTACKING_RUNNING_BACKWARD,"attacking_running_backward" },
 	{ ATTACKING_RUNNING_LEFT,   "attacking_running_left" },
 	{ ATTACKING_RUNNING_RIGHT,  "attacking_running_right" },
+
+
+	// Attacking stationary
+	{ MAGICSPELLING_FORWARD,        "magicspelling_forward" },
+	{ MAGICSPELLING_BACKWARD,       "magicspelling_backward" },
+	{ MAGICSPELLING_LEFT,           "magicspelling_left" },
+	{ MAGICSPELLING_RIGHT,          "magicspelling_right" },
+	// Attacking walking
+	{ MAGICSPELLING_WALKING_FORWARD, "magicspelling_walking_forward" },
+	{ MAGICSPELLING_WALKING_BACKWARD,"magicspelling_walking_backward" },
+	{ MAGICSPELLING_WALKING_LEFT,    "magicspelling_walking_left" },
+	{ MAGICSPELLING_WALKING_RIGHT,   "magicspelling_walking_right" },
+	// Attacking running
+	{ MAGICSPELLING_RUNNING_FORWARD, "magicspelling_running_forward" },
+	{ MAGICSPELLING_RUNNING_BACKWARD,"magicspelling_running_backward" },
+	{ MAGICSPELLING_RUNNING_LEFT,    "magicspelling_running_left" },
+	{ MAGICSPELLING_RUNNING_RIGHT,   "magicspelling_running_right" },
+
 	// Hurt
 	{ HURT_FORWARD,             "hurt_forward" },
 	{ HURT_BACKWARD,            "hurt_backward" },

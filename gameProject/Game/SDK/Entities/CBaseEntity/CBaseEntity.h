@@ -19,8 +19,9 @@ enum CBaseEntityState {
 	MOVING = 1 << 1 , // 00010
 	RUNNING = 1 << 2 , // 00100
 	ATTACKING = 1 << 3 , // 00100
-	HURT = 1 << 4 , // 01000
-	DEAD = 1 << 5  // 10000
+	MAGIC_ATTACKING = 1 << 4 , // 001000
+	HURT = 1 << 5 , // 010000
+	DEAD = 1 << 6  // 100000
 };
 
 enum CBaseEntityMovementDirection {

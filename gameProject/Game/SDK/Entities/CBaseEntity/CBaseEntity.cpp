@@ -385,6 +385,19 @@ CBaseEntityAnimationType CBaseEntity::getAnimationTypeBasedOnStateAndDirection( 
 		int idx = baseAnim + dirIndex; // Calcula o índice final da animação de ataque.
 		return static_cast< CBaseEntityAnimationType >( idx );
 	}
+	else if ( states & MAGIC_ATTACKING ) {
+		bool running = states & RUNNING; // Verifica se está correndo.
+		bool walking = states & MOVING;  // Verifica se está andando.
+		int baseAnim = static_cast< int >( MAGICSPELLING_FORWARD ); // Animação base de ataque.
+		if ( running ) {
+			baseAnim = static_cast< int >( MAGICSPELLING_RUNNING_FORWARD ); // Animação de ataque correndo.
+		}
+		else if ( walking ) {
+			baseAnim = static_cast< int >( MAGICSPELLING_WALKING_FORWARD ); // Animação de ataque andando.
+		}
+		int idx = baseAnim + dirIndex; // Calcula o índice final da animação de ataque.
+		return static_cast< CBaseEntityAnimationType >( idx );
+	}
 	// Estado: RUNNING (Correndo)
 	if ( states & RUNNING ) {
 		int idx = static_cast< int >( RUNNING_FORWARD ) + dirIndex; // Calcula o índice da animação de corrida.

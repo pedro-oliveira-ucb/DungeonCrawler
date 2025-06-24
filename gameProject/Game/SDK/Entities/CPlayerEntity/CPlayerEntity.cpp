@@ -147,7 +147,7 @@ void CPlayerEntity::handleMovementState( std::uint32_t & state ) {
 	if ( this->hasMovementRequest( ) ) {
 		if ( sprinting ) {
 			if ( currentStamina > 1.0f ) {
-				currentStamina -= currentLossFactor;	
+				currentStamina -= currentLossFactor;
 				lastWalkingTime = currentTime;
 			}
 		}
@@ -196,12 +196,27 @@ void CPlayerEntity::handleHurtState( std::uint32_t & state ) {
 }
 
 bool CPlayerEntity::handleAttackState( std::uint32_t & state ) {
-	state |= CBaseEntityState::ATTACKING;
+	CBaseEntityAnimationType attackAnimationState;
+
+	switch ( this->currentLoadingAttack ) {
+	case CBaseAttackType_Melee:
+		attackAnimationState = CBaseEntityAnimationType::ATTACKING_FORWARD;
+		state |= CBaseEntityState::ATTACKING;
+		break;
+	case CBaseAttackType_Ranged:
+		attackAnimationState = CBaseEntityAnimationType::MAGICSPELLING_FORWARD;
+		state |= CBaseEntityState::MAGIC_ATTACKING;
+		break;
+	default:
+		Log::Print( "Unknown attack type: %s", std::to_string( this->currentLoadingAttack ) );
+		return false; // Se o tipo de ataque não for reconhecido, não faz nada
+	}
+
 	loopAnimation = false; // Animação de ataque nunca deve ser em loop
 	reverseAnimation = false;
 
 	// Se a animação de ataque acabou de ser selecionada, reseta ela
-	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , CBaseEntityAnimationType::ATTACKING_FORWARD ) ) {
+	if ( CBaseEntityAnimation::isDifferentAnimationType( previousAnimationType , attackAnimationState ) ) {
 		this->getEntityAnimations( )->resetAnimation( );
 		EventManager::Get( ).Trigger( this->attacks.at( this->currentLoadingAttack )->GetEntityName( ) + "_attackLoad" );
 		return false;
@@ -213,7 +228,7 @@ bool CPlayerEntity::handleAttackState( std::uint32_t & state ) {
 	// Para simplificar aqui, vamos usar a lógica original, mas aprimorada.
 	// Para ataques Ranged, esperamos o fim. Para Melee, pode ser antes.
 	bool shouldThrowAttack = false;
-	switch ( this->attacks.at( this->currentLoadingAttack )->getAttackType( ) ) {
+	switch ( this->currentLoadingAttack ) {
 	case CBaseAttackType_Melee:
 		// Dispara o ataque melee na primeira vez que entramos aqui, para dar a sensação de imediatismo
 		if ( !this->alreadyThrowedAttack ) {
