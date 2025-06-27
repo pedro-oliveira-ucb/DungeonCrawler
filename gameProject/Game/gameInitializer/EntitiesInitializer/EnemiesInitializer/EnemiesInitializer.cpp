@@ -83,15 +83,15 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 	};
 
 	for ( std::string event : eventsNames ) {
-		std::string eventName = "enemies_" + enemyName + "_" + event;
+		std::string eventName =  enemyName + "_" + event;
 		EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 			eventName ,
 			[ eventName ] ( ) {
-				gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+				gameSoundsEventHandler::Get( ).addEventToQueue( "enemies_" + eventName );
 			}
 		) );
 	}
-
+	 
 	std::string eventName = enemyName + "_dead";
 	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
 		eventName ,
@@ -107,7 +107,7 @@ bool EnemiesInitializer::initializeEvents( std::string enemyName )
 				itemsHandler::Get( ).spawnItem( ItemType::MANA_ITEM );
 			}
 
-			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+			gameSoundsEventHandler::Get( ).addEventToQueue( "enemies_" + eventName );
 		}
 	) );
 

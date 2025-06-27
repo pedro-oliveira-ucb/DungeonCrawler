@@ -36,6 +36,7 @@ class rMusicManager : public rBaseResource
 	bool isFadingOut = false;
 	bool isFadingIn = false;
 	bool hasPendingTransition = false;
+	bool pausedMusic = false;
 	
 	rMusic * currentSound = nullptr;
 	rMusic * nextSound = nullptr;

@@ -38,7 +38,7 @@ void rMusic::initialize( ) {
 	initialized = true;
 }
 
-void rMusic::setVolumePercentage(float percentage) {
+void rMusic::setVolumePercentage( float percentage ) {
 	std::lock_guard<std::mutex> lock( mtx );
 	percentage = std::clamp( percentage , 0.0f , 100.0f ); // Ensure percentage is between 0 and 100
 	float desiredVolume = this->baseVolume * ( percentage / 100.0f );
@@ -92,17 +92,12 @@ bool rMusic::isPaused( ) const {
 }
 
 bool rMusic::update( float deltaTime ) {
-	if ( !initialized || !isPlaying( ) ) 
-		return true;
+	if ( !initialized || !isPlaying( ) )
+		return false;
 
 	std::lock_guard<std::mutex> lock( mtx );
 
 	UpdateMusicStream( *music );
-
-	// Check if the music is nearing the end
-	if ( GetMusicTimePlayed( *music ) >= GetMusicTimeLength( *music ) - 5.0f ) {
-		return true;
-	}
 
 	if ( transitionState == MusicTransitionState::FadeIn ) {
 		fadeTimer += deltaTime;
@@ -126,7 +121,12 @@ bool rMusic::update( float deltaTime ) {
 	else {
 		SetMusicVolume( *music , config.volume );
 	}
-	return false;
+
+	bool musicPlaying = IsMusicStreamPlaying( *music );
+	float musicTimePlayed = GetMusicTimePlayed( *music );
+	float musicLength = GetMusicTimeLength( *music );
+
+	return musicPlaying && musicTimePlayed > ( musicLength - 5.0f );
 }
 
 void rMusic::setVolume( float volume ) {

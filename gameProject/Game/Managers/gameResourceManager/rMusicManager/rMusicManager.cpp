@@ -89,6 +89,7 @@ void rMusicManager::setMusicVolume( float volume ) {
 
 void rMusicManager::pauseMusic( ) {
 	std::lock_guard<std::mutex> lock( this->musicMutex );
+	pausedMusic = true;
 
 	for ( const auto & it : this->musics ) {
 		for ( int i = 0; i < it.second.size( ); ++i ) {
@@ -101,6 +102,7 @@ void rMusicManager::pauseMusic( ) {
 
 void rMusicManager::resumeMusic( ) {
 	std::lock_guard<std::mutex> lock( this->musicMutex );
+	pausedMusic = false;
 
 	for ( const auto & it : this->musics ) {
 		for ( int i = 0; i < it.second.size( ); ++i ) {
@@ -180,6 +182,10 @@ bool rMusicManager::initialize( )
 
 bool rMusicManager::playMusic( musicType newType , float speed ) {
 	std::lock_guard<std::mutex> lock( this->musicMutex );
+
+	if ( pausedMusic )
+		return false;
+
 	// Se já estiver em transição, armazena a nova solicitação para depois
 	if ( onMusicTransition ) {
 		hasPendingTransition = true;
@@ -188,9 +194,9 @@ bool rMusicManager::playMusic( musicType newType , float speed ) {
 		return true;
 	}
 
-
 	if ( newType != currentMusicType ) {
-		currentSoundIndex = -1;
+		oldMusicType = currentMusicType;
+		currentSoundIndex = 0;
 	}
 
 	auto it = musics.find( newType );
@@ -199,11 +205,16 @@ bool rMusicManager::playMusic( musicType newType , float speed ) {
 		return false;
 	}
 
-	oldMusicType = currentMusicType;
 	currentMusicType = newType;
 
-	currentSoundIndex++;
-	if ( currentSoundIndex >= ( int ) it->second.size( ) ) {
+	if ( it->second.size( ) > 1 ) {
+		int tempCurrentIndex = currentSoundIndex;
+		do {
+			tempCurrentIndex = utils::Get( ).randomNumber( 0 , static_cast< int >( it->second.size( ) - 1 ) );
+		} while ( tempCurrentIndex == currentSoundIndex );
+		currentSoundIndex = tempCurrentIndex;
+	}
+	else {
 		currentSoundIndex = 0;
 	}
 
@@ -245,11 +256,12 @@ void rMusicManager::updateMusic( ) {
 	musicType immediateType = currentMusicType;
 	float immediateSpeed = 5.0f;
 
+
 	{   // Primeiro bloco: update da faixa atual
 		std::lock_guard<std::mutex> guard( this->musicMutex );
 		if ( currentSound ) {
-			bool musicNearEnd = currentSound->update( delta );
-			if ( musicNearEnd ) {
+			// musica perto do fim, sinaliza transição imediata
+			if ( currentSound->update( delta ) ) {
 				needImmediateTransition = true;
 				immediateType = currentMusicType;
 				immediateSpeed = 5.0f;
@@ -266,11 +278,13 @@ void rMusicManager::updateMusic( ) {
 				if ( volume <= 0.0f ) {
 					volume = 0.0f;
 					isFadingOut = false;
-					if ( currentSound ) currentSound->stop( );
+					if ( currentSound ) 
+						currentSound->stop( );
 
 					currentSound = nextSound;
 					nextSound = nullptr;
-					if ( currentSound ) currentSound->play( );
+					if ( currentSound ) 
+						currentSound->play( );
 					isFadingIn = true;
 				}
 				if ( currentSound ) currentSound->setVolume( volume );

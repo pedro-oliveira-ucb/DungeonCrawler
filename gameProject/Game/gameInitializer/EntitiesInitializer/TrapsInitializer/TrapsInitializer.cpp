@@ -62,19 +62,38 @@ bool TrapsInitializer::initialize( )
 	builder.health = 100;
 	builder.entityHitbox = GVector2D( 20 , 20 );
 	builder.movementSpeed = 30;
-	builder.Name = "SpikeTrap";
-	auto trap = generateSpikeTrap( builder , builder.Name , TrapType::SPIKES , 30 );
-	if ( !trap ) {
-		Log::Print( "[Item Initializer] Failed to create %s!" , builder.Name.c_str( ) );
-		return false;
+
+	{	
+		builder.Name = "SpikeTrap";
+		auto trap = generateSpikeTrap( builder , builder.Name , TrapType::SPIKES , 30 );
+		if ( !trap ) {
+			Log::Print( "[Item Initializer] Failed to create %s!" , builder.Name.c_str( ) );
+			return false;
+		}
+
+		if ( !initializeTrapEvents( builder.Name ) ) {
+			Log::Print( "[Item Initializer] Failed to events of %s!" , builder.Name.c_str( ) );
+			return false;
+		}
+
+		trapsHandler::Get( ).addSpawnableTrap( std::move( trap ) );
 	}
 
-	if ( !initializeTrapEvents( builder.Name ) ) {
-		Log::Print( "[Item Initializer] Failed to events of %s!" , builder.Name.c_str( ) );
-		return false;
-	}
+	{
+		builder.Name = "ExplosiveTrap";
+		auto trap = generateSpikeTrap( builder , builder.Name , TrapType::EXPLOSIVE , 50 );
+		if ( !trap ) {
+			Log::Print( "[Item Initializer] Failed to create %s!" , builder.Name.c_str( ) );
+			return false;
+		}
 
-	trapsHandler::Get( ).addSpawnableTrap( std::move( trap ) );
+		if ( !initializeTrapEvents( builder.Name ) ) {
+			Log::Print( "[Item Initializer] Failed to events of %s!" , builder.Name.c_str( ) );
+			return false;
+		}
+
+		trapsHandler::Get( ).addSpawnableTrap( std::move( trap ) );
+	}
 
     return true;
 }

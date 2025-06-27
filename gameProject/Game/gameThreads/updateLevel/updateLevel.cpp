@@ -42,6 +42,10 @@ void updateLevel::threadFunction( ) {
 		int localRoom = gameMap::Get( ).getRoomIdAtPosition( localPos );
 
 		Globals::Get( ).getGame( )->setCurrentGameRoom( localRoom );
+		
+		if ( keybindHandler::Get( ).isPressed( keybind_identifier::UPDATE_MENU ) ) {
+			levelManager.moveToNextLevel( );
+		}
 
 		bool inCorridor = gameMap::Get( ).isCorridor( localPos );
 		Globals::Get( ).getGame( )->setInCorridor( inCorridor );

@@ -37,7 +37,6 @@ void entitiesHandler::clearSpawnedEntities( ) {
 	spawnedEnemies.clear( );
 }
 
-
 std::vector<std::unique_ptr<CEnemyEntity>> * entitiesHandler::getSpawnedEnemies( ) {
 	std::lock_guard<std::mutex> lock( handlerMutex );
 	return &spawnedEnemies;
@@ -151,9 +150,9 @@ void entitiesHandler::updateLocalPlayer( ) {
 	}
 
 	GVector2D localPos = localPlayer->getEntityPosition( );
-	
+
 	if ( !localPlayer->isAlive( ) ) {
-		
+
 		if ( localPlayer->deathAnimationFinished( ) ) {
 			Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_GAME_OVER );
 			return;
@@ -166,7 +165,7 @@ void entitiesHandler::updateLocalPlayer( ) {
 		else
 			localPlayer->setSprinting( false );
 
-	
+
 		GVector2D mouseWorldPos = { Globals::Get( ).mousePosWorldX, Globals::Get( ).mousePosWorldY };
 		// Calcula ângulo com base nas posições no mundo
 		float newLookingAngle = radParaGraus( calcularAnguloRad( localPos , mouseWorldPos ) );
@@ -190,10 +189,15 @@ void entitiesHandler::updateLocalPlayer( ) {
 	// Atualiza player
 	localPlayer->updateEntity( );
 
-	float playerHealthPercentage = (float)(localPlayer->getHealth( )) / (float)(localPlayer->getMaxHealth( ));
+	float playerHealthPercentage = ( float ) ( localPlayer->getHealth( ) ) / ( float ) ( localPlayer->getMaxHealth( ) );
 
 	Globals::Get( ).getGame( )->setLocalPlayerHealthPercentage( playerHealthPercentage );
 	Globals::Get( ).getGame( )->setCurrentLocalPlayerPosition( localPos );
+	auto availableAttacks = localPlayer->getAvailableAttacks( );
+	for ( auto attackType : availableAttacks ) {
+		float TimeToUse = localPlayer->timeToUseAttack( attackType );
+		Globals::Get( ).getGame( )->setAttackTypeCooldown( attackType , TimeToUse );
+	}
 }
 
 GVector2D entitiesHandler::getRandomPlaceAroundPlayer( float radius )

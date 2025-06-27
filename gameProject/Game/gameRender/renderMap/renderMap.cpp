@@ -5,6 +5,7 @@
 
 #include "../../Handlers/entitiesHandler/entitiesHandler.h"
 
+#include "../../gameObjects/CameraController/CameraController.h"
 #include "../../gameObjects/gameMap/gameMap.h"
 #include "../../../Utils/Log/Log.h"
 
@@ -32,7 +33,7 @@ void renderTilesetEmGrid( const TileSet & tileSet ,
 	// previamente corrigido no map generator, todos tem a mesma quantidade de colunas.
 	size_t maxCols = tileSet.at( 0 ).size( );
 
-	GVector2D localPosition = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
+	Vector2 localPosition = CameraController::Get( ).GetCameraPosition( );
 	localPosition.x -= screenWidth / 2.0f; // Centraliza a câmera na tela
 	localPosition.y -= screenHeight / 2.0f; // Centraliza a câmera na tela
 

@@ -1,6 +1,8 @@
 #pragma once
 #include <mutex>
 
+#include <unordered_map>
+
 #include "../../Game/SDK/math/Vector2D/GVector2D.h"
 
 enum currentGameState {
@@ -10,6 +12,8 @@ enum currentGameState {
 	GAME_STATE_GAME_OVER,
 	GAME_STATE_EXIT
 };
+
+enum CBaseAttackType;
 
 class currentGame
 {
@@ -23,6 +27,8 @@ class currentGame
 	float localPlayerHealthPercentage = 1.0f; 
 	GVector2D currentLocalPlayerPosition = GVector2D( 0.0f , 0.0f );
 
+	std::unordered_map<CBaseAttackType , float> attackTypeCooldowns;
+	
 	int numKeys = 0;
 	int numMana = 100000.f;
 public:
@@ -39,6 +45,8 @@ public:
 	int getCurrentGameLevel( ) const;
 	float getLocalPlayerHealthPercentage( ) const;
 
+	void setAttackTypeCooldown( CBaseAttackType attackType , float cooldown );
+	float getAttackTypeCooldown( CBaseAttackType attackType ) const;
 
 
 	GVector2D getCurrentLocalPlayerPosition( ) const;

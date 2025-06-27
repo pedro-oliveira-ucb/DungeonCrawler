@@ -48,25 +48,27 @@ T * AttacksInitializer::generateAttack( std::string animationName , CBaseAttackC
 }
 
 bool generateAttackEvents( std::string attackName ) {
-	std::string eventName = attackName + "_attackThrow";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ eventName ] ( ) {
-			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+	std::string throwEventName = attackName + "_attackThrow";
+	EventManager::Get( ).RegisterEvent( throwEventName , std::make_shared<CallbackEvent>(
+		throwEventName ,
+		[ throwEventName ] ( ) {
+			gameSoundsEventHandler::Get( ).addEventToQueue( throwEventName );
 		}
 	) );
-	eventName = attackName + "_attackLoad";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ eventName ] ( ) {
-			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+
+	std::string loadEventName = attackName + "_attackLoad";
+	EventManager::Get( ).RegisterEvent( loadEventName , std::make_shared<CallbackEvent>(
+		loadEventName ,
+		[ loadEventName ] ( ) {
+			gameSoundsEventHandler::Get( ).addEventToQueue( loadEventName );
 		}
 	) );
-	eventName = attackName + "_attackHit";
-	EventManager::Get( ).RegisterEvent( eventName , std::make_shared<CallbackEvent>(
-		eventName ,
-		[ eventName ] ( ) {
-			gameSoundsEventHandler::Get( ).addEventToQueue( eventName );
+
+	std::string hitEventName = attackName + "_attackHit";
+	EventManager::Get( ).RegisterEvent( hitEventName , std::make_shared<CallbackEvent>(
+		hitEventName ,
+		[ hitEventName ] ( ) {
+			gameSoundsEventHandler::Get( ).addEventToQueue( hitEventName );
 		}
 	) );
 
@@ -270,7 +272,6 @@ bool AttacksInitializer::generateEnemiesAttacks( ) {
 
 	return true;
 }
-
 
 bool AttacksInitializer::initializeAttacks( ) {
 

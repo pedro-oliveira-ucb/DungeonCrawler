@@ -46,7 +46,7 @@ bool keybindHandler::initializeKeybinds( ) {
 		{ SPRINT,    keybind( KEY_LEFT_SHIFT, keybind_mode::HOLD ) },
 		{ ATTACK_SIMPLE, keybind( MOUSE_LEFT_BUTTON, keybind_mode::HOLD ) },
 		{ ATTACK_HEAVY,  keybind( MOUSE_RIGHT_BUTTON, keybind_mode::HOLD ) },
-		{ UPDATE_MENU,   keybind( KEY_DELETE, keybind_mode::TOGGLE ) }
+		{ UPDATE_MENU,   keybind( KEY_HOME, keybind_mode::TOGGLE ) }
 	};
 
 	// Inicializar estados de toggle

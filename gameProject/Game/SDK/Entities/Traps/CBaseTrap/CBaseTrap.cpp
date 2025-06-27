@@ -28,7 +28,7 @@ void CBaseTrap::initialize( GVector2D position) {
 	std::lock_guard<std::mutex> baseItemLock( baseTrapMutex );
 	this->setEntityPosition( position );
 	this->initialized = true;
-	this->getEntityAnimations( )->setAnimationStep( 1 );
+	this->getEntityAnimations( )->setAnimationStep( 0 );
 	EventManager::Get( ).Trigger( this->GetEntityName( ) + "_active" );
 }
 

@@ -5,6 +5,7 @@
 
 enum TrapType {
 	SPIKES,
+	EXPLOSIVE
 };
 
 class CBaseTrap : public CBaseEntity

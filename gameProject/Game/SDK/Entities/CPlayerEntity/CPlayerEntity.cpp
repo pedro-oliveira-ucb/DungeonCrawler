@@ -365,6 +365,20 @@ void CPlayerEntity::updateEntity( ) {
 	updateAttackCooldowns( );
 }
 
+float CPlayerEntity::timeToUseAttack( CBaseAttackType attackType )
+{
+	std::lock_guard<std::mutex> lock( localPlayerMutex );
+	if ( this->attackUseTime.find( attackType ) == this->attackUseTime.end( ) )
+		return 0.0f; // Ataque não encontrado, retorna 0
+
+	double currentGameTime = Globals::Get( ).getGame( )->getCurrentGameTime( );
+	double lastUse = this->attackUseTime.at( attackType );
+	double cooldown = this->attacks.at( attackType )->getCooldown( );
+	// Calcula o tempo restante para poder usar o ataque
+	double timeLeft = cooldown - ( currentGameTime - lastUse );
+	return std::max( 0.0f , static_cast< float >( timeLeft ) );
+}
+
 bool CPlayerEntity::isAttacking( ) {
 	std::lock_guard<std::mutex> lock( localPlayerMutex );
 	return this->inAttackLoadingAnimation;

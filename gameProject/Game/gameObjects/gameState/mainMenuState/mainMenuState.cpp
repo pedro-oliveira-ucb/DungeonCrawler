@@ -32,9 +32,7 @@ void mainMenuState::OnEnter( gameStateManager * manager ) {
 
 	Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_NONE );
 	if ( _gameResourceManager.getMusicManager( )->getcurrentMusicType( ) != musicType::MainMenuMusic )
-		_gameResourceManager.getMusicManager( )->playMusic( musicType::MainMenuMusic , 1 );
-
-
+		_gameResourceManager.getMusicManager( )->playMusic( musicType::MainMenuMusic , 1.0f );
 
 	// Carregar recursos específicos do menu: fontes, texturas, sons
 	// Exemplo:

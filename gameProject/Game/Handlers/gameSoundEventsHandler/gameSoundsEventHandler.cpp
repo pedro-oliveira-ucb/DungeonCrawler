@@ -2,19 +2,21 @@
 
 gameSoundsEventHandler gameSoundsQueue;
 
-void gameSoundsEventHandler::addEventToQueue( std::string eventName) {
+void gameSoundsEventHandler::addEventToQueue( std::string eventName , soundEventType type ) {
 	std::lock_guard<std::mutex> lock( this->threadLock );
-	this->soundQueue.emplace( eventName );
+	this->soundQueue.emplace( soundEvent( eventName , type ) );
 }
 
-std::string gameSoundsEventHandler::getLatestOnQueue( )
+soundEvent gameSoundsEventHandler::getLatestOnQueue( )
 {
+	soundEvent event( "" , PLAY );
+
 	std::lock_guard<std::mutex> lock( this->threadLock );
-	if ( this->soundQueue.empty( ) ) 
-		return "";
+	if ( this->soundQueue.empty( ) )
+		return event;
 
-	std::string eventName = this->soundQueue.front( );
+	soundEvent latestEvent = this->soundQueue.front( );
 	this->soundQueue.pop( );
-	return eventName;
-}
+	return latestEvent;
 
+}

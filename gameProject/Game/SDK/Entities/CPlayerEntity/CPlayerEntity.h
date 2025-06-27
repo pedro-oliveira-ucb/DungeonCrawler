@@ -72,6 +72,7 @@ public:
     bool isAttacking( );
 
     void updateEntity( ) override;
+	float timeToUseAttack( CBaseAttackType attackType );
 
     void Respawn(  );
 

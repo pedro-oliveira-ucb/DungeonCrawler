@@ -7,6 +7,7 @@
 #include "renderGameOver/renderGameOver.h"
 #include "renderMap/renderMap.h"
 #include "renderShopMenu/renderShopMenu.h"
+#include "renderHUD/renderHUD.h"
 
 #include "../Handlers/gameSoundEventsHandler/gameSoundsEventHandler.h"
 #include "../Managers/gameResourceManager/gameResourceManager.h"
@@ -20,16 +21,17 @@ renderCustomCursor customCursorRender;
 renderGameOver gameOverRender;
 renderMap mapRender;
 renderShopMenu shopMenuRender;
+renderHUD hudRender;
 
 void gameRender::processSoundEvents( ) {
-	std::string soundEvent = gameSoundsEventHandler::Get( ).getLatestOnQueue( );
-	while ( !soundEvent.empty( ) ) {
+	soundEvent event = gameSoundsEventHandler::Get( ).getLatestOnQueue( );
+	while ( !event.soundName.empty( ) ) {
 
-		if ( !_gameResourceManager.getSoundManager( )->playSound( soundEvent ) ) {
-			Log::Print( "[soundEvents] cant play %s" , soundEvent.c_str( ) );
+		if ( !_gameResourceManager.getSoundManager( )->playSound( event.soundName ) ) {
+			Log::Print( "[soundEvents] cant play %s" , event.soundName.c_str( ) );
 		}
 
-		soundEvent = gameSoundsEventHandler::Get( ).getLatestOnQueue( );
+		event = gameSoundsEventHandler::Get( ).getLatestOnQueue( );
 	}
 	_gameResourceManager.getMusicManager( )->updateMusic( );
 }
@@ -64,4 +66,8 @@ void gameRender::renderMapDoors( ) {
 
 void gameRender::renderShopMenu( ) {
 	shopMenuRender.render( );
+}
+
+void gameRender::renderHUD( ) {
+	hudRender.render( );
 }

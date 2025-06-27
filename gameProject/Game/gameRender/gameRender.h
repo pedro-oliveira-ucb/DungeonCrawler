@@ -16,4 +16,5 @@ public:
 	void renderMap( );
 	void renderMapDoors( );
 	void renderShopMenu( );
+	void renderHUD( );
 };

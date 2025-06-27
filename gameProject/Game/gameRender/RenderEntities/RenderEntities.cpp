@@ -31,11 +31,10 @@ void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 		return;
 	}
 
-	
-
 	Texture2D * texture = static_cast< Texture2D * >( entityAnimation->getCurrentTexture( ) );
 
-	GVector2D size = entityAnimation->getCurrentTextureSize( ) * sizeFactor;
+	GVector2D hitbox = entity->getHitbox( ).getHitboxSize( );
+	GVector2D size = entityAnimation->getCurrentTextureSize() * sizeFactor;
 	GVector2D pos = entity->getEntityPosition( );
 
 	Vector2 position = { pos.x, pos.y };
@@ -48,55 +47,72 @@ void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 	float baseAngle = entity->getEntityLookingDirectionBaseAngle( );
 	float lookingAngleDeg = entity->getLookingAngle( ).getDegrees( );
 
+
 	// calcula percentagem de vida [0..1]
 	float maxH = float( entity->getMaxHealth( ) );
 	float currH = float( entity->getHealth( ) );
-	float ratio = currH / maxH;  // 1.0 = cheio, 0.0 = vazio
+	float ratio = ( maxH > 0 ) ? ( currH / maxH ) : 0.0f; // Evita divisão por zero
 
 	// interpola R e G (B fica 0)
-	unsigned char R = unsigned char( ( 1.0f - ratio ) * 255.0f ); // vai de 0 → 255
-	unsigned char G = unsigned char( ratio * 255.0f );          // vai de 255 → 0
-
+	unsigned char R = ( unsigned char ) ( ( 1.0f - ratio ) * 255.0f ); // vai de 0 -> 255
+	unsigned char G = ( unsigned char ) ( ratio * 255.0f );         // vai de 255 -> 0
 	Color healthColor = { R, G, 0, 255 };
 
-	// dimensões da barra
-	int barWidth = 5;
-	int fullH = size.y;
+	// --- CONFIGURAÇÕES DA NOVA BARRA DE VIDA ---
 
-	// posição do canto superior esquerdo da barra (supondo pos no centro da entidade)
-	int barX = ( int ) pos.x + ( int ) size.x / 2 + 5;
-	int barY = int( pos.y ) - fullH / 2;
+	// Dimensões e Posição
+	float barWidth = hitbox.x * 0.8f; // 80% da largura da entidade
+	float barHeight = 8.0f;         // Altura fixa, mais grossa
+	float yOffset = size.y / 2.0f + 10.0f; // Distância acima da entidade
 
-	// altura da parte preenchida
-	int lifeH = int( ratio * fullH );
+	// Posição do canto superior esquerdo da barra (centralizada acima da entidade)
+	Vector2 barPosition = {
+		pos.x - barWidth / 2.0f,
+		pos.y - yOffset
+	};
+
+	// Cores
+	Color bgColor = { 30, 30, 30, 200 }; // Fundo cinza escuro, semitransparente
+	Color borderColor = { 0, 0, 0, 255 }; // Borda preta sólida
+
+	// Cores para o gradiente da vida
+	Color healthColorTop = { ( unsigned char ) ( R * 0.8f ), ( unsigned char ) ( G * 0.8f ), 0, 255 }; // Cor um pouco mais escura no topo
+	Color healthColorBottom = { R, G, 0, 255 }; // Cor principal na base
 
 	switch ( entity->getEntityType( ) ) {
 	case CBaseEntityType::ATTACK:
 		rotationAngle = lookingAngleDeg - 90;
 		break;
-	case CBaseEntityType::ITEM:
-	case CBaseEntityType::TRAP:
+	case CBaseEntityType::ITEM:	case CBaseEntityType::TRAP:
 		rotationAngle = 0;
 		break;
 	case CBaseEntityType::MOB:
-	case CBaseEntityType::PLAYER:
 
-		// desenha a parte “cheia” com a cor interpolada
-		DrawRectangle(
-			barX ,
-			barY + ( fullH - lifeH ) ,
-			barWidth ,
-			lifeH ,
-			healthColor
-		);
+		// 1. Desenha o fundo da barra
+		DrawRectangleV( barPosition , { barWidth, barHeight } , bgColor );
 
-		// borda fixa
-		DrawRectangleLines(
-			barX ,
-			barY ,
-			barWidth ,
-			fullH ,
-			BLACK
+		// 2. Desenha a barra de vida (com gradiente)
+		// Usamos DrawRectangleGradientV para o efeito.
+		if ( ratio > 0 ) {
+			DrawRectangleGradientEx( {
+				barPosition.x ,
+				barPosition.y ,
+				barWidth * ratio,
+				barHeight
+				},		
+				healthColorTop,          // Cor de baixo (no código, é a cor do topo do gradiente)
+				healthColorBottom ,      // Cor de cima (no código, é a cor da base do gradiente)
+				healthColorTop,          // Cor de baixo (no código, é a cor do topo do gradiente)
+				healthColorBottom      // Cor de cima (no código, é a cor da base do gradiente)
+			);
+		}
+
+		// 3. Desenha a borda ao redor da barra toda
+		// Use DrawRectangleLinesEx para poder controlar a espessura da linha
+		DrawRectangleLinesEx(
+			{ barPosition.x, barPosition.y, barWidth, barHeight } ,
+			1.5f , // Espessura da borda
+			borderColor
 		);
 
 		rotationAngle = math::AngleDiff( lookingAngleDeg , baseAngle );
@@ -107,7 +123,7 @@ void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 	}
 
 
-	
+
 
 	DrawTexturePro(
 		*texture ,
@@ -119,55 +135,55 @@ void renderEntity( CBaseEntity * entity , float sizeFactor = 1.0f ) {
 	);
 
 #if _DEBUG 
-		int offset = 0;
+	int offset = 0;
 
-		DrawText( entity->GetEntityName( ).c_str( ) , pos.x - size.x / 2 , pos.y - size.y / 2 - 20 + offset , 10 , BLACK );
+	DrawText( entity->GetEntityName( ).c_str( ) , pos.x - size.x / 2 , pos.y - size.y / 2 - 20 + offset , 10 , BLACK );
 
+	offset -= 12;
+
+	DrawText( CBaseEntityAnimation::getAnimationTypeName( entity->getEntityAnimations( )->getCurrentAnimationType( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
+
+	offset -= 12;
+
+	DrawText( std::to_string( entity->getEntityAnimations( )->getCurrentAnimationStep( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
+
+	offset -= 12;
+
+	DrawText( entity->getEntityStateAsString( ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
+
+	if ( entity->getEntityType( ) == CBaseEntityType::PLAYER ) {
 		offset -= 12;
+		float currentStamina = entity->getCurrentStamina( );
 
-		DrawText( CBaseEntityAnimation::getAnimationTypeName( entity->getEntityAnimations( )->getCurrentAnimationType( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
+		DrawText( std::to_string( currentStamina ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
+	}
 
-		offset -= 12;
 
-		DrawText( std::to_string( entity->getEntityAnimations( )->getCurrentAnimationStep( ) ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
 
-		offset -= 12;
+	DrawRectangleLines(
+		pos.x - hitbox.x / 2 ,
+		pos.y - hitbox.y / 2 ,
+		hitbox.x ,
+		hitbox.y ,
+		BLUE
+	);
 
-		DrawText( entity->getEntityStateAsString( ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
-
-		if ( entity->getEntityType( ) == CBaseEntityType::PLAYER ) {
-			offset -= 12;
-			float currentStamina = entity->getCurrentStamina( );
-
-			DrawText( std::to_string( currentStamina ).c_str( ) , pos.x - size.x / 2.0f , pos.y - size.y / 2.0f - 20 + offset , 10 , BLACK );
-		}
-
-		GVector2D hitbox = entity->getHitbox( ).getHitboxSize();
-
-		DrawRectangleLines(
-			pos.x - hitbox.x / 2 ,
-			pos.y - hitbox.y / 2 ,
-			hitbox.x ,
-			hitbox.y ,
-			BLUE
-		);
-
-		//Moving angle
-		DrawLine(
-			pos.x ,
-			pos.y ,
-			pos.x + cosf( entityMovingAngle.getRadians( ) ) * 50 ,
-			pos.y + sinf( entityMovingAngle.getRadians( ) ) * 50 ,
-			RED
-		);
-		//Looking angle
-		DrawLine(
-			pos.x ,
-			pos.y ,
-			pos.x + cosf( entityLookingAngle.getRadians( ) ) * 50 ,
-			pos.y + sinf( entityLookingAngle.getRadians( ) ) * 50 ,
-			GREEN
-		);
+	//Moving angle
+	DrawLine(
+		pos.x ,
+		pos.y ,
+		pos.x + cosf( entityMovingAngle.getRadians( ) ) * 50 ,
+		pos.y + sinf( entityMovingAngle.getRadians( ) ) * 50 ,
+		RED
+	);
+	//Looking angle
+	DrawLine(
+		pos.x ,
+		pos.y ,
+		pos.x + cosf( entityLookingAngle.getRadians( ) ) * 50 ,
+		pos.y + sinf( entityLookingAngle.getRadians( ) ) * 50 ,
+		GREEN
+	);
 #endif
 }
 
@@ -208,7 +224,7 @@ void renderEnemies( ) {
 		if ( !enemy->isAlive( ) && enemy->deathAnimationFinished( ) )
 			continue;
 
-		renderEntity( enemy  );
+		renderEntity( enemy );
 	}
 }
 
@@ -224,7 +240,7 @@ void renderItems( ) {
 		if ( item->getEntityAnimations( ) == nullptr )
 			continue;
 
-		renderEntity( item  );
+		renderEntity( item );
 	}
 }
 

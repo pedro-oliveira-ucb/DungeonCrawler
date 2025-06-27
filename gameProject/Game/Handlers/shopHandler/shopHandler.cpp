@@ -88,17 +88,17 @@ void setStatValue( StatBonus bonus , playerStats * status ) {
 playerStats getBasePlayerStats( ) {
 	playerStats base;
 
-	base.setMaxHealth( 100.0f );
+	base.setMaxHealth( 1000.0f );
 	base.setMaxStamina( 100.0f );
 
 	base.setStaminaLossFactor( 50.0f );
 	base.setStaminaRegenFactor( 25.0f );
 
-	base.setMeleeAttackDamageFactor( 20.0f );
+	base.setMeleeAttackDamageFactor( 1000.0f );
 	base.setMeleeAttackSpeedFactor( 30.f );
 	base.setMeleeAttackRangeFactor( 50.0f );
 
-	base.setRangeAttackDamageFactor( 50.0f );
+	base.setRangeAttackDamageFactor( 1000.0f );
 	base.setRangeAttackSpeedFactor( 150.f );
 	base.setRangeAttackRangeFactor( 700.0f );
 

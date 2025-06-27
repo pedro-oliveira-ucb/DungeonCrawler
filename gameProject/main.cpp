@@ -38,6 +38,8 @@ Game game;
 int main( void ) {
 #if _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#else
+	utils::Get( ).freeConsole( );
 #endif
 
 	Initialize( );
@@ -64,7 +66,9 @@ void Initialize( ) {
 	Log::Print( "[Globals] Tamanho da tela: %dx%d" , screenSize.first , screenSize.second );
 
 	SetConfigFlags( FLAG_VSYNC_HINT );
-	// SetConfigFlags(FLAG_FULLSCREEN_MODE); // Descomente para modo tela cheia.
+#if !_DEBUG
+	SetConfigFlags(FLAG_FULLSCREEN_MODE);
+#endif
 	InitWindow( Globals::Get( ).screenWidth , Globals::Get( ).screenHeight , "Janela do Jogo" );
 	InitAudioDevice( );
 	DisableCursor( ); // Desabilita o cursor do sistema para usar um cursor customizado.

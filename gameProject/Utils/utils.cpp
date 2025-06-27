@@ -6,13 +6,19 @@
 #include <fstream>
 
 
+std::random_device rd; // Pode ser um membro da classe
+std::mt19937 rng;      // Pode ser um membro da classe
+
 
 int utils::randomNumber( int min , int max ) const
 {
-	std::random_device rd;
-	std::mt19937 rng( rd( ) );
 	std::uniform_int_distribution<int> uni( min , max );
 	return uni( rng );
+}
+
+utils::utils( )
+{
+	rng = std::mt19937( rd( ) );
 }
 
 bool utils::onProbability( int probability ) const {
@@ -25,6 +31,11 @@ std::pair<int , int> utils::getScreenSize( ) const {
 	const HWND hDesktop = GetDesktopWindow( );
 	GetWindowRect( hDesktop , &desktop );
 	return std::make_pair( desktop.right , desktop.bottom );
+}
+
+void utils::freeConsole( )
+{
+	FreeConsole( );
 }
 
 std::string utils::readFileAsString( const std::string & filename ) const

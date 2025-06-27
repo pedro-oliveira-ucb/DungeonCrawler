@@ -43,11 +43,16 @@ void inGameState::OnEnter( gameStateManager * manager ) {
 	Log::Print( "[inGameState]: levelManager started" );
 
 	Globals::Get( ).getGame( )->setCurrentGameState( currentGameState::GAME_STATE_PLAYING );
-	_gameResourceManager.getMusicManager( )->playMusic( musicType::DungeonMusic , 10 );
+	_gameResourceManager.getMusicManager( )->playMusic( musicType::DungeonMusic , 5 );
 	showUpgradeScreen = false;
+
+	CPlayerEntity * player = entitiesHandler::Get( ).getLocalPlayer( );
 	GVector2D localPos = Globals::Get( ).getGame( )->getCurrentLocalPlayerPosition( );
+	if ( player != nullptr ) {
+		localPos = player->getEntityPosition( );
+	}
 	Vector2 playerPos = { localPos.x , localPos.y };
-	CameraController::Get( ).initialize( playerPos , 5.0f );
+	CameraController::Get( ).initialize( playerPos , 1.0f );
 
 	this->setEntering( true );
 }
@@ -111,7 +116,7 @@ void inGameState::HandleInput( gameStateManager * manager ) {
 						if ( gameTime - lastDialogThrowTime > 5.0f ) {
 							gameDialog lockedDialog;
 							lockedDialog.dialogText = "You need a key to open this door!";
-							lockedDialog.dialogDuration = 5;
+							lockedDialog.dialogDuration = 2;
 							lockedDialog.dialogStayTime = 1;
 							gameDialogHandler::Get( ).throwDialog( lockedDialog );
 							lastDialogThrowTime = gameTime;
@@ -197,6 +202,9 @@ void inGameState::Render( gameStateManager * manager ) {
 
 	if ( showUpgradeScreen ) {
 		gameRender::Get( ).renderShopMenu( );
+	}
+	else {
+		gameRender::Get( ).renderHUD( );
 	}
 
 	this->renderTransition( manager );

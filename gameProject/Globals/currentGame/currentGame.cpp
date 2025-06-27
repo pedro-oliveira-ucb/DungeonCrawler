@@ -1,4 +1,5 @@
 #include "currentGame.h"
+#include "../../Game/SDK/Entities/Attacks/CBaseAttack/CBaseAttack.h"
 
 void currentGame::setCurrentGameState( currentGameState newState )
 {
@@ -70,6 +71,24 @@ float currentGame::getLocalPlayerHealthPercentage( ) const
 {
 	std::lock_guard<std::mutex> lock( currentGameStateMutex );
 	return this->localPlayerHealthPercentage;
+}
+
+void currentGame::setAttackTypeCooldown( CBaseAttackType attackType , float cooldown )
+{
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	this->attackTypeCooldowns[ attackType ] = cooldown;
+}
+
+float currentGame::getAttackTypeCooldown( CBaseAttackType attackType ) const
+{
+	std::lock_guard<std::mutex> lock( currentGameStateMutex );
+	auto it = this->attackTypeCooldowns.find( attackType );
+	if ( it != this->attackTypeCooldowns.end( ) )
+	{
+		return it->second;
+	}
+
+	return 0.0f; // Default cooldown if not set
 }
 
 GVector2D currentGame::getCurrentLocalPlayerPosition( ) const

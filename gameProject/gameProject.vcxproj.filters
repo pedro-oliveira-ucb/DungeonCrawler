@@ -276,6 +276,9 @@
     <ClCompile Include="Game\gameObjects\gameState\inPreGameState\inPreGameState.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Game\gameObjects\CameraController\CameraController.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\gameThreads\updateLocalPlayer\updateLocalPlayer.h">
@@ -543,6 +546,9 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameObjects\gameState\inPreGameState\inPreGameState.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\gameObjects\CameraController\CameraController.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

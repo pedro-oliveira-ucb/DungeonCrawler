@@ -199,6 +199,7 @@ enum CBaseAnimationGroupType {
 	GROUP_WALKING ,
 	GROUP_RUNNING ,
 	GROUP_ATTACKING ,
+	GROUOP_MAGICSPELLING,
 	GROUP_HURT ,
 	GROUP_DEAD ,
 	GROUP_UNKNOWN
@@ -220,6 +221,9 @@ CBaseAnimationGroupType getAnimationGroup( CBaseEntityAnimationType anim ) {
 	case ATTACKING_RUNNING_FORWARD: case ATTACKING_RUNNING_BACKWARD: case ATTACKING_RUNNING_LEFT: case ATTACKING_RUNNING_RIGHT:
 		return GROUP_ATTACKING;
 
+	case MAGICSPELLING_BACKWARD: case MAGICSPELLING_FORWARD: case MAGICSPELLING_LEFT: case MAGICSPELLING_RIGHT:
+		return GROUOP_MAGICSPELLING;
+
 	case HURT_FORWARD: case HURT_BACKWARD: case HURT_LEFT: case HURT_RIGHT:
 		return GROUP_HURT;
 
@@ -237,9 +241,10 @@ bool CBaseEntityAnimation::isDifferentAnimationType( CBaseEntityAnimationType an
 }
 
 void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType animationType , bool ignoreCheck ) {
-	std::lock_guard<std::mutex> lock( animationMutex );
+	animationMutex.lock( );
 
 	if ( animationType == this->currentAnimationType && !ignoreCheck ) {
+		animationMutex.unlock( );
 		return;
 	}
 
@@ -255,12 +260,17 @@ void CBaseEntityAnimation::setCurrentAnimationType( CBaseEntityAnimationType ani
 			//update frame step on equal animations
 			float CurrentFramePercentage = ( this->currentAnimationStep / this->currentAnimation->size( ) );
 			int correctedFrameStep = static_cast< int >( floor( CurrentFramePercentage * ( float ) ( it->second->size( ) ) ) );
-			this->currentAnimationStep = correctedFrameStep;
+
+			animationMutex.unlock( );
+			setAnimationStep( correctedFrameStep );
+			animationMutex.lock( );
 		}
 
 		this->currentAnimationType = animationType;
 		this->currentAnimation = it->second;
 	}
+
+	animationMutex.unlock( );
 }
 
 // Mapeamento de animações para caminhos de arquivo

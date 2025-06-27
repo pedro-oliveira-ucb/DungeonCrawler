@@ -350,7 +350,7 @@ bool mapInitializer::initialize( ) {
 			return false;
 		}
 
-		int numRooms = 10;
+		int numRooms = 7;
 		int minRoomW = 10 , maxRoomW = 15; // Larguras devem ser ímpares e >= 3
 		int minRoomH = 10 , maxRoomH = 15; // Alturas devem ser >= 3
 		int corridorLen = 10;

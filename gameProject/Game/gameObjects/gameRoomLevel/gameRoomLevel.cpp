@@ -7,6 +7,7 @@
 #include "../../Handlers/trapsHandler/trapsHandler.h"
 
 #include "../../../Utils/Log/Log.h"
+#include "../../../Utils/utils.h"
 #include "../../../Globals/Globals.h"
 
 gameRoomLevel::gameRoomLevel( const gameRoomLevel & other )
@@ -200,7 +201,12 @@ void gameRoomLevel::respawnEnemies( bool forceRespawn ) {
 void gameRoomLevel::spawnTraps( ) {
 	for ( int i = 0; i < this->levelData.Traps; i++ ) {
 		GVector2D spawnPosition = getValidPositionOnCurrentRoom( );
-		trapsHandler::Get( ).spawnTrap( TrapType::SPIKES , spawnPosition );
+		if ( utils::Get( ).onProbability( 50 ) ) {
+			trapsHandler::Get( ).spawnTrap( TrapType::SPIKES , spawnPosition );
+		}
+		else {
+			trapsHandler::Get( ).spawnTrap( TrapType::EXPLOSIVE , spawnPosition );
+		}
 	}
 }
 
