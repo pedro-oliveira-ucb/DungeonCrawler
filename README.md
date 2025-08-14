@@ -18,6 +18,16 @@
 
 ---
 
+## Preview
+
+<div style="display:flex; flex-direction:row; align-items:center; justify-content:center;">
+  <img src="https://raw.githubusercontent.com/pedro-oliveira-ucb/DungeonCrawler/refs/heads/main/gameSS.jpg" style="width:900px;">
+  <img src="https://raw.githubusercontent.com/pedro-oliveira-ucb/DungeonCrawler/refs/heads/main/gameSS1.jpg" style="width:900px;">
+  <img src="https://raw.githubusercontent.com/pedro-oliveira-ucb/DungeonCrawler/refs/heads/main/gameSS2.jpg" style="width:900px;">
+</div>
+
+---
+
 **Dungeon Crawler** é um jogo 2D desenvolvido em **C++** com **Raylib**, utilizando um **motor de jogo personalizado**.  
 Sua arquitetura é organizada em módulos independentes, com gerenciamento de estados, processamento multithread e renderização otimizada.  
 O projeto segue padrões clássicos de desenvolvimento de jogos, oferecendo um fluxo robusto e escalável.
