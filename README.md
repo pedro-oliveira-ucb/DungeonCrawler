@@ -53,7 +53,6 @@ gameProject/
 ├── Process/ # Gerenciamento de threads
 ├── Utils/ # Funções e ferramentas auxiliares
 ├── main.cpp # Ponto de entrada (loop principal)
-└── randomMapGenerationBackup.txt # Backup de geração de mapas
 ```
 
 ---
