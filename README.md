@@ -21,8 +21,8 @@
 ## Preview
 
 <div style="display:flex; flex-direction:row; align-items:center; justify-content:center;">
-  <img src="https://raw.githubusercontent.com/pedro-oliveira-ucb/DungeonCrawler/refs/heads/main/gameSS.jpg" style="width:500px;">
-  <img src="https://raw.githubusercontent.com/pedro-oliveira-ucb/DungeonCrawler/refs/heads/main/gameSS1.jpg" style="width:500px;">
+  <img src="https://raw.githubusercontent.com/pedro-oliveira-ucb/DungeonCrawler/refs/heads/main/gameSS.jpg" style="width:700px;">
+  <img src="https://raw.githubusercontent.com/pedro-oliveira-ucb/DungeonCrawler/refs/heads/main/gameSS1.jpg" style="width:700px;">
 </div>
 
 ---
