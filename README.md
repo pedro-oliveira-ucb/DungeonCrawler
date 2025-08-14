@@ -1,47 +1,100 @@
-# 🎮 Dungeon Crawler: Demonstração de Thread Safety e Semaforização
 
-## 📋 Sumário
+<p align="center">
+  <img src="https://img.shields.io/badge/GAMEPROJECT-2D%20CUSTOM%20ENGINE-1f1f1f?style=for-the-badge&logo=raylib&logoColor=white" alt="GAMEPROJECT Logo">
+</p>
 
-1. [Introdução](#-introdução)
-2. [Visão Geral Técnica](#-visão-geral-técnica)
-3. [Arquitetura Detalhada](#-arquitetura-detalhada)
-   - [Diagrama de Componentes](#diagrama-de-componentes)
-   - [Fluxo de Execução](#fluxo-de-execução)
-4. [Implementação de Concorrência](#-implementação-de-concorrência)
-   - [Thread Safety](#thread-safety)
-   - [Semaforização](#semaforização)
-   - [Prevenção de Deadlocks](#prevenção-de-deadlocks)
-5. [Estrutura do Projeto](#-estrutura-do-projeto)
-6. [Game Design](#-game-design)
-   - [Mecânicas de Jogo](#mecânicas-de-jogo)
-   - [Interface do Usuário](#interface-do-usuário)
-   - [Controles Detalhados](#controles-detalhados)
-7. [Compilação e Execução](#-compilação-e-execução)
-   - [Requisitos do Sistema](#requisitos-do-sistema)
-   - [Passo a Passo](#passo-a-passo)
-   - [Opções de Configuração](#opções-de-configuração)
-8. [Guia de Desenvolvimento](#-guia-de-desenvolvimento)
-9. [Resolução de Problemas](#-resolução-de-problemas)
-10. [Licença e Créditos](#-licença-e-créditos)
+<h1 align="center">🎮 Dungeon Crawler</h1>
+<p align="center">
+  <em>Jogo 2D em C++ com Raylib — motor de jogo personalizado, arquitetura modular e desempenho otimizado.</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white">
+  <img src="https://img.shields.io/badge/Raylib-1f1f1f?style=for-the-badge&logo=raylib&logoColor=white">
+  <img src="https://img.shields.io/badge/Custom%20Game%20Engine-4B8BBE?style=for-the-badge">
+  <img src="https://img.shields.io/badge/State%20Machine-2F855A?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Multithreaded-553C9A?style=for-the-badge">
+</p>
 
 ---
 
-## 🔍 Introdução
-
-Este projeto foi desenvolvido para a disciplina de **Sistemas Operacionais**, oferecendo uma implementação prática de conceitos críticos de concorrência em um ambiente de jogo interativo. Através de um **Dungeon Crawler** com gráficos 2D, são demonstrados os desafios e soluções associados à programação multithread em um sistema de entretenimento em tempo real.
-
-O jogo apresenta um ambiente gerado proceduralmente onde o jogador navega através de masmorras, enfrenta inimigos e coleta itens, enquanto componentes de sistema paralelos gerenciam diferentes aspectos da experiência como física, IA, renderização e carregamento de recursos.
-
-
-## 📜 Licença e Créditos
-
-Este projeto é disponibilizado sob licença educacional para demonstração de conceitos de Sistemas Operacionais.
-
-**Créditos:**
-- Raylib: Copyright (c) 2013-2023 Ramon Santamaria (@raysan5)
-- Recursos Gráficos: [Créditos de Terceiros]
-- Efeitos Sonoros: [Créditos de Terceiros]
+**Dungeon Crawler** é um jogo 2D desenvolvido em **C++** com **Raylib**, utilizando um **motor de jogo personalizado**.  
+Sua arquitetura é organizada em módulos independentes, com gerenciamento de estados, processamento multithread e renderização otimizada.  
+O projeto segue padrões clássicos de desenvolvimento de jogos, oferecendo um fluxo robusto e escalável.
 
 ---
 
-*Desenvolvido como um projeto acadêmico para demonstração prática de conceitos de Thread Safety e Semaforização em jogos digitais. Não é destinado para fins comerciais.*
+## 🚀 Funcionalidades
+
+- 🖥 **Motor de jogo customizado** – Sem uso de engines prontas como Unity ou Godot.
+- 🧩 **Gerenciamento de Estados (State Machine)** – Menu, gameplay, game over.
+- ⚡ **Execução Multithread** – Separação entre lógica, IA e renderização para melhor desempenho.
+- 🗺 **Geração Procedural de Mapas** – Criação dinâmica de cenários.
+- 🎨 **Renderização em Camadas** – Mapa, entidades, HUD, menus e efeitos visuais.
+- 🎯 **Sistema de Entidades e Componentes** – Estrutura modular para jogadores, inimigos, itens e ataques.
+- 🔊 **Suporte a Áudio e Música** – Implementado via Raylib.
+
+---
+
+## 📂 Estrutura do Projeto
+
+```bash
+gameProject/
+├── Game/ # Lógica principal e sistemas do jogo
+│ ├── gameInitializer/ # Inicialização de recursos, entidades e mapa
+│ ├── gameRender/ # Renderização (mapa, HUD, entidades, menus)
+│ ├── gameThreads/ # Threads de atualização paralela
+│ ├── gameState/ # Estados do jogo (menu, gameplay, game over)
+│ ├── Handlers/ # Controle de entidades, ataques e itens
+│ ├── Managers/ # Gerenciamento de recursos, colisões e estados
+│ ├── SDK/ # Classes base e utilitários fundamentais
+│ └── gameObjects/ # Objetos principais (player, inimigos, etc.)
+├── Globals/ # Dados globais e configurações
+├── Process/ # Gerenciamento de threads
+├── Utils/ # Funções e ferramentas auxiliares
+├── main.cpp # Ponto de entrada (loop principal)
+└── randomMapGenerationBackup.txt # Backup de geração de mapas
+```
+
+---
+
+## 🛠 Tecnologias Utilizadas
+
+- **Linguagem:** C++ (`.cpp`, `.hpp`, `.h`)
+- **Biblioteca Gráfica e Multimídia:** [Raylib](https://www.raylib.com/)
+- **Arquitetura:** Motor de jogo personalizado
+- **Padrões de Projeto:**
+  - Singleton
+  - State Machine
+  - ECS (Entity-Component System) – parcialmente implementado
+
+---
+
+## 🖥 Como Compilar e Executar
+
+### 1️⃣ Pré-requisitos
+- [Raylib](https://www.raylib.com/) instalado e configurado.
+- Compilador C++ (GCC, Clang ou MSVC).
+- Visual Studio (opcional, projeto inclui `.sln`).
+
+### 2️⃣ Compilação (GCC/Clang)
+```sh
+g++ -std=c++17 -I<raylib_include_path> -L<raylib_lib_path> -o game main.cpp -lraylib
+```
+
+### 3️⃣ Execução
+```sh
+./game
+```
+---
+## 📈 Possíveis Melhorias
+```
+🔹 Implementar Injeção de Dependência para reduzir acoplamento.
+🔹 Substituir sistema de colisão por Box2D ou Chipmunk2D.
+🔹 Adicionar sistema de scripts (Lua) para acelerar o desenvolvimento.
+🔹 Evoluir arquitetura para um ECS puro (ex.: EnTT).
+🔹 Criar editor de níveis para mapas manuais.
+```
+---
+
+* 💡 GAMEPROJECT foi criado como um estudo de arquitetura de motores de jogo e pode servir como base para projetos 2D complexos.*
